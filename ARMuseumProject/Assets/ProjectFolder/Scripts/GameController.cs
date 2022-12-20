@@ -10,7 +10,7 @@ public class GameController : MonoBehaviour
     public GameObject CornerObjController;
     public GameObject FitToImageObj;
 
-    private bool isNavigating = true;
+    private bool isNavigating = false;
     private bool hasNavigated = false;
     private bool isSwitchingNavMode = false;
     private bool isInCurrentCycle = false;
@@ -23,7 +23,9 @@ public class GameController : MonoBehaviour
     {
 #if !UNITY_EDITOR
         Destroy(GameObject.Find("EmulatorRoom"));
-        isNavigating = false;
+#endif
+#if UNITY_EDITOR
+        isNavigating = true;
 #endif
         _FollowLayerScript = FollowLayerController.GetComponent<FollowLayerManager>();
         _CornerObjController = CornerObjController.GetComponent<CornerObjController>();
