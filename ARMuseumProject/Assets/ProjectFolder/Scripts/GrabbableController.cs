@@ -5,8 +5,8 @@ using NRKernal;
 
 public class GrabbableController : MonoBehaviour
 {
+    public TrackingItemsController _TrackingItemController;
     public GameObject NRCamera;
-    public GameObject[] GrabbableItemsArray;
     private Transform m_CenterCamera;
     private Transform CenterCamera
     {
@@ -27,7 +27,6 @@ public class GrabbableController : MonoBehaviour
         }
     }
 
-    // Start is called before the first frame update
     void Start()
     {
         //transform.position = TargetObject.transform.position;
@@ -41,20 +40,18 @@ public class GrabbableController : MonoBehaviour
 
         targetObject.position = obj.transform.position;
         targetObject.rotation = obj.transform.rotation;
-        targetObject.GetComponent<GrabbableObject>().TargetPosition = CenterCamera.transform.position + CenterCamera.transform.forward * 0.8f;
+        targetObject.GetComponent<GrabbableObject>().TargetPosition = CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
         targetObject.GetComponent<GrabbableObject>().TargetTransform = CenterCamera.transform;
 
         targetObject.gameObject.SetActive(true);
     }
 
-    public void InactiveGrabbleItems()
+    public void InactiveGrabbleItem(string name)
     {
+        Transform targetObject = transform.Find(name);
 
-    }
+        targetObject.gameObject.SetActive(false);
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        _TrackingItemController.RestoreObject(name.Substring(0, name.Length - 10));
     }
 }

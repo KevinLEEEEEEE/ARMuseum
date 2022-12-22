@@ -7,20 +7,19 @@ using NRKernal;
 public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public Vector3 TargetPosition;
-    public Quaternion TargetRotation;
+    //public Quaternion TargetRotation;
     public Transform TargetTransform;
-
     public Material DeleteMaterial;
     public Material RealisticMaterial;
 
     private bool canFollowCamera = true;
     private bool isReadyToDelete = false;
-    //private Quaternion rotation;
 
-    // Start is called before the first frame update
-    void Start()
+    private void OnEnable()
     {
         transform.LookAt(TargetTransform);
+
+        transform.GetComponent<Renderer>().material = RealisticMaterial;
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -28,16 +27,13 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         Debug.Log(collision.gameObject.name);
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (canFollowCamera == true)
         {
-
-
             if(TargetPosition != transform.position)
             {
-                transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.04f);
+                transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.025f);
                 //transform.rotation = Quaternion.Slerp(transform.rotation, TargetTransform.rotation, 0.2f);
             } else
             {
@@ -53,11 +49,14 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         if (isReadyToDelete == false)
         {
             transform.GetComponent<Renderer>().material = DeleteMaterial;
-
             isReadyToDelete = true;
         } else
         {
             Debug.Log("Delete object: " + transform.name);
+
+            canFollowCamera = true;
+            isReadyToDelete = false;
+            SendMessageUpwards("InactiveGrabbleItem", transform.name);
         }
     }
 
@@ -73,6 +72,7 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         if(isReadyToDelete == true)
         {
             transform.GetComponent<Renderer>().material = RealisticMaterial;
+            isReadyToDelete = false;
         }
     }
 }

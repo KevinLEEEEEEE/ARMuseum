@@ -1067,7 +1067,7 @@ GameObject:
   m_Component:
   - component: {fileID: 352936927}
   m_Layer: 5
-  m_Name: SwitchMode
+  m_Name: SwitchModeProgress
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1203,7 +1203,7 @@ GameObject:
   m_Component:
   - component: {fileID: 403669143}
   m_Layer: 5
-  m_Name: PinchOnboarding
+  m_Name: PinchGestureInstruction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1530,7 +1530,7 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Intensity: 1
   m_Range: 10
   m_SpotAngle: 30
@@ -1837,7 +1837,7 @@ GameObject:
   - component: {fileID: 580238063}
   - component: {fileID: 580238064}
   m_Layer: 9
-  m_Name: FitToImageItems
+  m_Name: TrackingItems
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1886,9 +1886,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2aa720addd4bd0641adf5c2fad5b66fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LaserRaycaster: {fileID: 711272186}
+  _Raycaster: {fileID: 711272188}
+  _GrabbableItemsController: {fileID: 1999815224}
+  _CornerObjController: {fileID: 1119715350}
   DisplayItemsLayer: {fileID: 903306995}
-  GrabbableItemsLayer: {fileID: 1999815222}
   RealisticMaterials:
   - {fileID: 2100000, guid: e85bdd09f6cb00a4bb75e15ca10970d3, type: 2}
   - {fileID: 2100000, guid: 0202e02250bde144d92cc924c13c6e1c, type: 2}
@@ -2232,11 +2233,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 706349809}
   m_CullTransparentMesh: 0
---- !u!1 &711272186 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1238760779359932, guid: 7f0032a8f9796bb418c31cdb8c16b78e, type: 3}
+--- !u!114 &711272188 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114167396768796594, guid: 7f0032a8f9796bb418c31cdb8c16b78e, type: 3}
   m_PrefabInstance: {fileID: 319275101}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2cde94f66f44a9479ef82d655daf234, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &716749972
 GameObject:
   m_ObjectHideFlags: 0
@@ -3076,7 +3083,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Onboarding
+  m_text: 'Image found :)
+
+    Grab both hands for 3 seconds to start/stop navigation'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -3103,8 +3112,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -3395,7 +3404,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   TargetTransform: {fileID: 0}
   DeleteMaterial: {fileID: 2100000, guid: b7ec92139bd8fee4fa1d25b3f3b4ff9e, type: 2}
   RealisticMaterial: {fileID: 2100000, guid: 0202e02250bde144d92cc924c13c6e1c, type: 2}
@@ -3409,7 +3417,7 @@ GameObject:
   m_Component:
   - component: {fileID: 903306996}
   m_Layer: 0
-  m_Name: DisplayItems
+  m_Name: DisplayObjects
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3853,9 +3861,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4ca3a06ba4790742bdb4c107ca89de6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  OnBoardingObj: {fileID: 1965316161}
-  SwitchModeObj: {fileID: 352936926}
-  PinchOnboardingObj: {fileID: 403669142}
+  SwitchModeInstruction: {fileID: 1965316161}
+  SwitchModeProgress: {fileID: 352936926}
+  PinchGestureInstruction: {fileID: 403669142}
 --- !u!1 &1096457460
 GameObject:
   m_ObjectHideFlags: 0
@@ -4848,7 +4856,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Open hand and pinch
+  m_text: Open hand and pinch object to grab it~
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -4875,8 +4883,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5250,7 +5258,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   TargetTransform: {fileID: 0}
   DeleteMaterial: {fileID: 2100000, guid: b1f7f60b5f788404d86cb2340a0e05fb, type: 2}
   RealisticMaterial: {fileID: 2100000, guid: 9c54f29cec54009408883bc9047b15d6, type: 2}
@@ -5263,7 +5270,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1560679383}
-  - component: {fileID: 1560679384}
   m_Layer: 0
   m_Name: ContentLayer
   m_TagString: Untagged
@@ -5290,23 +5296,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1560679384
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1560679381}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb6527658e67ce948a426c0d22ef484d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  modelsGroups:
-  - rightHandModel: {fileID: 319275104}
-    leftHandModel: {fileID: 1435808384}
-  - rightHandModel: {fileID: 1248888561}
-    leftHandModel: {fileID: 406258502}
 --- !u!1 &1608051812
 GameObject:
   m_ObjectHideFlags: 0
@@ -5451,7 +5440,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   TargetPosition: {x: 0, y: 0, z: 0}
-  TargetRotation: {x: 0, y: 0, z: 0, w: 0}
   TargetTransform: {fileID: 0}
   DeleteMaterial: {fileID: 2100000, guid: 444aa38a48dfb81428618b132b310a64, type: 2}
   RealisticMaterial: {fileID: 2100000, guid: e85bdd09f6cb00a4bb75e15ca10970d3, type: 2}
@@ -5513,7 +5501,9 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: SwitchingMode
+  m_text: 'Switching mode,
+
+    Please wait~'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -5540,8 +5530,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 20
+  m_fontSizeBase: 20
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
@@ -5600,6 +5590,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1729450200}
   - component: {fileID: 1729450201}
+  - component: {fileID: 1729450202}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -5615,7 +5606,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1729450199}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.41985583, y: 0.44382626, z: 1.1835229}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5635,9 +5626,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Observer: {fileID: 175484632}
-  FollowLayerController: {fileID: 1085075678}
-  CornerObjController: {fileID: 1119715348}
-  FitToImageObj: {fileID: 580238061}
+  TrackingItems: {fileID: 580238061}
+  InsctructionLayer: {fileID: 1085075678}
+--- !u!114 &1729450202
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1729450199}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cb6527658e67ce948a426c0d22ef484d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  modelsGroups:
+  - rightHandModel: {fileID: 319275104}
+    leftHandModel: {fileID: 1435808384}
+  - rightHandModel: {fileID: 1248888561}
+    leftHandModel: {fileID: 406258502}
 --- !u!1 &1772604962
 GameObject:
   m_ObjectHideFlags: 0
@@ -6183,7 +6190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1965316162}
   m_Layer: 5
-  m_Name: Onboarding
+  m_Name: SwitchModeInstruction
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -6257,8 +6264,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d387c884742a0cd4aa70b999c87e9979, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _TrackingItemController: {fileID: 580238064}
   NRCamera: {fileID: 915523253}
-  GrabbableItemsArray: []
 --- !u!1001 &2017234957
 PrefabInstance:
   m_ObjectHideFlags: 0

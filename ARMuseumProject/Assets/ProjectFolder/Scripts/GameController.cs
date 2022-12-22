@@ -6,164 +6,124 @@ using NRKernal;
 public class GameController : MonoBehaviour
 {
     public TrackableObserver Observer;
-    public GameObject FollowLayerController;
-    public GameObject CornerObjController;
-    public GameObject FitToImageObj;
+    public GameObject TrackingItems;
+    public GameObject InsctructionLayer;
 
+    private TrackingItemsController _TrackingItemsController;
+    private InstructionController _InstructionController;
+    enum GameState
+    {
+        OnBoarding,
+        ModeSwitching,
+        ModeSwitched,
+        Default,
+    }
+    private GameState CurrentState = GameState.OnBoarding;
     private bool isNavigating = false;
-    private bool hasNavigated = false;
-    private bool isSwitchingNavMode = false;
-    private bool isInCurrentCycle = false;
 
-    private FollowLayerManager _FollowLayerScript;
-    private CornerObjController _CornerObjController;
-
-    // Start is called before the first frame update
     void Start()
     {
 #if !UNITY_EDITOR
         Destroy(GameObject.Find("EmulatorRoom"));
 #endif
-#if UNITY_EDITOR
-        isNavigating = true;
-#endif
-        _FollowLayerScript = FollowLayerController.GetComponent<FollowLayerManager>();
-        _CornerObjController = CornerObjController.GetComponent<CornerObjController>();
+        _InstructionController = InsctructionLayer.GetComponent<InstructionController>();
+        _TrackingItemsController = TrackingItems.GetComponent<TrackingItemsController>();
         Observer.FoundEvent += Found;
         Observer.LostEvent += Lost;
     }
+
     private void Found(Vector3 pos, Quaternion qua)
     {
-        FitToImageObj.transform.position = pos;
-        FitToImageObj.transform.rotation = qua;
-        FitToImageObj.SetActive(true);
-        SwitchUserOnBoarding(true);
+        TrackingItems.transform.position = pos;
+        TrackingItems.transform.rotation = qua;
+
+        // 当用户首次进入界面时，如果检测到目标图像，则展示模式切换教程
+        if(CurrentState == GameState.OnBoarding)
+        {
+            _InstructionController.ShowSwitchModeInstruction();
+        } else
+        {
+            _InstructionController.HideSwitchModeInstruction();
+        }
     }
 
     private void Lost()
     {
-        FitToImageObj.SetActive(false);
-        SwitchUserOnBoarding(false);
+        _InstructionController.HideSwitchModeInstruction();
     }
 
-    private void SwitchUserOnBoarding(bool isTracking)
+    private void CanSwitchMode()
     {
-        if (isNavigating == true || isSwitchingNavMode == true)
-        {
-            // 已经在导览模式中或正在进行模式切换，不显示Onboarding内容
-            _FollowLayerScript.HideOnboarding();
+        HandState rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+        HandState leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
+        bool trackingCondition = rightHandState.isTracked;
+        bool grabbingCondition = rightHandState.currentGesture == HandGesture.Grab;
 
+#if !UNITY_EDITOR
+        trackingCondition = rightHandState.isTracked && leftHandState.isTracked;
+        grabbingCondition = rightHandState.currentGesture == HandGesture.Grab && leftHandState.currentGesture == HandGesture.Grab;
+#endif
+        // 满足模式切换条件
+        if (trackingCondition && grabbingCondition)
+        {
+            // 如果正在切换模式或本轮模式切换已经完成，直接退出
+            if (CurrentState == GameState.Default || CurrentState == GameState.OnBoarding)
+            {
+                Debug.Log("[Player] Begin switching mode.");
+                CurrentState = GameState.ModeSwitching;
+                _InstructionController.ShowSwitchModeProgress();
+                Invoke("SwitchMode", 3);
+            }
             return;
         }
 
-        // 如果未在导览模式或模式切换中，且首次进入，则仅当检测到目标图像时提示Onboarding
-        if (isTracking == true && hasNavigated == false)
-        {
-            _FollowLayerScript.ShowOnboarding();
-        } else
-        {
-            _FollowLayerScript.HideOnboarding();
-        }
-    }
-
-    private void CanModeSwitch()
-    {
-        HandState RightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
-        HandState LeftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
-
-        // 两只手被同时检测到，且同时为握拳状态 
-        if (RightHandState.isTracked && LeftHandState.isTracked)
-        {
-            Debug.Log("Both hands detected.");
-
-            if (RightHandState.currentGesture == HandGesture.Grab && LeftHandState.currentGesture == HandGesture.Grab)
-            {
-                // 此时，如果未处于模式切换过程中，则切换模式
-                // 如果已经处于模式切换过程，则直接return，不建立新的Invoke
-
-                if(isSwitchingNavMode == true || isInCurrentCycle == true)
-                {
-                    return;
-                }
-
-                Debug.Log("Both hands Grabbing, start switching mode.");
-
-                isSwitchingNavMode = true;
-                
-                Invoke("SwitchNavMode", 3);
-
-                UpdateSwitchNavModeInfo();
-
-                return;
-            }
-        }
-
         // 如果在模式切换过程中，手势条件转为不满足，则停止模式切换
-        if (isSwitchingNavMode == true)
+        if (CurrentState == GameState.ModeSwitching)
         {
-            isSwitchingNavMode = false;
+            Debug.Log("[Player] Cancel switching mode.");
 
-            CancelInvoke("SwitchNavMode");
+            CurrentState = GameState.ModeSwitched;
+            _InstructionController.HideSwitchModeProgress();
+            CancelInvoke("SwitchMode");
 
-            UpdateSwitchNavModeInfo();
+        } else if (CurrentState == GameState.ModeSwitched)
+        {
+            CurrentState = GameState.Default;
         }
-
-        isInCurrentCycle = false; // 任何不满足双手握拳的情况都被视为重置本轮循环
     }
 
-    private void SwitchNavMode()
+    private void SwitchMode()
     {
+        Debug.Log("[Player] Successfully switching mode.");
+
+        CurrentState = GameState.ModeSwitched;
+        _InstructionController.ResetAll();
+
         isNavigating = !isNavigating;
-        hasNavigated = true;
 
-        isSwitchingNavMode = false;
-        isInCurrentCycle = true; // 本轮成功切换模式后，提示本轮已经执行过切换模式
-
-        UpdateSwitchNavModeInfo();
-
-        if(isNavigating)
+        if (isNavigating == true)
         {
-            Debug.Log("Start Navigating.");
+            Debug.Log("[Player] Current navigating mode: start.");
 
-            FitToImageObj.SetActive(true);
-
-            // 展示3s的单手Pinch&Select操作逻辑
-            _FollowLayerScript.ShowPinchOnboarding();
-            Invoke("HidePinchOnboarding", 3);
-
-            // 告知窗体当前已经进入导览模式
-
-            _CornerObjController.StartNavigating();
+            _TrackingItemsController.StartTracking();
+            _InstructionController.ShowPinchGestureInstruction();
+            Invoke("HidePinchGestureInstruction", 3);
         }
         else
         {
-            Debug.Log("Stop Navigating.");
+            Debug.Log("[Player] Current navigating mode: end.");
 
-            FitToImageObj.SetActive(false);
-
-            _CornerObjController.StopNavigating();
+            _TrackingItemsController.StopTracking();
         }
     }
 
-    private void HidePinchOnboarding()
+    private void HidePinchGestureInstruction()
     {
-        _FollowLayerScript.HidePinchOnboarding();
+        _InstructionController.HidePinchGestureInstruction();
     }
 
-    private void UpdateSwitchNavModeInfo()
-    {
-        if (isSwitchingNavMode == true)
-        {
-            _FollowLayerScript.ShowSwitchModeProgress();
-        } else
-        {
-            _FollowLayerScript.HideSwitchModeProgress();
-        }
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        CanModeSwitch();
+        CanSwitchMode();
     }
 }
