@@ -36,6 +36,7 @@ public class GameController : MonoBehaviour
     {
         FitToImageObj.transform.position = pos;
         FitToImageObj.transform.rotation = qua;
+        FitToImageObj.SetActive(true);
         SwitchUserOnBoarding(true);
     }
 

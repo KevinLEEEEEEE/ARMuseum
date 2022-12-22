@@ -7,20 +7,101 @@ using NRKernal;
 public class PointerEvents : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public GameObject LaserRaycaster;
-    private NRPointerRaycaster _Raycaster;
-    //public GameObject Laser;
-    //private LineRenderer _LaserRenderer;
     public GameObject DisplayItemsLayer;
+    public GameObject GrabbableItemsLayer;
+    public Material[] RealisticMaterials;
+    public Material[] DefaultMaterials;
+
+    private NRPointerRaycaster _Raycaster;
+    private GrabbableController _GrabbableItemsController;
+    private bool isPointerEnter = false;
+    private GameObject NearestObject = null;
+    private Vector3[] ObjectPositionArray;
+    private int ObjectCount = 0;
 
     void Start()
     {
         _Raycaster = LaserRaycaster.GetComponent<NRPointerRaycaster>();
-        //_LaserRenderer = Laser.GetComponent<LineRenderer>();
+        _GrabbableItemsController = GrabbableItemsLayer.GetComponent<GrabbableController>();
+
+        ObjectCount = DisplayItemsLayer.transform.childCount;
+        ObjectPositionArray = new Vector3[ObjectCount];
+
+        UpdateObjectPosition();
+    }
+
+    private void UpdateObjectPosition()
+    {
+        for(int i = 0; i < ObjectCount; i++)
+        {
+            GameObject child = DisplayItemsLayer.transform.GetChild(i).gameObject;
+
+            ObjectPositionArray[i] = transform.InverseTransformPoint(child.transform.position);
+        }
     }
 
     void Update()
     {
+        if(isPointerEnter == true && ObjectPositionArray != null && ObjectPositionArray.Length > 0)
+        {
+            UpdateNearestObject();
+        }
+    }
 
+    private void UpdateNearestObject()
+    {
+        GameObject LatestNearestObject = FindNearestObject();
+
+        if (NearestObject != LatestNearestObject)
+        {
+            if (NearestObject != null) {
+                RestoreNearestObject();
+            }
+
+            NearestObject = LatestNearestObject; // 实时计算“最近物体”，并更新样式
+            ActiveNearestObject();
+        }
+    }
+
+    private void RestoreNearestObject()
+    {
+        int index = NearestObject.transform.GetSiblingIndex();
+
+        NearestObject.GetComponent<Renderer>().material = DefaultMaterials[index];
+    }
+
+    private void ActiveNearestObject()
+    {
+        if(NearestObject == null)
+        {
+            return;
+        }
+
+        int index = NearestObject.transform.GetSiblingIndex();
+
+        NearestObject.GetComponent<Renderer>().material = RealisticMaterials[index];
+
+        //Debug.Log(NearestObject.GetComponent<Renderer>().bounds.size);
+
+        //Vector3 currPosition = NearestObject.transform.position;
+
+        ////NearestObject.transform.position = Vector3.MoveTowards(currPosition, new Vector3(currPosition.x, currPosition.y + 0.1f, currPosition.z), 10);
+    }
+
+    public void ResetAll()
+    {
+        // 恢复所有物体的材质
+
+        int DisplayItemsCount = DisplayItemsLayer.transform.childCount;
+
+        for (int i = 0; i < DisplayItemsCount; i++)
+        {
+            DisplayItemsLayer.transform.GetChild(i).GetComponent<Renderer>().material = DefaultMaterials[i];
+        }
+
+        NearestObject = null;
+
+        // 恢复所有物体的位置
     }
 
     private GameObject FindNearestObject()
@@ -30,15 +111,19 @@ public class PointerEvents : MonoBehaviour, IPointerClickHandler, IPointerEnterH
         float NearsetDistance = float.MaxValue;
         GameObject NearestObject = null;
 
-        foreach (Transform child in DisplayItemsLayer.transform)
+        for (int i = 0; i < ObjectCount; i++)
         {
-            Vector3 displayObjectPosition = transform.InverseTransformPoint(child.gameObject.transform.position);
-            float distance = Vector3.Distance(hitPointPosition, displayObjectPosition);
+            if(DisplayItemsLayer.transform.GetChild(i).gameObject.activeSelf == false)
+            {
+                continue;
+            }
+
+            float distance = Vector3.Distance(hitPointPosition, ObjectPositionArray[i]);
 
             if (NearsetDistance > distance)
             {
                 // 如果当前物体距离hitpoint更近，则当前物体为新的NearestObject
-                NearestObject = child.gameObject;
+                NearestObject = DisplayItemsLayer.transform.GetChild(i).gameObject;
                 NearsetDistance = distance;
             }
         }
@@ -48,34 +133,37 @@ public class PointerEvents : MonoBehaviour, IPointerClickHandler, IPointerEnterH
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        GameObject nearestObject = FindNearestObject();
+        if(NearestObject == null)
+        {
+            Debug.Log("Pointer click, no object left");
 
-        nearestObject.GetComponent<MeshRenderer>().material.color = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
+            return;
+        }
+
+        Debug.Log("Pointer click, the nearest object is: " + NearestObject.name);
+
+        // notify
+
+        _GrabbableItemsController.ActiveGrabbableItem(NearestObject);
+
+        NearestObject.SetActive(false);
+
+        UpdateObjectPosition();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        Debug.Log("pointer enter: ");
+        Debug.Log("Pointer enter.");
 
-        // Corner颜色变化与缩进动画
-
-        // 获取指针位置
-
-        //Color laserColor = _LaserRenderer.material.color;
-        //laserColor.a = 0.1f;
-
-        //_LaserRenderer.material.color = laserColor;
+        isPointerEnter = true;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        Debug.Log("pointer exit");
+        Debug.Log("Pointer exit.");
 
-        // Corner样式恢复
+        isPointerEnter = false;
 
-        //Color laserColor = _LaserRenderer.material.color;
-        //laserColor.a = 1f;
-
-        //_LaserRenderer.material.color = laserColor;
+        ResetAll();
     }
 }
