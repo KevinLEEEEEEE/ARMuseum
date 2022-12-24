@@ -6,31 +6,33 @@ using NRKernal;
 public class GrabbableController : MonoBehaviour
 {
     public TrackingItemsController _TrackingItemController;
-    public GameObject NRCamera;
-    private Transform m_CenterCamera;
-    private Transform CenterCamera
-    {
-        get
-        {
-            if (m_CenterCamera == null)
-            {
-                if (NRSessionManager.Instance.CenterCameraAnchor != null)
-                {
-                    m_CenterCamera = NRSessionManager.Instance.CenterCameraAnchor;
-                }
-                else if (Camera.main != null)
-                {
-                    m_CenterCamera = Camera.main.transform;
-                }
-            }
-            return m_CenterCamera;
-        }
-    }
+    //public GameObject NRCamera;
+    //private Transform m_CenterCamera;
+    //private Transform CenterCamera
+    //{
+    //    get
+    //    {
+    //        if (m_CenterCamera == null)
+    //        {
+    //            if (NRSessionManager.Instance.CenterCameraAnchor != null)
+    //            {
+    //                m_CenterCamera = NRSessionManager.Instance.CenterCameraAnchor;
+    //            }
+    //            else if (Camera.main != null)
+    //            {
+    //                m_CenterCamera = Camera.main.transform;
+    //            }
+    //        }
+    //        return m_CenterCamera;
+    //    }
+    //}
 
     void Start()
     {
         //transform.position = TargetObject.transform.position;
         //transform.rotation = TargetObject.transform.rotation;
+
+        ResetAll();
     }
 
     public void ActiveGrabbableItem(GameObject obj)
@@ -40,8 +42,8 @@ public class GrabbableController : MonoBehaviour
 
         targetObject.position = obj.transform.position;
         targetObject.rotation = obj.transform.rotation;
-        targetObject.GetComponent<GrabbableObject>().TargetPosition = CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
-        targetObject.GetComponent<GrabbableObject>().TargetTransform = CenterCamera.transform;
+        //targetObject.GetComponent<GrabbableObject>().TargetPosition = CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
+        //targetObject.GetComponent<GrabbableObject>().TargetTransform = CenterCamera.transform;
 
         targetObject.gameObject.SetActive(true);
     }
@@ -53,5 +55,13 @@ public class GrabbableController : MonoBehaviour
         targetObject.gameObject.SetActive(false);
 
         _TrackingItemController.RestoreObject(name.Substring(0, name.Length - 10));
+    }
+
+    public void ResetAll()
+    {
+        foreach(Transform child in transform)
+        {
+            child.gameObject.SetActive(false);
+        }
     }
 }
