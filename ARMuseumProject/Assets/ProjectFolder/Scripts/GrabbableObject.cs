@@ -6,13 +6,18 @@ using NRKernal;
 
 public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    public Vector3 TargetPosition;
-    //public Quaternion TargetRotation;
-    public Transform TargetTransform;
+    public GameObject ObjectMesh;
     public Material DeleteMaterial;
     public Material RealisticMaterial;
-    public GameObject ExpendSwitch;
+    public GameObject InfoContact;
 
+    private Vector3 TargetPosition
+    {
+        get
+        {
+            return CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
+        }
+    }
     private Transform m_CenterCamera;
     private Transform CenterCamera
     {
@@ -37,48 +42,61 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     private void OnEnable()
     {
-        transform.LookAt(TargetTransform);
+        LookAtCamera();
 
-        transform.GetComponent<Renderer>().material = RealisticMaterial;
+        ExitDeleteMode();
 
-        CalculatePosition();
+        HideInfoContact();
     }
 
-    private void CalculatePosition()
+    public void ShowInfoContact()
     {
-        TargetPosition = CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
-        TargetTransform = CenterCamera.transform;
+        if(canFollowCamera == false)
+        {
+            foreach (Transform child in InfoContact.transform)
+            {
+                child.gameObject.SetActive(true);
+            }
+        }
     }
 
-    public void ShowExpendSwitches()
+    public void HideInfoContact()
     {
-
-    }
-
-    public void HideExpendSwitches()
-    {
-
+        foreach (Transform child in InfoContact.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
     }
 
     public void EnterDeleteMode()
     {
+        if (canFollowCamera == false)
+        {
+            ObjectMesh.GetComponent<Renderer>().material = DeleteMaterial;
 
+            Debug.Log("[Player] " + transform.name + " enter delete mode");
+        }
     }
 
     public void ExitDeleteMode()
     {
-
+        ObjectMesh.GetComponent<Renderer>().material = RealisticMaterial;
     }
 
     public void ResetAll()
     {
-
+        
     }
 
-    //private void OnCollisionEnter(Collision collision)
-    //{
-    //    Debug.Log(collision.gameObject.name);
-    //}
+    private void LookAtCamera()
+    {
+        ObjectMesh.transform.LookAt(CenterCamera.transform.position);
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        Debug.Log("[Player] Grabbable Object on collision " + collision.gameObject.name);
+    }
 
     void Update()
     {
@@ -87,26 +105,9 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
             if(TargetPosition != transform.position)
             {
                 transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.025f);
-                //transform.rotation = Quaternion.Slerp(transform.rotation, TargetTransform.rotation, 0.2f);
             } else
             {
                 canFollowCamera = false;
-            }
-        }
-
-        HandState handState = NRInput.Hands.GetHandState(HandEnum.RightHand);
-
-        if (handState.isTracked && handState.currentGesture == HandGesture.Point)
-        {
-            foreach(Transform child in ExpendSwitch.transform)
-            {
-                child.gameObject.SetActive(true);
-            }
-        } else
-        {
-            foreach (Transform child in ExpendSwitch.transform)
-            {
-                child.gameObject.SetActive(false);
             }
         }
     }
@@ -115,24 +116,9 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
     {
         Debug.Log("Pointer click object: " + transform.name);
 
-        CalculatePosition();
-
-        transform.LookAt(TargetTransform);
+        LookAtCamera();
 
         canFollowCamera = true;
-
-        //if (isReadyToDelete == false)
-        //{
-        //    transform.GetComponent<Renderer>().material = DeleteMaterial;
-        //    isReadyToDelete = true;
-        //} else
-        //{
-        //    Debug.Log("Delete object: " + transform.name);
-
-        //    canFollowCamera = true;
-        //    isReadyToDelete = false;
-        //    SendMessageUpwards("InactiveGrabbleItem", transform.name);
-        //}
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -143,11 +129,5 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
     public void OnPointerExit(PointerEventData eventData)
     {
         Debug.Log("Pointer exit object: " + transform.name);
-
-        //if(isReadyToDelete == true)
-        //{
-        //    transform.GetComponent<Renderer>().material = RealisticMaterial;
-        //    isReadyToDelete = false;
-        //}
     }
 }

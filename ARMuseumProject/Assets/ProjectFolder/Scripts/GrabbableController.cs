@@ -6,45 +6,25 @@ using NRKernal;
 public class GrabbableController : MonoBehaviour
 {
     public TrackingItemsController _TrackingItemController;
-    //public GameObject NRCamera;
-    //private Transform m_CenterCamera;
-    //private Transform CenterCamera
-    //{
-    //    get
-    //    {
-    //        if (m_CenterCamera == null)
-    //        {
-    //            if (NRSessionManager.Instance.CenterCameraAnchor != null)
-    //            {
-    //                m_CenterCamera = NRSessionManager.Instance.CenterCameraAnchor;
-    //            }
-    //            else if (Camera.main != null)
-    //            {
-    //                m_CenterCamera = Camera.main.transform;
-    //            }
-    //        }
-    //        return m_CenterCamera;
-    //    }
-    //}
+    private GrabbableState CurrState = GrabbableState.Default;
+    private enum GrabbableState
+    {
+        Default,
+        ShowDelete,
+        ShowInfoContact
+    }
 
     void Start()
     {
-        //transform.position = TargetObject.transform.position;
-        //transform.rotation = TargetObject.transform.rotation;
-
         ResetAll();
     }
 
     public void ActiveGrabbableItem(GameObject obj)
     {
         Transform targetObject = transform.Find(obj.name + "-Grabbable");
-        //float originDistance = Vector3.Distance(transform.position, CenterCamera == null ? Vector3.zero : CenterCamera.position);
 
         targetObject.position = obj.transform.position;
         targetObject.rotation = obj.transform.rotation;
-        //targetObject.GetComponent<GrabbableObject>().TargetPosition = CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
-        //targetObject.GetComponent<GrabbableObject>().TargetTransform = CenterCamera.transform;
-
         targetObject.gameObject.SetActive(true);
     }
 
@@ -57,11 +37,89 @@ public class GrabbableController : MonoBehaviour
         _TrackingItemController.RestoreObject(name.Substring(0, name.Length - 10));
     }
 
+    private void ShowInfoContact()
+    {
+        foreach(Transform child in transform)
+        {
+            child.gameObject.GetComponent<GrabbableObject>().ShowInfoContact();
+        }
+    }
+
+    private void HideInfoContact()
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.GetComponent<GrabbableObject>().HideInfoContact();
+        }
+    }
+
+    private void EnterDeleteMode()
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.GetComponent<GrabbableObject>().EnterDeleteMode();
+        }
+    }
+
+    private void ExitDeleteMode()
+    {
+        foreach (Transform child in transform)
+        {
+            child.gameObject.GetComponent<GrabbableObject>().ExitDeleteMode();
+        }
+    }
+
     public void ResetAll()
     {
         foreach(Transform child in transform)
         {
             child.gameObject.SetActive(false);
+        }
+
+        CurrState = GrabbableState.Default;
+    }
+
+    private void Update()
+    {
+        HandState handState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+
+        if (handState.isTracked == true)
+        {
+            if (handState.currentGesture == HandGesture.Point)
+            {
+                if(CurrState == GrabbableState.ShowInfoContact)
+                {
+                    return;
+                }
+
+                ExitDeleteMode();
+                ShowInfoContact();
+
+                CurrState = GrabbableState.ShowInfoContact;
+            }
+            else if (handState.currentGesture == HandGesture.Victory || Input.GetKey(KeyCode.Space)) // 因为模拟器无法模拟Victory，以空格替代
+            {
+                if (CurrState == GrabbableState.ShowDelete)
+                {
+                    return;
+                }
+
+                HideInfoContact();
+                EnterDeleteMode();
+
+                CurrState = GrabbableState.ShowDelete;
+            } else
+            {
+                if (CurrState == GrabbableState.Default)
+                {
+                    return;
+                }
+
+                ExitDeleteMode();
+                HideInfoContact();
+
+                CurrState = GrabbableState.Default;
+            }  
         }
     }
 }

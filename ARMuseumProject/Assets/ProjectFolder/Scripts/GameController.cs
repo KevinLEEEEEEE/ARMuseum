@@ -8,6 +8,8 @@ public class GameController : MonoBehaviour
     public TrackableObserver Observer;
     public GameObject TrackingItems;
     public GameObject InsctructionLayer;
+    public int ModeSwitchDuration = 2;
+    public int PinchInstructionDuration = 2;
 
     private TrackingItemsController _TrackingItemsController;
     private InstructionController _InstructionController;
@@ -72,7 +74,7 @@ public class GameController : MonoBehaviour
                 Debug.Log("[Player] Begin switching mode.");
                 CurrentState = GameState.ModeSwitching;
                 _InstructionController.ShowSwitchModeProgress();
-                Invoke("SwitchMode", 3);
+                Invoke("SwitchMode", ModeSwitchDuration);
             }
             return;
         }
@@ -107,7 +109,7 @@ public class GameController : MonoBehaviour
 
             _TrackingItemsController.StartTracking();
             _InstructionController.ShowPinchGestureInstruction();
-            Invoke("HidePinchGestureInstruction", 3);
+            Invoke("HidePinchGestureInstruction", PinchInstructionDuration);
         }
         else
         {
