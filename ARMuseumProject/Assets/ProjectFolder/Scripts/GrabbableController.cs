@@ -6,6 +6,9 @@ using NRKernal;
 public class GrabbableController : MonoBehaviour
 {
     public TrackingItemsController _TrackingItemController;
+
+    private GameObject IndexTip;
+    private GameObject MiddleTip;
     private GrabbableState CurrState = GrabbableState.Default;
     private enum GrabbableState
     {
@@ -17,6 +20,22 @@ public class GrabbableController : MonoBehaviour
     void Start()
     {
         ResetAll();
+
+        InitFingerTip();
+    }
+
+    private void InitFingerTip()
+    {
+        GameObject NRHandVisual = GameObject.Find("NRHandCapsuleVisual_R");
+
+        IndexTip = NRHandVisual.transform.GetChild(31).gameObject;
+        MiddleTip = NRHandVisual.transform.GetChild(35).gameObject;
+
+        IndexTip.GetComponent<SphereCollider>().enabled = true;
+        IndexTip.GetComponent<SphereCollider>().isTrigger = true;
+
+        MiddleTip.GetComponent<SphereCollider>().enabled = true;
+        MiddleTip.GetComponent<SphereCollider>().isTrigger = true;
     }
 
     public void ActiveGrabbableItem(GameObject obj)
@@ -28,13 +47,13 @@ public class GrabbableController : MonoBehaviour
         targetObject.gameObject.SetActive(true);
     }
 
-    public void InactiveGrabbleItem(string name)
+    public void InactiveGrabbleItem(GameObject obj)
     {
-        Transform targetObject = transform.Find(name);
+        obj.SetActive(false);
 
-        targetObject.gameObject.SetActive(false);
+        string objectName = obj.transform.name;
 
-        _TrackingItemController.RestoreObject(name.Substring(0, name.Length - 10));
+        _TrackingItemController.RestoreObject(objectName.Substring(0, objectName.Length - 10));
     }
 
     private void ShowInfoContact()

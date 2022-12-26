@@ -6,16 +6,19 @@ using NRKernal;
 
 public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    public GameObject ObjectMesh;
     public Material DeleteMaterial;
     public Material RealisticMaterial;
-    public GameObject InfoContact;
+    public float ForwardOffset;
 
+    private GameObject ObjectMesh;
+    private GameObject ObjectBorder;
+    private GameObject InfoContact;
+    private GameObject InfoContent;
     private Vector3 TargetPosition
     {
         get
         {
-            return CenterCamera.transform.position + CenterCamera.transform.forward * 0.4f;
+            return CenterCamera.transform.position + CenterCamera.transform.forward * ForwardOffset;
         }
     }
     private Transform m_CenterCamera;
@@ -38,15 +41,42 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         }
     }
     private bool canFollowCamera = true;
-    //private bool isReadyToDelete = false;
+    private bool canDelete = false;
 
     private void OnEnable()
     {
+        InitGameObject();
+
         LookAtCamera();
 
         ExitDeleteMode();
 
         HideInfoContact();
+
+        canFollowCamera = true;
+    }
+
+    private void InitGameObject()
+    {
+        if(ObjectMesh != null)
+        {
+            return;
+        }
+
+        ObjectMesh = transform.Find("ObjectMesh").gameObject;
+        InfoContact = transform.Find("InfoContact").gameObject;
+        InfoContent = transform.Find("InfoContent").gameObject;
+        ObjectBorder = transform.Find("ObjectBorder").gameObject;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(canDelete == true)
+        {
+            Debug.Log("[Player] delete object: " + transform.name);
+
+            SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
+        }
     }
 
     public void ShowInfoContact()
@@ -68,11 +98,21 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         }
     }
 
+    public void HideInfoContent()
+    {
+        foreach (Transform child in InfoContent.transform)
+        {
+            child.gameObject.SetActive(false);
+        }
+    }
+
     public void EnterDeleteMode()
     {
         if (canFollowCamera == false)
         {
             ObjectMesh.GetComponent<Renderer>().material = DeleteMaterial;
+
+            canDelete = true;
 
             Debug.Log("[Player] " + transform.name + " enter delete mode");
         }
@@ -81,11 +121,15 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
     public void ExitDeleteMode()
     {
         ObjectMesh.GetComponent<Renderer>().material = RealisticMaterial;
+
+        canDelete = false;
     }
 
     public void ResetAll()
     {
-        
+        ExitDeleteMode();
+
+        HideInfoContact();
     }
 
     private void LookAtCamera()
@@ -124,10 +168,14 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
     public void OnPointerEnter(PointerEventData eventData)
     {
         Debug.Log("Pointer enter object: " + transform.name);
+
+        ObjectBorder.SetActive(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         Debug.Log("Pointer exit object: " + transform.name);
+
+        ObjectBorder.SetActive(false);
     }
 }
