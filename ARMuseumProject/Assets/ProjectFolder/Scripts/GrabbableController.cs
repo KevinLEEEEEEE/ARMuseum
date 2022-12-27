@@ -13,29 +13,14 @@ public class GrabbableController : MonoBehaviour
     private enum GrabbableState
     {
         Default,
+        Grab, // 在Grab期间通知画布不检测raycast避免误触
         ShowDelete,
-        ShowInfoContact
+        ShowInfoContact,
     }
 
     void Start()
     {
         ResetAll();
-
-        InitFingerTip();
-    }
-
-    private void InitFingerTip()
-    {
-        GameObject NRHandVisual = GameObject.Find("NRHandCapsuleVisual_R");
-
-        IndexTip = NRHandVisual.transform.GetChild(31).gameObject;
-        MiddleTip = NRHandVisual.transform.GetChild(35).gameObject;
-
-        IndexTip.GetComponent<SphereCollider>().enabled = true;
-        IndexTip.GetComponent<SphereCollider>().isTrigger = true;
-
-        MiddleTip.GetComponent<SphereCollider>().enabled = true;
-        MiddleTip.GetComponent<SphereCollider>().isTrigger = true;
     }
 
     public void ActiveGrabbableItem(GameObject obj)
@@ -78,6 +63,8 @@ public class GrabbableController : MonoBehaviour
         {
             child.gameObject.GetComponent<GrabbableObject>().EnterDeleteMode();
         }
+
+        SwitchFingerTipState(true);
     }
 
     private void ExitDeleteMode()
@@ -86,6 +73,35 @@ public class GrabbableController : MonoBehaviour
         {
             child.gameObject.GetComponent<GrabbableObject>().ExitDeleteMode();
         }
+
+        SwitchFingerTipState(false);
+    }
+
+    public void StartGrab()
+    {
+        _TrackingItemController.StopRayastDetection();
+
+        Debug.Log("[Player] Start grab.");
+    }
+
+    public void StopGrab()
+    {
+        _TrackingItemController.StartRaycastDetection();
+        Debug.Log("[Player] Stop grab.");
+    }
+
+    private void SwitchFingerTipState(bool canTrigger)
+    {
+        GameObject NRHandVisual = GameObject.Find("NRHandCapsuleVisual_R");
+
+        IndexTip = NRHandVisual.transform.GetChild(31).gameObject;
+        MiddleTip = NRHandVisual.transform.GetChild(35).gameObject;
+
+        IndexTip.GetComponent<SphereCollider>().enabled = canTrigger;
+        IndexTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
+
+        MiddleTip.GetComponent<SphereCollider>().enabled = canTrigger;
+        MiddleTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
     }
 
     public void ResetAll()

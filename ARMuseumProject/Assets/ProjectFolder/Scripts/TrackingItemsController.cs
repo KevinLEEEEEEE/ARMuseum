@@ -18,6 +18,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     private Vector3[] ObjectPositionArray;
     private int ObjectCount = 0;
     private bool isNavigating;
+    private bool canDetectRaycast;
 
     void Start()
     {
@@ -33,11 +34,12 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         }
 
         StopTracking();
+        StartRaycastDetection();
     }
 
     void Update()
     {
-        if(isPointerEnter == true && ObjectPositionArray.Length > 0)
+        if(isPointerEnter == true && ObjectPositionArray.Length > 0 && canDetectRaycast)
         {
             UpdateNearestObject();
         }
@@ -65,6 +67,18 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         }
 
         isNavigating = false;
+    }
+
+    public void StartRaycastDetection()
+    {
+        canDetectRaycast = true;
+    }
+
+    public void StopRayastDetection()
+    {
+        canDetectRaycast = false;
+
+        ResetAll();
     }
 
     private void UpdateNearestObject()
@@ -151,9 +165,9 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (isNavigating == false || NearestObject == null)
+        if (isNavigating == false || canDetectRaycast == false || NearestObject == null)
         {
-            Debug.Log("[Player] No visuable object to active.");
+            Debug.Log("[Player] No visuable object to active && Stop detecting raycast");
 
             return;
         }

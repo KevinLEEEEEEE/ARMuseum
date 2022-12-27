@@ -13,7 +13,7 @@ public class InfoContact : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(transform.name + ":" + other.gameObject.name);
+        Debug.Log("[Player] Trigger Info Contact: " + transform.name);
     }
 
     // Update is called once per frame

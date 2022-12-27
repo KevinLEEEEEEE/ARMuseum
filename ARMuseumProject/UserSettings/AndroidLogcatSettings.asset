@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "192.168.3.37:6666",
         "name": "com.DefaultCompany.ARMuseumProject",
-        "processId": 27101,
+        "processId": 12336,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -11,37 +11,31 @@
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 9862,
-            "exited": true
-        },
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 13484,
-            "exited": true
-        },
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 19510,
-            "exited": true
-        },
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 26052,
+            "processId": 25496,
             "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "ai.nreal.nebula.mainland:space",
-            "processId": 26463,
-            "exited": false
+            "processId": 27328,
+            "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 27101,
+            "processId": 28069,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "com.DefaultCompany.ARMuseumProject",
+            "processId": 28953,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "com.DefaultCompany.ARMuseumProject",
+            "processId": 12336,
             "exited": false
         }
     ],
@@ -96,7 +90,7 @@
         "Behavior": 0
     },
     "m_FilterOptions": {
-        "m_Filter": "",
+        "m_Filter": "Player",
         "m_UseRegularExpressions": true,
         "m_MatchCase": true
     },

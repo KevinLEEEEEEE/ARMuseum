@@ -54,6 +54,8 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         HideInfoContact();
 
         canFollowCamera = true;
+
+        transform.position = TargetPosition;
     }
 
     private void InitGameObject()
@@ -81,13 +83,13 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     public void ShowInfoContact()
     {
-        if(canFollowCamera == false)
-        {
+        //if(canFollowCamera == false)
+        //{
             foreach (Transform child in InfoContact.transform)
             {
                 child.gameObject.SetActive(true);
             }
-        }
+        //}
     }
 
     public void HideInfoContact()
@@ -108,14 +110,14 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     public void EnterDeleteMode()
     {
-        if (canFollowCamera == false)
-        {
+        //if (canFollowCamera == false)
+        //{
             ObjectMesh.GetComponent<Renderer>().material = DeleteMaterial;
 
             canDelete = true;
 
             Debug.Log("[Player] " + transform.name + " enter delete mode");
-        }
+        //}
     }
 
     public void ExitDeleteMode()
@@ -144,16 +146,16 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     void Update()
     {
-        if (canFollowCamera == true)
-        {
-            if(TargetPosition != transform.position)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.025f);
-            } else
-            {
-                canFollowCamera = false;
-            }
-        }
+        //if (canFollowCamera == true)
+        //{
+        //    if(TargetPosition != transform.position)
+        //    {
+        //        transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.025f);
+        //    } else
+        //    {
+        //        canFollowCamera = false;
+        //    }
+        //}
     }
 
     public void OnPointerClick(PointerEventData eventData)
