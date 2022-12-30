@@ -1255,5 +1255,5 @@ Shader "Mixed Reality Toolkit/Standard"
     }
 
     Fallback "Hidden/InternalErrorShader"
-    CustomEditor "Microsoft.MixedReality.Toolkit.Editor.MixedRealityStandardShaderGUI"
+    //CustomEditor "Microsoft.MixedReality.Toolkit.Editor.MixedRealityStandardShaderGUI"
 }

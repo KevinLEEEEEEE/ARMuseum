@@ -8,4 +8,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/ProjectFolder/Scenes/ARExtendInfo.unity
     guid: 3318d21887460e644a6a17c65a01c07a
+  - enabled: 0
+    path: Assets/NRSDK/Demos/RGBCamera-Record.unity
+    guid: 372f49325786d554ea3a2306e1178303
   m_configObjects: {}

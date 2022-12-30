@@ -2,18 +2,12 @@
     "m_SelectedDeviceId": "192.168.3.37:6666",
     "m_SelectedPackage": {
         "deviceId": "192.168.3.37:6666",
-        "name": "com.DefaultCompany.ARMuseumProject",
-        "processId": 12336,
+        "name": "ai.nreal.nebula.mainland",
+        "processId": 32439,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 25496,
-            "exited": true
-        },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "ai.nreal.nebula.mainland:space",
@@ -36,6 +30,12 @@
             "deviceId": "192.168.3.37:6666",
             "name": "com.DefaultCompany.ARMuseumProject",
             "processId": 12336,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "ai.nreal.nebula.mainland",
+            "processId": 32439,
             "exited": false
         }
     ],

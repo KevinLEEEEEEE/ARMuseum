@@ -39,8 +39,10 @@ public class GameController : MonoBehaviour
         TrackingItems.transform.position = pos;
         TrackingItems.transform.rotation = qua;
 
+        _TrackingItemsController.TargetFound();
+
         // 当用户首次进入界面时，如果检测到目标图像，则展示模式切换教程
-        if(CurrentState == GameState.OnBoarding)
+        if (CurrentState == GameState.OnBoarding)
         {
             _InstructionController.ShowSwitchModeInstruction();
         } else
@@ -51,6 +53,8 @@ public class GameController : MonoBehaviour
 
     private void Lost()
     {
+        _TrackingItemsController.TargetLost();
+
         _InstructionController.HideSwitchModeInstruction();
     }
 
@@ -107,7 +111,6 @@ public class GameController : MonoBehaviour
         {
             Debug.Log("[Player] Current navigating mode: start.");
 
-            _TrackingItemsController.StartTracking();
             _InstructionController.ShowPinchGestureInstruction();
             Invoke("HidePinchGestureInstruction", PinchInstructionDuration);
         }
@@ -122,6 +125,8 @@ public class GameController : MonoBehaviour
     private void HidePinchGestureInstruction()
     {
         _InstructionController.HidePinchGestureInstruction();
+
+        _TrackingItemsController.StartTracking();
     }
 
     void Update()

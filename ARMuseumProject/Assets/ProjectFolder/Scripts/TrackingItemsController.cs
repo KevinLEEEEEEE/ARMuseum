@@ -10,23 +10,21 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public GrabbableController _GrabbableItemsController;
     public CornerObjController _CornerObjController;
     public GameObject DisplayItemsLayer;
-    public Material[] RealisticMaterials;
-    public Material[] DefaultMaterials;
+    public float InitializingDuration = 0;
 
+    private bool isNavigating = false;
     private bool isPointerEnter = false;
+    private bool canDetectRaycast = false;
     private GameObject NearestObject = null;
-    private Vector3[] ObjectPositionArray;
-    private int ObjectCount = 0;
-    private bool isNavigating;
-    private bool canDetectRaycast;
+    private Vector3[] ObjectPositionArray = null;
 
     void Start()
     {
-        ObjectCount = DisplayItemsLayer.transform.childCount;
-        ObjectPositionArray = new Vector3[ObjectCount];
+        int objectCount = DisplayItemsLayer.transform.childCount;
+        ObjectPositionArray = new Vector3[objectCount];
 
         // 初始化展示节点中所有组件的位置，方便后续计算最近距离物体
-        for (int i = 0; i < ObjectCount; i++)
+        for (int i = 0; i < objectCount; i++)
         {
             GameObject child = DisplayItemsLayer.transform.GetChild(i).gameObject;
 
@@ -34,7 +32,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         }
 
         StopTracking();
-        StartRaycastDetection();
+        
     }
 
     void Update()
@@ -45,26 +43,31 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         }
     }
 
-    public void StartTracking()
+    public void FinishInitializing()
+    {
+        StartRaycastDetection();
+    }
+
+    public void TargetFound()
     {
         _CornerObjController.ActiveCornerObjects();
+    }
 
-        foreach (Transform child in transform)
-        {
-            child.gameObject.SetActive(true);
-        }
+    public void TargetLost()
+    {
+        _CornerObjController.InactiveCornerObjects();
+    }
+
+    public void StartTracking()
+    {
+        DisplayItemsLayer.SetActive(true);
 
         isNavigating = true;
     }
 
     public void StopTracking()
     {
-        _CornerObjController.InactiveCornerObjects();
-
-        foreach (Transform child in transform)
-        {
-            child.gameObject.SetActive(false);
-        }
+        DisplayItemsLayer.SetActive(false);
 
         isNavigating = false;
     }
@@ -105,9 +108,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     private void RestoreNearestObject()
     {
-        int index = NearestObject.transform.GetSiblingIndex();
-
-        NearestObject.GetComponent<Renderer>().material = DefaultMaterials[index];
+        NearestObject.GetComponent<DisplayObjectController>().ChangeToDefaultState();
 
         ResetAll();
     }
@@ -119,18 +120,14 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
             return;
         }
 
-        int index = NearestObject.transform.GetSiblingIndex();
-
-        NearestObject.GetComponent<Renderer>().material = RealisticMaterials[index];
+        NearestObject.GetComponent<DisplayObjectController>().ChangeToHoverState();
     }
 
     public void ResetAll()
     {
-        int DisplayItemsCount = DisplayItemsLayer.transform.childCount;
-
-        for (int i = 0; i < DisplayItemsCount; i++)
+        foreach(Transform child in DisplayItemsLayer.transform)
         {
-            DisplayItemsLayer.transform.GetChild(i).GetComponent<Renderer>().material = DefaultMaterials[i];
+            child.GetComponent<DisplayObjectController>().ChangeToDefaultState();
         }
 
         NearestObject = null;
@@ -143,7 +140,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         float nearsetDistance = float.MaxValue;
         GameObject currNearestObject = null;
 
-        for (int i = 0; i < ObjectCount; i++)
+        for (int i = 0; i < ObjectPositionArray.Length; i++)
         {
             if(DisplayItemsLayer.transform.GetChild(i).gameObject.activeSelf == false)
             {
@@ -181,7 +178,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if(isNavigating == false)
+        if(isNavigating == false || canDetectRaycast == false)
         {
             return;
         }
@@ -189,11 +186,14 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         Debug.Log("[Player] Pointer enter.");
 
         isPointerEnter = true;
+
+        //NRInput.ReticleVisualActive = false;
+        NRInput.LaserVisualActive = false;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (isNavigating == false)
+        if (isNavigating == false || canDetectRaycast == false)
         {
             return;
         }
@@ -201,6 +201,9 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         Debug.Log("[Player] Pointer exit.");
 
         isPointerEnter = false;
+
+        //NRInput.ReticleVisualActive = true;
+        NRInput.LaserVisualActive = true;
 
         ResetAll();
     }
