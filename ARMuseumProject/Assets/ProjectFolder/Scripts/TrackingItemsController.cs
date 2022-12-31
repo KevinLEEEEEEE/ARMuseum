@@ -14,8 +14,10 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     private bool isNavigating = false;
     private bool isPointerEnter = false;
-    private bool canDetectRaycast = false;
+    private bool canDetectRaycast = true;
+    private bool isInitializing = true;
     private GameObject NearestObject = null;
+    private Vector3 NearestObjectOriginalPosition;
     private Vector3[] ObjectPositionArray = null;
 
     void Start()
@@ -32,20 +34,27 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         }
 
         StopTracking();
-        
     }
 
     void Update()
     {
-        if(isPointerEnter == true && ObjectPositionArray.Length > 0 && canDetectRaycast)
+        if(isPointerEnter && ObjectPositionArray.Length > 0 && canDetectRaycast && !isInitializing)
         {
             UpdateNearestObject();
+
+            if(NearestObject != null)
+            {
+                RaycastResult firstHit = _Raycaster.FirstRaycastResult();
+                Vector3 hitPointPosition = transform.InverseTransformPoint(firstHit.worldPosition);
+
+                NearestObject.transform.localPosition = Vector3.Slerp(NearestObjectOriginalPosition, hitPointPosition, 0.1f);
+            }
         }
     }
 
     public void FinishInitializing()
     {
-        StartRaycastDetection();
+        isInitializing = false;
     }
 
     public void TargetFound()
@@ -95,6 +104,9 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
             }
 
             NearestObject = currNearestObject; // 实时计算“最近物体”，并更新样式
+
+            NearestObjectOriginalPosition = currNearestObject.transform.localPosition;
+
             ActiveNearestObject();
         }
     }
@@ -110,7 +122,9 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     {
         NearestObject.GetComponent<DisplayObjectController>().ChangeToDefaultState();
 
-        ResetAll();
+        NearestObject.transform.localPosition = NearestObjectOriginalPosition;
+
+        NearestObject = null;
     }
 
     private void ActiveNearestObject()
@@ -162,7 +176,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (isNavigating == false || canDetectRaycast == false || NearestObject == null)
+        if (isNavigating == false || canDetectRaycast == false || NearestObject == null || isInitializing)
         {
             Debug.Log("[Player] No visuable object to active && Stop detecting raycast");
 
@@ -178,7 +192,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if(isNavigating == false || canDetectRaycast == false)
+        if(isNavigating == false || canDetectRaycast == false || isInitializing)
         {
             return;
         }
@@ -187,13 +201,19 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
         isPointerEnter = true;
 
-        //NRInput.ReticleVisualActive = false;
+        _CornerObjController.HightlightCornerObjects();
+
         NRInput.LaserVisualActive = false;
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (isNavigating == false || canDetectRaycast == false)
+        if (NearestObject != null)
+        {
+            RestoreNearestObject();
+        }
+
+        if (isNavigating == false || canDetectRaycast == false || isInitializing)
         {
             return;
         }
@@ -202,7 +222,8 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
         isPointerEnter = false;
 
-        //NRInput.ReticleVisualActive = true;
+        _CornerObjController.RestoreCornerObjects();
+
         NRInput.LaserVisualActive = true;
 
         ResetAll();

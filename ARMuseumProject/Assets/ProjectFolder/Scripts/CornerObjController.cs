@@ -6,13 +6,13 @@ using NRKernal;
 public class CornerObjController : MonoBehaviour
 {
     [SerializeField]
-    private GameObject LeftTopCorner;
+    private GameObject UpperLeft;
     [SerializeField]
-    private GameObject LeftBottomCorner;
+    private GameObject LowerLeft;
     [SerializeField]
-    private GameObject RightTopCorner;
+    private GameObject UpperRight;
     [SerializeField]
-    private GameObject RightBottomCorner;
+    private GameObject LowerRight;
 
     public void ActiveCornerObjects()
     {
@@ -22,6 +22,22 @@ public class CornerObjController : MonoBehaviour
     public void InactiveCornerObjects()
     {
         SwitchCornerState(false);
+    }
+
+    public void HightlightCornerObjects()
+    {
+        foreach (Transform child in transform)
+        {
+            child.GetChild(0).GetComponent<Animation>().Play("HightlightCorner-" + child.name);
+        }
+    }
+
+    public void RestoreCornerObjects()
+    {
+        foreach (Transform child in transform)
+        {
+            child.GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
+        }
     }
 
     private void SwitchCornerState(bool state)

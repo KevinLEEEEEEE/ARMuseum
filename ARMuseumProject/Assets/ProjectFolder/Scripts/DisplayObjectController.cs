@@ -12,12 +12,7 @@ public class DisplayObjectController : MonoBehaviour
     private Transform ObjectTransform;
     private Renderer ObjectRenderer;
     private Animation ObjectAnimation;
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
+    private bool isFirstEnable;
 
     private void OnEnable()
     {
@@ -26,23 +21,38 @@ public class DisplayObjectController : MonoBehaviour
         ObjectAnimation = ObjectTransform.GetComponent<Animation>();
 
         ObjectTransform.gameObject.SetActive(false);
+        isFirstEnable = true;
 
-        Invoke("RunShowSelfAnimation", ShowSlefDelay);
-    }
-
-    private void RunShowSelfAnimation()
-    {
-        ObjectTransform.gameObject.SetActive(true);
-
-        ObjectAnimation.Play("ShowSelf");
-
-        if(isLastObject == true)
+        if (isFirstEnable == true)
         {
-            Invoke("FinishShowSelfAnimation", 0.75f);
+            Invoke("RunShowExhibitsAnimation", ShowSlefDelay);
+
+            isFirstEnable = false;
+        }
+        else
+        {
+            Invoke("RunShowExhibitsAnimation", 1f);
         }
     }
 
-    private void FinishShowSelfAnimation()
+    private void OnDisable()
+    {
+        CancelInvoke("RunShowExhibitsAnimation");
+    }
+
+    private void RunShowExhibitsAnimation()
+    {
+        ObjectTransform.gameObject.SetActive(true);
+
+        ObjectAnimation.Play("ShowExhibits");
+
+        if(isLastObject == true)
+        {
+            Invoke("FinishShowExhibitsAnimation", 0.75f);
+        }
+    }
+
+    private void FinishShowExhibitsAnimation()
     {
         SendMessageUpwards("FinishInitializing");
     }
@@ -51,21 +61,15 @@ public class DisplayObjectController : MonoBehaviour
     {
         ObjectRenderer.material = HoverMaterial;
 
-        ObjectAnimation.Play("HightlightSelf");
+        ObjectAnimation.Play("HightlightExhibits");
     }
 
     public void ChangeToDefaultState()
     {
         ObjectRenderer.material = DefaultMaterial;
 
-        ObjectAnimation.Stop("HightlightSelf");
+        ObjectAnimation.Stop("HightlightExhibits");
 
         ObjectTransform.localPosition = new Vector3(0, 0, 0);
-    }
-
-     // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

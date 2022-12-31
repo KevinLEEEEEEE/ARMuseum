@@ -27,8 +27,8 @@ public class GrabbableController : MonoBehaviour
     {
         Transform targetObject = transform.Find(obj.name + "-Grabbable");
 
-        targetObject.position = obj.transform.position;
-        targetObject.rotation = obj.transform.rotation;
+        targetObject.position = obj.transform.GetChild(0).position; // …Ë÷√≥ı ºŒª÷√
+        targetObject.rotation = obj.transform.GetChild(0).rotation;
         targetObject.gameObject.SetActive(true);
     }
 

@@ -42,6 +42,7 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
     }
     private bool canFollowCamera = true;
     private bool canDelete = false;
+    private bool isDeleting = false;
 
     private void OnEnable()
     {
@@ -54,8 +55,8 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
         HideInfoContact();
 
         canFollowCamera = true;
-
-        transform.position = TargetPosition;
+        canDelete = false;
+        isDeleting = false;
     }
 
     private void InitGameObject()
@@ -73,35 +74,51 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     private void OnTriggerEnter(Collider other)
     {
-        if(canDelete == true)
+        if(canDelete == true && !isDeleting)
         {
             Debug.Log("[Player] delete object: " + transform.name);
 
-            SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
+            isDeleting = true;
+
+            transform.GetComponent<Animation>().Play("DeleteExhibits");
+
+            Invoke("DeleteSelf", 0.84f);
         }
+    }
+
+    private void DeleteSelf()
+    {
+        SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
     }
 
     public void ShowInfoContact()
     {
-        //if(canFollowCamera == false)
-        //{
+        if (canFollowCamera == false && !isDeleting)
+        {
             foreach (Transform child in InfoContact.transform)
             {
                 child.gameObject.SetActive(true);
             }
-        //}
-    }
+        }
+    }   
 
     public void HideInfoContact()
     {
-        foreach (Transform child in InfoContact.transform)
+        if (!isDeleting)
         {
-            child.gameObject.SetActive(false);
+            foreach (Transform child in InfoContact.transform)
+            {
+                child.gameObject.SetActive(false);
+            }
         }
     }
 
     public void HideInfoContent()
     {
+        if(isDeleting) {
+            return;
+        }
+
         foreach (Transform child in InfoContent.transform)
         {
             child.gameObject.SetActive(false);
@@ -110,18 +127,23 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     public void EnterDeleteMode()
     {
-        //if (canFollowCamera == false)
-        //{
+        if (canFollowCamera == false && !isDeleting)
+        {
             ObjectMesh.GetComponent<Renderer>().material = DeleteMaterial;
 
             canDelete = true;
 
             Debug.Log("[Player] " + transform.name + " enter delete mode");
-        //}
+        }
     }
 
     public void ExitDeleteMode()
     {
+        if(isDeleting)
+        {
+            return;
+        }
+
         ObjectMesh.GetComponent<Renderer>().material = RealisticMaterial;
 
         canDelete = false;
@@ -146,25 +168,26 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     void Update()
     {
-        //if (canFollowCamera == true)
-        //{
-        //    if(TargetPosition != transform.position)
-        //    {
-        //        transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.025f);
-        //    } else
-        //    {
-        //        canFollowCamera = false;
-        //    }
-        //}
+        if (canFollowCamera == true)
+        {
+            if (Vector3.Distance(transform.position, TargetPosition) >= 0.02f)
+            {
+                transform.position = Vector3.MoveTowards(transform.position, TargetPosition, 0.025f);
+            }
+            else
+            {
+                canFollowCamera = false;
+            }
+        }
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("Pointer click object: " + transform.name);
+        //Debug.Log("Pointer click object: " + transform.name);
 
-        LookAtCamera();
+        //LookAtCamera();
 
-        canFollowCamera = true;
+        //canFollowCamera = true;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
