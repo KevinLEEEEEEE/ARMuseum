@@ -6,6 +6,7 @@ using NRKernal;
 public class GrabbableController : MonoBehaviour
 {
     public TrackingItemsController _TrackingItemController;
+    public SoundController _SoundController;
 
     private GameObject IndexTip;
     private GameObject MiddleTip;
@@ -30,6 +31,8 @@ public class GrabbableController : MonoBehaviour
         targetObject.position = obj.transform.GetChild(0).position; // …Ë÷√≥ı ºŒª÷√
         targetObject.rotation = obj.transform.GetChild(0).rotation;
         targetObject.gameObject.SetActive(true);
+
+        _SoundController.PlaySound(SoundController.Sounds.SelectExhibits);
     }
 
     public void InactiveGrabbleItem(GameObject obj)
@@ -81,12 +84,17 @@ public class GrabbableController : MonoBehaviour
     {
         _TrackingItemController.StopRayastDetection();
 
+        _SoundController.PlaySound(SoundController.Sounds.GrabStart);
+
         Debug.Log("[Player] Start grab.");
     }
 
     public void StopGrab()
     {
         _TrackingItemController.StartRaycastDetection();
+
+        _SoundController.PlaySound(SoundController.Sounds.GrabEnd);
+
         Debug.Log("[Player] Stop grab.");
     }
 

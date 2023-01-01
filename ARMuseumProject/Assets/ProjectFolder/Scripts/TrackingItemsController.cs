@@ -11,6 +11,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public CornerObjController _CornerObjController;
     public GameObject DisplayItemsLayer;
     public float InitializingDuration = 0;
+    public SoundController _SoundController;
 
     private bool isNavigating = false;
     private bool isPointerEnter = false;
@@ -72,6 +73,8 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         DisplayItemsLayer.SetActive(true);
 
         isNavigating = true;
+
+        _SoundController.PlaySound(SoundController.Sounds.ShowExhibits);
     }
 
     public void StopTracking()
@@ -107,15 +110,19 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
             NearestObjectOriginalPosition = currNearestObject.transform.localPosition;
 
+            _SoundController.PlaySound(SoundController.Sounds.HoverExhibits);
+
             ActiveNearestObject();
         }
     }
 
     public void RestoreObject(string name)
     {
-        Debug.Log("restore object: " + name);
+        Debug.Log("[Player] Grabbable object inactive, restore display object: " + name);
 
         DisplayItemsLayer.transform.Find(name).gameObject.SetActive(true);
+
+        UpdateNearestObject();
     }
 
     private void RestoreNearestObject()
@@ -176,9 +183,11 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        Debug.Log("[Player] state " + isNavigating + " " + canDetectRaycast + " " + NearestObject + " " + isInitializing);
+
         if (isNavigating == false || canDetectRaycast == false || NearestObject == null || isInitializing)
         {
-            Debug.Log("[Player] No visuable object to active && Stop detecting raycast");
+            Debug.Log("[Player] No object to click: " + isNavigating + " " + canDetectRaycast + " " + NearestObject + " " + isInitializing);
 
             return;
         }
@@ -186,6 +195,8 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         Debug.Log("[Player] Pointer click, the nearest object is: " + NearestObject.name);
 
         _GrabbableItemsController.ActiveGrabbableItem(NearestObject);
+
+        transform.GetComponent<AudioSource>().Play();
 
         NearestObject.SetActive(false);
     }

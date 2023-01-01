@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class InstructionController : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject SwitchModeInstruction;
-    [SerializeField]
-    private GameObject SwitchModeProgress;
-    [SerializeField]
-    private GameObject PinchGestureInstruction;
+    [SerializeField] private GameObject SwitchModeInstruction;
+    [SerializeField] private GameObject SwitchModeProgress;
+    [SerializeField] private GameObject PinchGestureInstruction;
+    [SerializeField] private SoundController _SoundController;
 
     // Start is called before the first frame update
     void Start()
@@ -20,6 +18,10 @@ public class InstructionController : MonoBehaviour
     public void ShowSwitchModeInstruction()
     {
         SwitchModeInstruction.SetActive(true);
+
+        Debug.Log("show");
+
+        //_SoundController.PlaySound(SoundController.Sounds.UserGuide);
     }
 
     public void HideSwitchModeInstruction()
@@ -30,11 +32,8 @@ public class InstructionController : MonoBehaviour
     public void ShowSwitchModeProgress()
     {
         SwitchModeProgress.SetActive(true);
-    }
 
-    public void UpdateSwitchModeProgress(int progress)
-    {
-        // 传入[0,1]的值，并更新对应的进度条信息
+        //_SoundController.PlaySound(SoundController.Sounds.UserGuide);
     }
 
     public void HideSwitchModeProgress()
@@ -45,6 +44,8 @@ public class InstructionController : MonoBehaviour
     public void ShowPinchGestureInstruction()
     {
         PinchGestureInstruction.SetActive(true);
+
+        //_SoundController.PlaySound(SoundController.Sounds.UserGuide);
     }
 
     public void HidePinchGestureInstruction()

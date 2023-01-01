@@ -82,12 +82,18 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
             transform.GetComponent<Animation>().Play("DeleteExhibits");
 
+            transform.GetComponent<AudioSource>().Play();
+
             Invoke("DeleteSelf", 0.84f);
         }
     }
 
     private void DeleteSelf()
     {
+        transform.GetComponent<Animation>().Stop("DeleteExhibits");
+
+        ObjectMesh.GetComponent<Renderer>().material = RealisticMaterial;
+
         SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
     }
 
@@ -183,11 +189,7 @@ public class GrabbableObject : MonoBehaviour, IPointerClickHandler, IPointerEnte
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        //Debug.Log("Pointer click object: " + transform.name);
-
-        //LookAtCamera();
-
-        //canFollowCamera = true;
+        Debug.Log("Pointer click object: " + transform.name);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
