@@ -7,21 +7,19 @@ public class InstructionController : MonoBehaviour
     [SerializeField] private GameObject SwitchModeInstruction;
     [SerializeField] private GameObject SwitchModeProgress;
     [SerializeField] private GameObject PinchGestureInstruction;
-    [SerializeField] private SoundController _SoundController;
+    [SerializeField] private AudioSource AudioPlayer;
 
-    // Start is called before the first frame update
     void Start()
     {
+        AudioPlayer = transform.GetComponent<AudioSource>();
+
         ResetAll();
     }
 
     public void ShowSwitchModeInstruction()
     {
         SwitchModeInstruction.SetActive(true);
-
-        Debug.Log("show");
-
-        //_SoundController.PlaySound(SoundController.Sounds.UserGuide);
+        AudioPlayer.Play();
     }
 
     public void HideSwitchModeInstruction()
@@ -32,8 +30,7 @@ public class InstructionController : MonoBehaviour
     public void ShowSwitchModeProgress()
     {
         SwitchModeProgress.SetActive(true);
-
-        //_SoundController.PlaySound(SoundController.Sounds.UserGuide);
+        AudioPlayer.Play();
     }
 
     public void HideSwitchModeProgress()
@@ -44,8 +41,7 @@ public class InstructionController : MonoBehaviour
     public void ShowPinchGestureInstruction()
     {
         PinchGestureInstruction.SetActive(true);
-
-        //_SoundController.PlaySound(SoundController.Sounds.UserGuide);
+        AudioPlayer.Play();
     }
 
     public void HidePinchGestureInstruction()
@@ -55,9 +51,8 @@ public class InstructionController : MonoBehaviour
 
     public void ResetAll()
     {
-        foreach(Transform child in transform)
-        {
-            child.gameObject.SetActive(false);
-        }
+        HideSwitchModeInstruction();
+        HideSwitchModeProgress();
+        HidePinchGestureInstruction();
     }
 }

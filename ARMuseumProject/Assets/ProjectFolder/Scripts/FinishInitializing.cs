@@ -1,9 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NRKernal;
 
-public class InfoContact : MonoBehaviour
+public class FinishInitializing : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -11,14 +10,14 @@ public class InfoContact : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void FinishInitializingAnimation()
     {
-        Debug.Log("[Player] Trigger Info Contact: " + transform.name);
+        SendMessageUpwards("FinishInitializingObject");
     }
 
     // Update is called once per frame
     void Update()
     {
-
+        
     }
 }

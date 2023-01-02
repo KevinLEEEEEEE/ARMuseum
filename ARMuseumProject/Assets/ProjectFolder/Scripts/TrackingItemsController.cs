@@ -10,13 +10,22 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public GrabbableController _GrabbableItemsController;
     public CornerObjController _CornerObjController;
     public GameObject DisplayItemsLayer;
-    public float InitializingDuration = 0;
-    public SoundController _SoundController;
+    public AudioClip ShowExhibits;
+    public AudioClip HoverExhibits;
+    public AudioClip SelectExhibits;
 
+    private AudioSource AudioPlayer;
     private bool isNavigating = false;
     private bool isPointerEnter = false;
     private bool canDetectRaycast = true;
-    private bool isInitializing = true;
+    private bool isInitializing
+    {
+        get
+        {
+            return InitializingCount > 0;
+        }
+    }
+    private int InitializingCount = 0;
     private GameObject NearestObject = null;
     private Vector3 NearestObjectOriginalPosition;
     private Vector3[] ObjectPositionArray = null;
@@ -26,62 +35,47 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         int objectCount = DisplayItemsLayer.transform.childCount;
         ObjectPositionArray = new Vector3[objectCount];
 
-        // 初始化展示节点中所有组件的位置，方便后续计算最近距离物体
         for (int i = 0; i < objectCount; i++)
         {
-            GameObject child = DisplayItemsLayer.transform.GetChild(i).gameObject;
-
-            ObjectPositionArray[i] = transform.InverseTransformPoint(child.transform.position);
+            ObjectPositionArray[i] = DisplayItemsLayer.transform.GetChild(i).localPosition; 
         }
 
-        StopTracking();
+        AudioPlayer = transform.GetComponent<AudioSource>();
+        StopNavigating();
     }
 
-    void Update()
+    public void BeginInitializing()
     {
-        if(isPointerEnter && ObjectPositionArray.Length > 0 && canDetectRaycast && !isInitializing)
-        {
-            UpdateNearestObject();
-
-            if(NearestObject != null)
-            {
-                RaycastResult firstHit = _Raycaster.FirstRaycastResult();
-                Vector3 hitPointPosition = transform.InverseTransformPoint(firstHit.worldPosition);
-
-                NearestObject.transform.localPosition = Vector3.Slerp(NearestObjectOriginalPosition, hitPointPosition, 0.1f);
-            }
-        }
+        InitializingCount++;
     }
 
     public void FinishInitializing()
     {
-        isInitializing = false;
+        InitializingCount--;
     }
 
-    public void TargetFound()
+    public void TrackingImageFound()
     {
         _CornerObjController.ActiveCornerObjects();
     }
 
-    public void TargetLost()
+    public void TrackingImageLost()
     {
         _CornerObjController.InactiveCornerObjects();
     }
 
-    public void StartTracking()
+    public void StartNavigating()
     {
         DisplayItemsLayer.SetActive(true);
-
         isNavigating = true;
-
-        _SoundController.PlaySound(SoundController.Sounds.ShowExhibits);
+        PlaySound(ShowExhibits);
     }
 
-    public void StopTracking()
+    public void StopNavigating()
     {
         DisplayItemsLayer.SetActive(false);
-
         isNavigating = false;
+        ResetAll();
     }
 
     public void StartRaycastDetection()
@@ -92,56 +86,23 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public void StopRayastDetection()
     {
         canDetectRaycast = false;
-
         ResetAll();
-    }
-
-    private void UpdateNearestObject()
-    {
-        GameObject currNearestObject = FindNearestObject();
-
-        if (NearestObject != currNearestObject)
-        {
-            if (NearestObject != null) {
-                RestoreNearestObject();
-            }
-
-            NearestObject = currNearestObject; // 实时计算“最近物体”，并更新样式
-
-            NearestObjectOriginalPosition = currNearestObject.transform.localPosition;
-
-            _SoundController.PlaySound(SoundController.Sounds.HoverExhibits);
-
-            ActiveNearestObject();
-        }
     }
 
     public void RestoreObject(string name)
     {
         Debug.Log("[Player] Grabbable object inactive, restore display object: " + name);
 
-        DisplayItemsLayer.transform.Find(name).gameObject.SetActive(true);
+        GameObject restoreObject = DisplayItemsLayer.transform.Find(name).gameObject;
 
-        UpdateNearestObject();
+        restoreObject.SetActive(true);
     }
 
     private void RestoreNearestObject()
     {
         NearestObject.GetComponent<DisplayObjectController>().ChangeToDefaultState();
-
         NearestObject.transform.localPosition = NearestObjectOriginalPosition;
-
         NearestObject = null;
-    }
-
-    private void ActiveNearestObject()
-    {
-        if(NearestObject == null)
-        {
-            return;
-        }
-
-        NearestObject.GetComponent<DisplayObjectController>().ChangeToHoverState();
     }
 
     public void ResetAll()
@@ -156,65 +117,87 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     private GameObject FindNearestObject()
     {
-        RaycastResult firstHit = _Raycaster.FirstRaycastResult();
-        Vector3 hitPointPosition = transform.InverseTransformPoint(firstHit.worldPosition);
-        float nearsetDistance = float.MaxValue;
+        float currNearsetDistance = float.MaxValue;
         GameObject currNearestObject = null;
 
         for (int i = 0; i < ObjectPositionArray.Length; i++)
         {
-            if(DisplayItemsLayer.transform.GetChild(i).gameObject.activeSelf == false)
-            {
-                continue;
-            }
+            GameObject currObject = DisplayItemsLayer.transform.GetChild(i).gameObject;
 
-            float distance = Vector3.Distance(hitPointPosition, ObjectPositionArray[i]);
-
-            if (nearsetDistance > distance)
+            if (currObject.activeSelf)
             {
-                // 如果当前物体距离hitpoint更近，则当前物体为新的NearestObject
-                currNearestObject = DisplayItemsLayer.transform.GetChild(i).gameObject;
-                nearsetDistance = distance;
+                float distance = Vector3.Distance(GetRaycastHitPosition(), ObjectPositionArray[i]);
+
+                if (currNearsetDistance > distance)
+                {
+                    currNearestObject = currObject;
+                    currNearsetDistance = distance;
+                }
             }
         }
-
         return currNearestObject;
+    }
+
+    private void PlaySound(AudioClip clip)
+    {
+        AudioPlayer.clip = clip;
+        AudioPlayer.Play();
+    }
+
+    void Update()
+    {
+        if (isPointerEnter && ObjectPositionArray.Length > 0 && canDetectRaycast && !isInitializing)
+        {
+            GameObject currNearestObject = FindNearestObject();
+
+            if (NearestObject != currNearestObject)
+            {
+                if (NearestObject != null)
+                {
+                    RestoreNearestObject();
+                }
+
+                if (currNearestObject != null)
+                {
+                    NearestObject = currNearestObject;
+                    NearestObjectOriginalPosition = currNearestObject.transform.localPosition;
+                    NearestObject.GetComponent<DisplayObjectController>().ChangeToHoverState();
+                    PlaySound(HoverExhibits);
+                }
+            }
+
+            // Change the position of nearest object for magnetic effect
+            if (NearestObject != null)
+            {
+                NearestObject.transform.localPosition = Vector3.Slerp(NearestObjectOriginalPosition, GetRaycastHitPosition(), 0.1f);
+            }
+        }
+    }
+
+    private Vector3 GetRaycastHitPosition()
+    {
+        return transform.InverseTransformPoint(_Raycaster.FirstRaycastResult().worldPosition);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        Debug.Log("[Player] state " + isNavigating + " " + canDetectRaycast + " " + NearestObject + " " + isInitializing);
-
-        if (isNavigating == false || canDetectRaycast == false || NearestObject == null || isInitializing)
+        if (isNavigating && canDetectRaycast && !isInitializing && NearestObject != null)
         {
-            Debug.Log("[Player] No object to click: " + isNavigating + " " + canDetectRaycast + " " + NearestObject + " " + isInitializing);
-
-            return;
+            Debug.Log("[Player] Pointer click, the nearest object is: " + NearestObject.name);
+            _GrabbableItemsController.ActiveGrabbableItem(NearestObject);
+            NearestObject.SetActive(false);
+            PlaySound(SelectExhibits);
         }
-
-        Debug.Log("[Player] Pointer click, the nearest object is: " + NearestObject.name);
-
-        _GrabbableItemsController.ActiveGrabbableItem(NearestObject);
-
-        transform.GetComponent<AudioSource>().Play();
-
-        NearestObject.SetActive(false);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if(isNavigating == false || canDetectRaycast == false || isInitializing)
+        if (isNavigating && canDetectRaycast && !isInitializing)
         {
-            return;
+            isPointerEnter = true;
+            _CornerObjController.HightlightCornerObjects();
+            NRInput.LaserVisualActive = false;
         }
-
-        Debug.Log("[Player] Pointer enter.");
-
-        isPointerEnter = true;
-
-        _CornerObjController.HightlightCornerObjects();
-
-        NRInput.LaserVisualActive = false;
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -224,19 +207,12 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
             RestoreNearestObject();
         }
 
-        if (isNavigating == false || canDetectRaycast == false || isInitializing)
+        if (isNavigating && canDetectRaycast && !isInitializing)
         {
-            return;
+            isPointerEnter = false;
+            _CornerObjController.RestoreCornerObjects();
+            NRInput.LaserVisualActive = true;
+            ResetAll();
         }
-
-        Debug.Log("[Player] Pointer exit.");
-
-        isPointerEnter = false;
-
-        _CornerObjController.RestoreCornerObjects();
-
-        NRInput.LaserVisualActive = true;
-
-        ResetAll();
     }
 }

@@ -6,10 +6,16 @@ using NRKernal;
 public class GrabbableController : MonoBehaviour
 {
     public TrackingItemsController _TrackingItemController;
-    public SoundController _SoundController;
+    public AudioClip GrabStart;
+    public AudioClip GrabEnd;
+    public AudioClip SelectExhibit;
+    public AudioClip DeleteExhibit;
+    public AudioClip OpenOrb;
+    public AudioClip CloseOrb;
 
     private GameObject IndexTip;
     private GameObject MiddleTip;
+    private AudioSource AudioPlayer;
     private GrabbableState CurrState = GrabbableState.Default;
     private enum GrabbableState
     {
@@ -21,27 +27,46 @@ public class GrabbableController : MonoBehaviour
 
     void Start()
     {
+        AudioPlayer = transform.GetComponent<AudioSource>();
+
         ResetAll();
+    }
+
+    public void OpenOrbMessage()
+    {
+        PlaySound(OpenOrb);
+    }
+
+    public void CloseOrbMessage()
+    {
+        PlaySound(CloseOrb);
+    }
+
+    public void DeleteExhibitsMessage()
+    {
+        PlaySound(DeleteExhibit);
     }
 
     public void ActiveGrabbableItem(GameObject obj)
     {
-        Transform targetObject = transform.Find(obj.name + "-Grabbable");
+        Transform targetObject = transform.Find(obj.name);
 
         targetObject.position = obj.transform.GetChild(0).position; // 设置初始位置
         targetObject.rotation = obj.transform.GetChild(0).rotation;
         targetObject.gameObject.SetActive(true);
-
-        _SoundController.PlaySound(SoundController.Sounds.SelectExhibits);
+        PlaySound(SelectExhibit);
     }
 
     public void InactiveGrabbleItem(GameObject obj)
     {
         obj.SetActive(false);
+        _TrackingItemController.RestoreObject(obj.transform.name);
+    }
 
-        string objectName = obj.transform.name;
-
-        _TrackingItemController.RestoreObject(objectName.Substring(0, objectName.Length - 10));
+    private void PlaySound(AudioClip clip)
+    {
+        AudioPlayer.clip = clip;
+        AudioPlayer.Play();
     }
 
     private void ShowInfoContact()
@@ -83,19 +108,13 @@ public class GrabbableController : MonoBehaviour
     public void StartGrab()
     {
         _TrackingItemController.StopRayastDetection();
-
-        _SoundController.PlaySound(SoundController.Sounds.GrabStart);
-
-        Debug.Log("[Player] Start grab.");
+        PlaySound(GrabStart);
     }
 
     public void StopGrab()
     {
         _TrackingItemController.StartRaycastDetection();
-
-        _SoundController.PlaySound(SoundController.Sounds.GrabEnd);
-
-        Debug.Log("[Player] Stop grab.");
+        PlaySound(GrabEnd);
     }
 
     private void SwitchFingerTipState(bool canTrigger)
@@ -107,7 +126,6 @@ public class GrabbableController : MonoBehaviour
 
         IndexTip.GetComponent<SphereCollider>().enabled = canTrigger;
         IndexTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
-
         MiddleTip.GetComponent<SphereCollider>().enabled = canTrigger;
         MiddleTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
     }
@@ -124,44 +142,43 @@ public class GrabbableController : MonoBehaviour
 
     private void Update()
     {
-        HandState handState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+        HandState RightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+        HandState LeftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
 
-        if (handState.isTracked == true)
+        bool isTracking = RightHandState.isTracked || LeftHandState.isTracked;
+        bool isPointing = RightHandState.currentGesture == HandGesture.Point || LeftHandState.currentGesture == HandGesture.Point;
+        bool isVctory = RightHandState.currentGesture == HandGesture.Victory || LeftHandState.currentGesture == HandGesture.Victory;
+
+        if (isTracking)
         {
-            if (handState.currentGesture == HandGesture.Point)
+            if (isPointing)
             {
-                if(CurrState == GrabbableState.ShowInfoContact)
+                if(CurrState != GrabbableState.ShowInfoContact)
                 {
-                    return;
+                    ExitDeleteMode();
+                    ShowInfoContact();
+
+                    CurrState = GrabbableState.ShowInfoContact;
                 }
-
-                ExitDeleteMode();
-                ShowInfoContact();
-
-                CurrState = GrabbableState.ShowInfoContact;
             }
-            else if (handState.currentGesture == HandGesture.Victory || Input.GetKey(KeyCode.Space)) // 因为模拟器无法模拟Victory，以空格替代
+            else if (isVctory)
             {
-                if (CurrState == GrabbableState.ShowDelete)
+                if (CurrState != GrabbableState.ShowDelete)
                 {
-                    return;
+                    HideInfoContact();
+                    EnterDeleteMode();
+
+                    CurrState = GrabbableState.ShowDelete;
                 }
-
-                HideInfoContact();
-                EnterDeleteMode();
-
-                CurrState = GrabbableState.ShowDelete;
             } else
             {
-                if (CurrState == GrabbableState.Default)
+                if (CurrState != GrabbableState.Default)
                 {
-                    return;
+                    ExitDeleteMode();
+                    HideInfoContact();
+
+                    CurrState = GrabbableState.Default;
                 }
-
-                ExitDeleteMode();
-                HideInfoContact();
-
-                CurrState = GrabbableState.Default;
             }  
         }
     }
