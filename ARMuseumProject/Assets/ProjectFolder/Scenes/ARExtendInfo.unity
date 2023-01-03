@@ -1547,7 +1547,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: InformationBoard2Material
+  m_Name: Material
   m_Shader: {fileID: 10752, guid: 0000000000000000f000000000000000, type: 0}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -1561,7 +1561,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: d071c03856d37b4488e7240c18d75b64, type: 3}
+        m_Texture: {fileID: 2800000, guid: 1c80050a85f0dd94fa6b17f76b2d04d8, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Ints: []
@@ -4912,7 +4912,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.4, y: 0, z: 0.4}
+  m_Size: {x: 0.45, y: 0, z: 0.45}
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &580238064
 MonoBehaviour:
@@ -8769,7 +8769,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeleteMaterial: {fileID: 2100000, guid: deb9fe1d9f1156e42a295ebe506bbc74, type: 2}
   RealisticMaterial: {fileID: 2100000, guid: 9c54f29cec54009408883bc9047b15d6, type: 2}
-  ForwardOffset: 0.4
+  ForwardOffset: 0.38
 --- !u!114 &1136514471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8822,9 +8822,10 @@ Animation:
   m_GameObject: {fileID: 1136514468}
   m_Enabled: 1
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 5e3f9e2796b97be4f8424f861a364dbf, type: 2}
+  m_Animation: {fileID: 0}
   m_Animations:
   - {fileID: 7400000, guid: 5e3f9e2796b97be4f8424f861a364dbf, type: 2}
+  - {fileID: 7400000, guid: afb96ec0bf6df2542ac383e26365a0bc, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
@@ -12179,7 +12180,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeleteMaterial: {fileID: 2100000, guid: 2287331afeaad824fb2411f6e4c0258c, type: 2}
   RealisticMaterial: {fileID: 2100000, guid: e85bdd09f6cb00a4bb75e15ca10970d3, type: 2}
-  ForwardOffset: 0.4
+  ForwardOffset: 0.38
 --- !u!136 &1608051821
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -12203,9 +12204,10 @@ Animation:
   m_GameObject: {fileID: 1608051812}
   m_Enabled: 1
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 5e3f9e2796b97be4f8424f861a364dbf, type: 2}
+  m_Animation: {fileID: 0}
   m_Animations:
   - {fileID: 7400000, guid: 5e3f9e2796b97be4f8424f861a364dbf, type: 2}
+  - {fileID: 7400000, guid: afb96ec0bf6df2542ac383e26365a0bc, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0
@@ -14271,7 +14273,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DeleteMaterial: {fileID: 2100000, guid: 08fe050c15d654b4abfb98d08af0fc40, type: 2}
   RealisticMaterial: {fileID: 2100000, guid: a9537d8a8e2da3e478c878b0a5c0791d, type: 2}
-  ForwardOffset: 0.4
+  ForwardOffset: 0.38
 --- !u!114 &2005352026
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14325,9 +14327,10 @@ Animation:
   m_GameObject: {fileID: 2005352023}
   m_Enabled: 1
   serializedVersion: 3
-  m_Animation: {fileID: 7400000, guid: 5e3f9e2796b97be4f8424f861a364dbf, type: 2}
+  m_Animation: {fileID: 0}
   m_Animations:
   - {fileID: 7400000, guid: 5e3f9e2796b97be4f8424f861a364dbf, type: 2}
+  - {fileID: 7400000, guid: afb96ec0bf6df2542ac383e26365a0bc, type: 2}
   m_WrapMode: 0
   m_PlayAutomatically: 0
   m_AnimatePhysics: 0

@@ -82,6 +82,7 @@ public class GrabbableObject : MonoBehaviour
         if (!canFollowCamera && !isDeleting)
         {
             ObjectMesh.GetComponent<Renderer>().material = DeleteMaterial;
+            transform.GetComponent<Animation>().Play("ReverseDeleteExhibits");
             canDelete = true;
         }
     }

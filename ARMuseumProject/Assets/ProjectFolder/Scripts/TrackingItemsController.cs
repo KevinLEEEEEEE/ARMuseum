@@ -128,13 +128,19 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
             {
                 float distance = Vector3.Distance(GetRaycastHitPosition(), ObjectPositionArray[i]);
 
-                if (currNearsetDistance > distance)
+                if(currObject != NearestObject)
+                {
+                    distance += 0.03f;
+                }
+
+                if (distance < currNearsetDistance)
                 {
                     currNearestObject = currObject;
                     currNearsetDistance = distance;
                 }
             }
         }
+
         return currNearestObject;
     }
 
@@ -146,7 +152,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     void Update()
     {
-        if (isPointerEnter && ObjectPositionArray.Length > 0 && canDetectRaycast && !isInitializing)
+        if (isPointerEnter && canDetectRaycast && !isInitializing)
         {
             GameObject currNearestObject = FindNearestObject();
 
@@ -192,11 +198,11 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (isNavigating && canDetectRaycast && !isInitializing)
+        // ÎÞÐè¼ì²â canDetectRaycast && !isInitializing
+        if (isNavigating)
         {
             isPointerEnter = true;
             _CornerObjController.HightlightCornerObjects();
-            NRInput.LaserVisualActive = false;
         }
     }
 
@@ -207,11 +213,10 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
             RestoreNearestObject();
         }
 
-        if (isNavigating && canDetectRaycast && !isInitializing)
+        if (isNavigating)
         {
             isPointerEnter = false;
             _CornerObjController.RestoreCornerObjects();
-            NRInput.LaserVisualActive = true;
             ResetAll();
         }
     }
