@@ -11,9 +11,6 @@ Material:
   m_Shader: {fileID: 4800000, guid: 5bdea20278144b11916d77503ba1467a, type: 3}
   m_ValidKeywords:
   - _ALPHABLEND_ON
-  - _BORDER_LIGHT_USES_HOVER_COLOR
-  - _HOVER_LIGHT
-  - _NORMAL_MAP
   - _RIM_LIGHT
   - _SPECULAR_HIGHLIGHTS
   m_InvalidKeywords:
@@ -91,7 +88,7 @@ Material:
     - _BorderLightOpaque: 0
     - _BorderLightOpaqueAlpha: 1
     - _BorderLightReplacesAlbedo: 0
-    - _BorderLightUsesHoverColor: 1
+    - _BorderLightUsesHoverColor: 0
     - _BorderMinValue: 0.02
     - _BorderWidth: 0.1
     - _BorderWidthHorizontal: 0.1
@@ -117,7 +114,7 @@ Material:
     - _EnableHoverColorOverride: 0
     - _EnableLightMap: 0
     - _EnableLocalSpaceTriplanarMapping: 0
-    - _EnableNormalMap: 1
+    - _EnableNormalMap: 0
     - _EnableProximityLightColorOverride: 0
     - _EnableSSAA: 0
     - _EnableTriplanarMapping: 0
@@ -131,7 +128,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HoverLight: 1
+    - _HoverLight: 0
     - _HoverLightOpaque: 0
     - _IgnoreZScale: 0
     - _IndependentCorners: 0
