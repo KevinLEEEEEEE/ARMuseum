@@ -35,6 +35,12 @@ public class DisplayObjectController : MonoBehaviour
         }
     }
 
+    public void ResetAll()
+    {
+        ChangeToDefaultState();
+        isFirstInitialize = true;
+    }
+
     private void RunShowExhibitsAnimation()
     {
         

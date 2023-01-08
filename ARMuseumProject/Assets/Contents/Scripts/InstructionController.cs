@@ -4,55 +4,55 @@ using UnityEngine;
 
 public class InstructionController : MonoBehaviour
 {
-    [SerializeField] private GameObject SwitchModeInstruction;
-    [SerializeField] private GameObject SwitchModeProgress;
-    [SerializeField] private GameObject PinchGestureInstruction;
-    [SerializeField] private AudioSource AudioPlayer;
+    //[SerializeField] private GameObject SwitchModeInstruction;
+    //[SerializeField] private GameObject SwitchModeProgress;
+    //[SerializeField] private GameObject PinchGestureInstruction;
+    private AudioSource AudioPlayer;
 
     void Start()
     {
         AudioPlayer = transform.GetComponent<AudioSource>();
 
-        ResetAll();
+        //ResetAll();
     }
 
-    public void ShowSwitchModeInstruction()
-    {
-        SwitchModeInstruction.SetActive(true);
-        AudioPlayer.Play();
-    }
+    //public void ShowSwitchModeInstruction()
+    //{
+    //    SwitchModeInstruction.SetActive(true);
+    //    AudioPlayer.Play();
+    //}
 
-    public void HideSwitchModeInstruction()
-    {
-        SwitchModeInstruction.SetActive(false);
-    }
+    //public void HideSwitchModeInstruction()
+    //{
+    //    SwitchModeInstruction.SetActive(false);
+    //}
 
-    public void ShowSwitchModeProgress()
-    {
-        SwitchModeProgress.SetActive(true);
-        AudioPlayer.Play();
-    }
+    //public void ShowSwitchModeProgress()
+    //{
+    //    SwitchModeProgress.SetActive(true);
+    //    AudioPlayer.Play();
+    //}
 
-    public void HideSwitchModeProgress()
-    {
-        SwitchModeProgress.SetActive(false);
-    }
+    //public void HideSwitchModeProgress()
+    //{
+    //    SwitchModeProgress.SetActive(false);
+    //}
 
-    public void ShowPinchGestureInstruction()
-    {
-        PinchGestureInstruction.SetActive(true);
-        AudioPlayer.Play();
-    }
+    //public void ShowPinchGestureInstruction()
+    //{
+    //    PinchGestureInstruction.SetActive(true);
+    //    AudioPlayer.Play();
+    //}
 
-    public void HidePinchGestureInstruction()
-    {
-        PinchGestureInstruction.SetActive(false);
-    }
+    //public void HidePinchGestureInstruction()
+    //{
+    //    PinchGestureInstruction.SetActive(false);
+    //}
 
-    public void ResetAll()
-    {
-        HideSwitchModeInstruction();
-        HideSwitchModeProgress();
-        HidePinchGestureInstruction();
-    }
+    //public void ResetAll()
+    //{
+    //    HideSwitchModeInstruction();
+    //    HideSwitchModeProgress();
+    //    HidePinchGestureInstruction();
+    //}
 }

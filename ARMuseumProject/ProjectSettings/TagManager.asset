@@ -16,7 +16,7 @@ TagManager:
   - 
   - RaycastTarget
   - Grabbable
-  - ExpendSwitch
+  - Orb
   - ColliderEntity
   - 
   - 

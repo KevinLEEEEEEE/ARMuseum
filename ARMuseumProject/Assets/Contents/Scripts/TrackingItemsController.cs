@@ -10,11 +10,12 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public GrabbableController _GrabbableItemsController;
     public CornerObjController _CornerObjController;
     public GameObject DisplayItemsLayer;
+
     public AudioClip ShowExhibits;
     public AudioClip HoverExhibits;
     public AudioClip SelectExhibits;
-
     private AudioSource AudioPlayer;
+
     private bool isNavigating = false;
     private bool isPointerEnter = false;
     private bool canDetectRaycast = true;
@@ -54,19 +55,10 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         InitializingCount--;
     }
 
-    public void TrackingImageFound()
-    {
-        _CornerObjController.ActiveCornerObjects();
-    }
-
-    public void TrackingImageLost()
-    {
-        _CornerObjController.InactiveCornerObjects();
-    }
-
     public void StartNavigating()
     {
         DisplayItemsLayer.SetActive(true);
+        _CornerObjController.ActiveCornerObjects();
         isNavigating = true;
         PlaySound(ShowExhibits);
     }
@@ -74,7 +66,9 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public void StopNavigating()
     {
         DisplayItemsLayer.SetActive(false);
+        _CornerObjController.InactiveCornerObjects();
         isNavigating = false;
+        AudioPlayer.Stop();
         ResetAll();
     }
 
@@ -86,7 +80,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public void StopRayastDetection()
     {
         canDetectRaycast = false;
-        ResetAll();
+        RestoreAllObjectState();
     }
 
     public void RestoreObject(string name)
@@ -105,14 +99,26 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         NearestObject = null;
     }
 
-    public void ResetAll()
+    private void RestoreAllObjectState()
     {
-        foreach(Transform child in DisplayItemsLayer.transform)
+        foreach (Transform child in DisplayItemsLayer.transform)
         {
             child.GetComponent<DisplayObjectController>().ChangeToDefaultState();
         }
 
         NearestObject = null;
+    }
+
+    public void ResetAll()
+    {
+        foreach(Transform child in DisplayItemsLayer.transform)
+        {
+            child.gameObject.SetActive(true);
+            child.GetComponent<DisplayObjectController>().ResetAll();
+        }
+
+        NearestObject = null;
+        InitializingCount = 0;
     }
 
     private GameObject FindNearestObject()
@@ -217,7 +223,7 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         {
             isPointerEnter = false;
             _CornerObjController.RestoreCornerObjects();
-            ResetAll();
+            RestoreAllObjectState();
         }
     }
 }

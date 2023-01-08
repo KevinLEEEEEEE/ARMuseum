@@ -5,15 +5,6 @@ using NRKernal;
 
 public class CornerObjController : MonoBehaviour
 {
-    [SerializeField]
-    private GameObject UpperLeft;
-    [SerializeField]
-    private GameObject LowerLeft;
-    [SerializeField]
-    private GameObject UpperRight;
-    [SerializeField]
-    private GameObject LowerRight;
-
     public void ActiveCornerObjects()
     {
         SwitchCornerState(true);
