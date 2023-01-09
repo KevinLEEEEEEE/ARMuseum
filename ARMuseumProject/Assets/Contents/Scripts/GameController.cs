@@ -7,9 +7,10 @@ public class GameController : MonoBehaviour
 {
     [SerializeField] private TrackableObserver Observer;
     [SerializeField] private TrackingItemsController _TrackingItemsController;
+    [SerializeField] private Orb_Switch _Orb_Switch;
     [SerializeField] private GrabbableController _GrabbableController;
     [SerializeField] private Transform[] TrackingItemList;
-    private bool isTracking = false;
+    private bool isGrabbing = false;
 
     void Start()
     {
@@ -27,30 +28,56 @@ public class GameController : MonoBehaviour
             child.position = pos;
             child.rotation = qua;
         }
-
-        isTracking = true;
     }
 
     private void Lost()
     {
-        isTracking = false;
+        // 考虑新增图像丢失提示功能
     }
 
     public void BeginTour()
     {
-        if(isTracking)
-        {
-            _TrackingItemsController.StartNavigating();
-        }
-        
+        _TrackingItemsController.StartNavigating();
     }
 
     public void EndTour()
     {
-        if(isTracking)
+        _TrackingItemsController.StopNavigating();
+        _GrabbableController.ResetAll();
+    }
+
+    public void GrabStart()
+    {
+        isGrabbing = true;
+    }
+
+    public void GrabEnd()
+    {
+        isGrabbing = false;
+    }
+
+    private void Update()
+    {
+        HandState rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+        HandState leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
+        bool canRaycast = true;
+
+        // Stop raycast detection when grabbing or pointing
+        if (isGrabbing || rightHandState.currentGesture == HandGesture.Point || leftHandState.currentGesture == HandGesture.Point)
         {
-            _TrackingItemsController.StopNavigating();
-            _GrabbableController.ResetAll();
+            canRaycast = false;
+        }
+
+        if(NRInput.LaserVisualActive && !canRaycast)
+        {
+            _TrackingItemsController.StopRayastDetection();
+            _Orb_Switch.StopRayastDetection();
+            NRInput.LaserVisualActive = canRaycast;
+        } else if (!NRInput.LaserVisualActive && canRaycast)
+        {
+            _TrackingItemsController.StartRaycastDetection();
+            _Orb_Switch.StartRaycastDetection();
+            NRInput.LaserVisualActive = canRaycast;
         }
     }
 }

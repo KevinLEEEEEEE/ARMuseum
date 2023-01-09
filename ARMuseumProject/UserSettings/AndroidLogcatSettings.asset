@@ -3,17 +3,11 @@
     "m_SelectedPackage": {
         "deviceId": "192.168.3.37:6666",
         "name": "com.DefaultCompany.ARMuseumProject",
-        "processId": 24660,
+        "processId": 8225,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 28069,
-            "exited": true
-        },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.DefaultCompany.ARMuseumProject",
@@ -36,6 +30,12 @@
             "deviceId": "192.168.3.37:6666",
             "name": "com.DefaultCompany.ARMuseumProject",
             "processId": 24660,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "com.DefaultCompany.ARMuseumProject",
+            "processId": 8225,
             "exited": false
         }
     ],

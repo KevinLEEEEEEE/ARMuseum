@@ -6,6 +6,7 @@ using NRKernal;
 public class GrabbableController : MonoBehaviour
 {
     public TrackingItemsController _TrackingItemController;
+    public GameController _GameController;
     public AudioClip GrabStart;
     public AudioClip GrabEnd;
     public AudioClip SelectExhibit;
@@ -85,50 +86,50 @@ public class GrabbableController : MonoBehaviour
         }
     }
 
-    private void EnterDeleteMode()
-    {
-        foreach (Transform child in transform)
-        {
-            child.gameObject.GetComponent<GrabbableObject>().EnterDeleteMode();
-        }
+    //private void EnterDeleteMode()
+    //{
+    //    foreach (Transform child in transform)
+    //    {
+    //        child.gameObject.GetComponent<GrabbableObject>().EnterDeleteMode();
+    //    }
 
-        SwitchFingerTipState(true);
-    }
+    //    SwitchFingerTipState(true);
+    //}
 
-    private void ExitDeleteMode()
-    {
-        foreach (Transform child in transform)
-        {
-            child.gameObject.GetComponent<GrabbableObject>().ExitDeleteMode();
-        }
+    //private void ExitDeleteMode()
+    //{
+    //    foreach (Transform child in transform)
+    //    {
+    //        child.gameObject.GetComponent<GrabbableObject>().ExitDeleteMode();
+    //    }
 
-        SwitchFingerTipState(false);
-    }
+    //    SwitchFingerTipState(false);
+    //}
 
     public void StartGrab()
     {
-        _TrackingItemController.StopRayastDetection();
+        _GameController.GrabStart();
         PlaySound(GrabStart);
     }
 
     public void StopGrab()
     {
-        _TrackingItemController.StartRaycastDetection();
+        _GameController.GrabEnd();
         PlaySound(GrabEnd);
     }
 
-    private void SwitchFingerTipState(bool canTrigger)
-    {
-        GameObject NRHandVisual = GameObject.Find("NRHandCapsuleVisual_R");
+    //private void SwitchFingerTipState(bool canTrigger)
+    //{
+    //    GameObject NRHandVisual = GameObject.Find("NRHandCapsuleVisual_R");
 
-        IndexTip = NRHandVisual.transform.GetChild(31).gameObject;
-        MiddleTip = NRHandVisual.transform.GetChild(35).gameObject;
+    //    IndexTip = NRHandVisual.transform.GetChild(31).gameObject;
+    //    MiddleTip = NRHandVisual.transform.GetChild(35).gameObject;
 
-        IndexTip.GetComponent<SphereCollider>().enabled = canTrigger;
-        IndexTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
-        MiddleTip.GetComponent<SphereCollider>().enabled = canTrigger;
-        MiddleTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
-    }
+    //    IndexTip.GetComponent<SphereCollider>().enabled = canTrigger;
+    //    IndexTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
+    //    MiddleTip.GetComponent<SphereCollider>().enabled = canTrigger;
+    //    MiddleTip.GetComponent<SphereCollider>().isTrigger = canTrigger;
+    //}
 
     public void ResetAll()
     {
@@ -155,7 +156,7 @@ public class GrabbableController : MonoBehaviour
             {
                 if(CurrState != GrabbableState.ShowInfoContact)
                 {
-                    ExitDeleteMode();
+                    //ExitDeleteMode();
                     ShowInfoContact();
 
                     CurrState = GrabbableState.ShowInfoContact;
@@ -166,7 +167,7 @@ public class GrabbableController : MonoBehaviour
                 if (CurrState != GrabbableState.ShowDelete)
                 {
                     HideInfoContact();
-                    EnterDeleteMode();
+                    //EnterDeleteMode();
 
                     CurrState = GrabbableState.ShowDelete;
                 }
@@ -174,7 +175,7 @@ public class GrabbableController : MonoBehaviour
             {
                 if (CurrState != GrabbableState.Default)
                 {
-                    ExitDeleteMode();
+                    //ExitDeleteMode();
                     HideInfoContact();
 
                     CurrState = GrabbableState.Default;

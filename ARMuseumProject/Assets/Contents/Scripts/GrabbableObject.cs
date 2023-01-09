@@ -12,18 +12,15 @@ public class GrabbableObject : MonoBehaviour
     private GameObject InfoContact;
     private GameObject CenterCameraAnchor;
     private bool canFollowCamera = true;
-    private bool canDelete = false;
     private bool isDeleting = false;
 
     private void OnEnable()
     {
         InitGameObject();
         LookAtCamera();
-        ExitDeleteMode();
         HideInfoContact();
 
         canFollowCamera = true;
-        canDelete = false;
         isDeleting = false;
     }
 
@@ -31,20 +28,21 @@ public class GrabbableObject : MonoBehaviour
     {
         if(ObjectMesh == null)
         {
-            ObjectMesh = transform.Find("ObjectMesh").gameObject;
-            InfoContact = transform.Find("InfoOrb").gameObject;
+            ObjectMesh = transform.Find("Mesh").gameObject;
+            InfoContact = transform.Find("Orbs").gameObject;
             CenterCameraAnchor = GameObject.Find("NRCameraRig/CenterAnchor");
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void DeleteOrb()
     {
-        if(canDelete && !isDeleting)
+        if (!isDeleting)
         {
             Debug.Log("[Player] delete object: " + transform.name);
 
             isDeleting = true;
-            transform.GetComponent<Animation>().Play("DeleteExhibits");
+            //transform.GetComponent<Animation>().Play("DeleteExhibits"); // ÔÝÍ£¶¯»­
+            DeleteAnimationFinished();
             SendMessageUpwards("DeleteExhibitsMessage");
         }
     }
@@ -77,28 +75,8 @@ public class GrabbableObject : MonoBehaviour
         }
     }
 
-    public void EnterDeleteMode()
-    {
-        if (!canFollowCamera && !isDeleting)
-        {
-            ObjectMesh.GetComponent<Renderer>().material = DeleteMaterial;
-            transform.GetComponent<Animation>().Play("ReverseDeleteExhibits");
-            canDelete = true;
-        }
-    }
-
-    public void ExitDeleteMode()
-    {
-        if(!isDeleting)
-        {
-            ObjectMesh.GetComponent<Renderer>().material = RealisticMaterial;
-            canDelete = false;
-        }
-    }
-
     public void ResetAll()
     {
-        ExitDeleteMode();
         HideInfoContact();
     }
 

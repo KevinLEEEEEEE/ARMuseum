@@ -5,24 +5,30 @@ using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using NRKernal;
 
-public class Orb_Switch : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class Orb_Switch : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField]
     [FormerlySerializedAs("GameController")]
     private GameController _GameController;
 
-    //public float ToggleDuration = 2f;
+    public HandCoach _HandCoach;
     public Sprite SeeSprite;
     public Sprite UnseeSprite;
     private MeshRenderer _MeshRenderer;
     private SpriteRenderer _SpriteRenderer;
+    private Animation _Animation;
 
+    private bool isFirstUse = true;
+    private bool isPointerDown = false;
+    private bool isFirstClickAfterRaycastStart = false;
+    private bool canDetectRaycast = true;
     private bool canSee = false;
 
     void Start()
     {
         _MeshRenderer = transform.GetComponent<MeshRenderer>();
         _SpriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
+        _Animation = transform.GetComponent<Animation>();
         _MeshRenderer.enabled = false;
     }
 
@@ -41,14 +47,50 @@ public class Orb_Switch : MonoBehaviour, IPointerClickHandler, IPointerEnterHand
         }
     }
 
+    public void StartRaycastDetection()
+    {
+        canDetectRaycast = true;
+    }
+
+    public void StopRayastDetection()
+    {
+        canDetectRaycast = false;
+        isFirstClickAfterRaycastStart = true;
+        _MeshRenderer.enabled = false;
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
-        ToggleSee();
+        if(isFirstUse)
+        {
+            isFirstUse = false;
+            _HandCoach.StopHintLoop();
+        }
+
+        if(canDetectRaycast)
+        {
+            if(isPointerDown && isFirstClickAfterRaycastStart)
+            {
+                isFirstClickAfterRaycastStart = false;
+                return;
+            }
+
+            _Animation.Play();
+            isPointerDown = false;
+        }
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        isPointerDown = true;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        _MeshRenderer.enabled = true;
+        if (canDetectRaycast)
+        {
+            _MeshRenderer.enabled = true;
+        }  
     }
 
     public void OnPointerExit(PointerEventData eventData)

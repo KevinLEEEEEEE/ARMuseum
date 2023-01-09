@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft Corporation.
-// Licensed under the MIT License.AlbedoAlphaMode
+// Licensed under the MIT License.
 
 // NOTE: MRTK Shaders are versioned via the MRTK.Shaders.sentinel file.
 // When making changes to any shader's source file, the value in the sentinel _must_ be incremented.
@@ -11,8 +11,8 @@ Shader "Mixed Reality Toolkit/Standard"
         // Main maps.
         _Color("Color", Color) = (1.0, 1.0, 1.0, 1.0)
         _MainTex("Albedo", 2D) = "white" {}
-        //[Enum(AlbedoAlphaMode)] _AlbedoAlphaMode("Albedo Alpha Mode", Float) = 0 // "Transparency" ++
-        //_AlbedoAlphaMode("Albedo Alpha Mode", Float) = 0
+        //[Enum(AlbedoAlphaMode)] _AlbedoAlphaMode("Albedo Alpha Mode", Float) = 0 // "Transparency"
+        _AlbedoAlphaMode("Albedo Alpha Mode", Float) = 0 // Add
         [Toggle] _AlbedoAssignedAtRuntime("Albedo Assigned at Runtime", Float) = 0.0
         _Cutoff("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
         _Metallic("Metallic", Range(0.0, 1.0)) = 0.0
@@ -95,16 +95,16 @@ Shader "Mixed Reality Toolkit/Standard"
         _EnvironmentColorZ("Environment Color Z (RGB)", Color) = (0.0, 0.0, 1.0, 1.0)
 
         // Advanced options.
-        //[Enum(RenderingMode)] _Mode("Rendering Mode", Float) = 0                                     // "Opaque" ++
-        //_Mode("Rendering Mode", Float) = 0
-        //[Enum(CustomRenderingMode)] _CustomMode("Mode", Float) = 0                                   // "Opaque" ++
-        //_CustomMode("Mode", Float) = 0
+        //[Enum(RenderingMode)] _Mode("Rendering Mode", Float) = 0                                     // "Opaque"
+        //[Enum(CustomRenderingMode)] _CustomMode("Mode", Float) = 0                                   // "Opaque"
+        _Mode("Rendering Mode", Float) = 0 // Add
+        _CustomMode("Mode", Float) = 0 // Add
         [Enum(UnityEngine.Rendering.BlendMode)] _SrcBlend("Source Blend", Float) = 1                 // "One"
         [Enum(UnityEngine.Rendering.BlendMode)] _DstBlend("Destination Blend", Float) = 0            // "Zero"
         [Enum(UnityEngine.Rendering.BlendOp)] _BlendOp("Blend Operation", Float) = 0                 // "Add"
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("Depth Test", Float) = 4                // "LessEqual"
-        //[Enum(DepthWrite)] _ZWrite("Depth Write", Float) = 1                                         // "On" ++
-        //_ZWrite("Depth Write", Float) = 1
+        //[Enum(DepthWrite)] _ZWrite("Depth Write", Float) = 1                                         // "On"
+        _ZWrite("Depth Write", Float) = 1 // Add
         _ZOffsetFactor("Depth Offset Factor", Float) = 0                                             // "Zero"
         _ZOffsetUnits("Depth Offset Units", Float) = 0                                               // "Zero"
         [Enum(UnityEngine.Rendering.ColorWriteMask)] _ColorWriteMask("Color Write Mask", Float) = 15 // "All"
@@ -127,7 +127,7 @@ Shader "Mixed Reality Toolkit/Standard"
             Blend[_SrcBlend][_DstBlend]
             BlendOp[_BlendOp]
             ZTest[_ZTest]
-            //ZWrite[_ZWrite]
+            ZWrite[_ZWrite]
             Cull[_CullMode]
             Offset[_ZOffsetFactor],[_ZOffsetUnits]
             ColorMask[_ColorWriteMask]
@@ -191,8 +191,8 @@ Shader "Mixed Reality Toolkit/Standard"
             #include "UnityCG.cginc"
             #include "UnityUI.cginc"
             #include "UnityStandardConfig.cginc"
-            #include "UnityStandardUtils.cginc"
-            #include "/MixedRealityShaderUtils.cginc"
+            //#include "UnityStandardUtils.cginc"
+            #include "MixedRealityShaderUtils.cginc"
 
             // This define will get commented in by the UpgradeShaderForUniversalRenderPipeline method.
             //#define _RENDER_PIPELINE

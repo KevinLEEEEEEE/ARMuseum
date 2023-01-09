@@ -2,11 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
+using TMPro;
 
-public class InfoOrb : MonoBehaviour
+public class DeleteOrb : MonoBehaviour
 {
-    //public GameObject RelatedContent;
-
     private bool isActive = false;
     private Material _material;
     private Material CurrentMaterial
@@ -24,6 +23,7 @@ public class InfoOrb : MonoBehaviour
     private const float MinDistance = 0.03f;
     private const float MaxRimPower = 3.5f;
     private const float MinRimPower = 1.8f;
+    public TextMeshPro _TextMesh;
 
     private void OnEnable()
     {
@@ -33,22 +33,33 @@ public class InfoOrb : MonoBehaviour
     public void ResetAll()
     {
         CurrentMaterial.SetFloat("_RimLight", MaxRimPower);
+        
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log("[Player] Trigger Orb: " + transform.name);
+        Debug.Log("[Player] Trigger Delete Orb: " + transform.name);
 
         if (isActive)
         {
-            SendMessageUpwards("CloseOrbMessage");
+            CancelInvoke("ResetDeleteState");
+            ResetDeleteState();
+            SendMessageUpwards("DeleteOrb");
+            // ³¹µ×É¾³ý
         }
         else
         {
             SendMessageUpwards("OpenOrbMessage");
+            _TextMesh.text = "Confirm?";
+            Invoke("ResetDeleteState", 2f);
         }
 
         isActive = !isActive;
+    }
+
+    private void ResetDeleteState()
+    {
+        _TextMesh.text = "Delete";
     }
 
     void Update()

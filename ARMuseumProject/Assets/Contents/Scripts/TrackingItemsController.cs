@@ -4,20 +4,25 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using NRKernal;
 
-public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
+public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public NRPointerRaycaster _Raycaster;
     public GrabbableController _GrabbableItemsController;
     public CornerObjController _CornerObjController;
     public GameObject DisplayItemsLayer;
+    public GameObject HandCoach_Point;
 
     public AudioClip ShowExhibits;
     public AudioClip HoverExhibits;
     public AudioClip SelectExhibits;
     private AudioSource AudioPlayer;
 
+    private bool isFirstUse = true;
+    private GameObject NearestObjectOnPointerDown = null;
     private bool isNavigating = false;
     private bool isPointerEnter = false;
+    private bool isFirstClickAfterRaycastStart = false;
+    private bool isNearestObjectStateRecovered = true;
     private bool canDetectRaycast = true;
     private bool isInitializing
     {
@@ -28,7 +33,6 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     }
     private int InitializingCount = 0;
     private GameObject NearestObject = null;
-    private Vector3 NearestObjectOriginalPosition;
     private Vector3[] ObjectPositionArray = null;
 
     void Start()
@@ -75,11 +79,13 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     public void StartRaycastDetection()
     {
         canDetectRaycast = true;
+        isNearestObjectStateRecovered = false;
     }
 
     public void StopRayastDetection()
     {
         canDetectRaycast = false;
+        isFirstClickAfterRaycastStart = true;
         RestoreAllObjectState();
     }
 
@@ -95,18 +101,15 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     private void RestoreNearestObject()
     {
         NearestObject.GetComponent<DisplayObjectController>().ChangeToDefaultState();
-        NearestObject.transform.localPosition = NearestObjectOriginalPosition;
         NearestObject = null;
     }
 
-    private void RestoreAllObjectState()
+    public void RestoreAllObjectState()
     {
         foreach (Transform child in DisplayItemsLayer.transform)
         {
             child.GetComponent<DisplayObjectController>().ChangeToDefaultState();
         }
-
-        NearestObject = null;
     }
 
     public void ResetAll()
@@ -162,6 +165,13 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         {
             GameObject currNearestObject = FindNearestObject();
 
+            if (isFirstClickAfterRaycastStart && NearestObject == NearestObjectOnPointerDown && !isNearestObjectStateRecovered)
+            {
+                NearestObject.GetComponent<DisplayObjectController>().ChangeToHoverState();
+                PlaySound(HoverExhibits);
+                isNearestObjectStateRecovered = true;
+            }
+
             if (NearestObject != currNearestObject)
             {
                 if (NearestObject != null)
@@ -172,16 +182,9 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
                 if (currNearestObject != null)
                 {
                     NearestObject = currNearestObject;
-                    NearestObjectOriginalPosition = currNearestObject.transform.localPosition;
                     NearestObject.GetComponent<DisplayObjectController>().ChangeToHoverState();
                     PlaySound(HoverExhibits);
                 }
-            }
-
-            // Change the position of nearest object for magnetic effect
-            if (NearestObject != null)
-            {
-                NearestObject.transform.localPosition = Vector3.Slerp(NearestObjectOriginalPosition, GetRaycastHitPosition(), 0.1f);
             }
         }
     }
@@ -195,6 +198,22 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
     {
         if (isNavigating && canDetectRaycast && !isInitializing && NearestObject != null)
         {
+            if(isFirstClickAfterRaycastStart)
+            {
+                isFirstClickAfterRaycastStart = false;
+
+                if(NearestObject == NearestObjectOnPointerDown)
+                {
+                    return;
+                }
+            }
+
+            if(isFirstUse)
+            {
+                isFirstUse = false;
+                HandCoach_Point.SetActive(true);
+            }
+
             Debug.Log("[Player] Pointer click, the nearest object is: " + NearestObject.name);
             _GrabbableItemsController.ActiveGrabbableItem(NearestObject);
             NearestObject.SetActive(false);
@@ -202,27 +221,33 @@ public class TrackingItemsController : MonoBehaviour, IPointerClickHandler, IPoi
         }
     }
 
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if(!isFirstClickAfterRaycastStart)
+        {
+            NearestObjectOnPointerDown = NearestObject;
+        }
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
-        // ÎÞÐè¼ì²â canDetectRaycast && !isInitializing
         if (isNavigating)
         {
             isPointerEnter = true;
-            _CornerObjController.HightlightCornerObjects();
+            
         }
+
+        _CornerObjController.HightlightCornerObjects();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (NearestObject != null)
-        {
-            RestoreNearestObject();
-        }
+        _CornerObjController.RestoreCornerObjects();
 
         if (isNavigating)
         {
             isPointerEnter = false;
-            _CornerObjController.RestoreCornerObjects();
+            
             RestoreAllObjectState();
         }
     }
