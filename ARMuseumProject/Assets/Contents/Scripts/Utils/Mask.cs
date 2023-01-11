@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MaskController : MonoBehaviour
+public class Mask : MonoBehaviour
 {
     void Start()
     {

@@ -5,7 +5,7 @@ using NRKernal;
 
 public class HandCoach_Point : MonoBehaviour
 {
-    public HandCoach _HandCoach;
+    public InteractionHint _HandCoach;
     public float ForwardOffset;
     private GameObject CenterCameraAnchor;
     private bool isFirstUse = true;

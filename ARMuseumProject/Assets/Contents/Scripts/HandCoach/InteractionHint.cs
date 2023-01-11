@@ -12,7 +12,7 @@ namespace NRKernal
     /// <summary>
     /// This class provides wrapper functionality for triggering animations and fades for the hand rig.
     /// </summary>
-    public class HandCoach : MonoBehaviour
+    public class InteractionHint : MonoBehaviour
     {
         public GameObject VisualsRoot { get; set; }
 

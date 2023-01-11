@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
 
-public class CornerObjController : MonoBehaviour
+public class Frame : MonoBehaviour
 {
-    public void ActiveCornerObjects()
+    public void ActiveFrames()
     {
-        SwitchCornerState(true);
+        SwitchFrameState(true);
     }
 
-    public void InactiveCornerObjects()
+    public void InactiveFrames()
     {
-        SwitchCornerState(false);
+        SwitchFrameState(false);
     }
 
-    public void HightlightCornerObjects()
+    public void HightlightFrames()
     {
         foreach (Transform child in transform)
         {
@@ -23,7 +23,7 @@ public class CornerObjController : MonoBehaviour
         }
     }
 
-    public void RestoreCornerObjects()
+    public void RestoreFrames()
     {
         foreach (Transform child in transform)
         {
@@ -31,7 +31,7 @@ public class CornerObjController : MonoBehaviour
         }
     }
 
-    private void SwitchCornerState(bool state)
+    private void SwitchFrameState(bool state)
     {
         foreach(Transform child in transform)
         {
@@ -41,6 +41,6 @@ public class CornerObjController : MonoBehaviour
 
     public void ResetAll()
     {
-        SwitchCornerState(false);
+        SwitchFrameState(false);
     }
 }

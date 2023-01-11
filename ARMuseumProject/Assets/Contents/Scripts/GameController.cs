@@ -1,15 +1,28 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using NRKernal;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private TrackableObserver Observer;
-    [SerializeField] private TrackingItemsController _TrackingItemsController;
-    [SerializeField] private Orb_Switch _Orb_Switch;
-    [SerializeField] private GrabbableController _GrabbableController;
-    [SerializeField] private Transform[] TrackingItemList;
+    [SerializeField]
+    [FormerlySerializedAs("Observer")]
+    private TrackableObserver observer;
+
+    [SerializeField]
+    [FormerlySerializedAs("TrackingItemList")]
+    private Transform[] FollowTrackerList;
+
+    public event Action FoundObserverEvent;
+    public event Action LostObserverEvent;
+    public event Action StartRaycastEvent;
+    public event Action StopRaycastEvent;
+    public event Action BeginTourEvent;
+    public event Action EndTourEvent;
+
+    private bool isTracking = false;
     private bool isGrabbing = false;
 
     void Start()
@@ -17,33 +30,42 @@ public class GameController : MonoBehaviour
 #if !UNITY_EDITOR
         Destroy(GameObject.Find("Env_Room"));
 #endif
-        Observer.FoundEvent += Found;
-        Observer.LostEvent += Lost;
+        observer.FoundEvent += Found;
+        observer.LostEvent += Lost;
     }
 
     private void Found(Vector3 pos, Quaternion qua)
     {
-        foreach(Transform child in TrackingItemList)
+        foreach(Transform trans in FollowTrackerList)
         {
-            child.position = pos;
-            child.rotation = qua;
+            trans.position = pos;
+            trans.rotation = qua;
+        }
+
+        if(!isTracking)
+        {
+            FoundObserverEvent?.Invoke();
+            isTracking = true;
         }
     }
 
     private void Lost()
     {
-        // 考虑新增图像丢失提示功能
+        if(isTracking)
+        {
+            LostObserverEvent?.Invoke();
+            isTracking = false;
+        }
     }
 
     public void BeginTour()
     {
-        _TrackingItemsController.StartNavigating();
+        BeginTourEvent?.Invoke();
     }
 
     public void EndTour()
     {
-        _TrackingItemsController.StopNavigating();
-        _GrabbableController.ResetAll();
+        EndTourEvent?.Invoke();
     }
 
     public void GrabStart()
@@ -70,13 +92,11 @@ public class GameController : MonoBehaviour
 
         if(NRInput.LaserVisualActive && !canRaycast)
         {
-            _TrackingItemsController.StopRayastDetection();
-            _Orb_Switch.StopRayastDetection();
+            StopRaycastEvent?.Invoke();
             NRInput.LaserVisualActive = canRaycast;
         } else if (!NRInput.LaserVisualActive && canRaycast)
         {
-            _TrackingItemsController.StartRaycastDetection();
-            _Orb_Switch.StartRaycastDetection();
+            StartRaycastEvent?.Invoke();
             NRInput.LaserVisualActive = canRaycast;
         }
     }

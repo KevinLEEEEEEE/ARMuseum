@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DisplayObjectController : MonoBehaviour
+public class Exhibits : MonoBehaviour
 {
     public Material DefaultMaterial;
     public Material HoverMaterial;

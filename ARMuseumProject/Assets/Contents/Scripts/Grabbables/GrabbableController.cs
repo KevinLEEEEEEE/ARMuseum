@@ -5,7 +5,7 @@ using NRKernal;
 
 public class GrabbableController : MonoBehaviour
 {
-    public TrackingItemsController _TrackingItemController;
+    public ExhibitsPanel _TrackingItemController;
     public GameController _GameController;
     public AudioClip GrabStart;
     public AudioClip GrabEnd;
@@ -14,8 +14,8 @@ public class GrabbableController : MonoBehaviour
     public AudioClip OpenOrb;
     public AudioClip CloseOrb;
 
-    private GameObject IndexTip;
-    private GameObject MiddleTip;
+    //private GameObject IndexTip;
+    //private GameObject MiddleTip;
     private AudioSource AudioPlayer;
     private GrabbableState CurrState = GrabbableState.Default;
     private enum GrabbableState
@@ -29,6 +29,8 @@ public class GrabbableController : MonoBehaviour
     void Start()
     {
         AudioPlayer = transform.GetComponent<AudioSource>();
+
+        _GameController.EndTourEvent += ResetAll;
 
         ResetAll();
     }
@@ -61,7 +63,7 @@ public class GrabbableController : MonoBehaviour
     public void InactiveGrabbleItem(GameObject obj)
     {
         obj.SetActive(false);
-        _TrackingItemController.RestoreObject(obj.transform.name);
+        _TrackingItemController.ActiveExhibit(obj.transform.name);
     }
 
     private void PlaySound(AudioClip clip)
