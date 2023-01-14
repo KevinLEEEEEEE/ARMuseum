@@ -5,29 +5,22 @@ using NRKernal;
 
 public class LookAtCamera : MonoBehaviour
 {
-    private Transform m_CenterCamera;
-    private Transform CenterCamera
+    private Transform m_CenterAnchor;
+    private Transform centerAnchor
     {
         get
         {
-            if (m_CenterCamera == null)
+            if (m_CenterAnchor == null)
             {
-                if (NRSessionManager.Instance.CenterCameraAnchor != null)
-                {
-                    m_CenterCamera = NRSessionManager.Instance.CenterCameraAnchor;
-                }
-                else if (Camera.main != null)
-                {
-                    m_CenterCamera = Camera.main.transform;
-                }
+                m_CenterAnchor = NRSessionManager.Instance.NRHMDPoseTracker.centerAnchor;
             }
-            return m_CenterCamera;
+            return m_CenterAnchor;
         }
     }
 
     // Update is called once per frame
     void Update()
     {
-        transform.LookAt(transform.position - CenterCamera.transform.position);
+        transform.LookAt(transform.position - centerAnchor.position);
     }
 }

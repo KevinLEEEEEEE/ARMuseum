@@ -8,11 +8,11 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
 {
     public GameController gameController;
     public NRPointerRaycaster raycaster;
-    public GrabbableController grabbableExhibits;
+    public GrabbablePanel grabbablePanel;
     public Frame frame;
     public GameObject exhibits;
     public GameObject handCoach_Point;
-    //public GameObject
+    public GameObject status_TargetLost;
     public AudioClip showExhibits;
     public AudioClip hoverExhibits;
     public AudioClip selectExhibits;
@@ -114,12 +114,12 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
 
     private void FoundObserver()
     {
-
+        status_TargetLost.SetActive(false);
     }
 
     private void LostObserver()
     {
-        // 显示图像识别异常提示，要求用户调整角度；大欸一个有呼吸感的平面红色提示层
+        status_TargetLost.SetActive(true);
     }
 
     private void PlaySound(AudioClip clip)
@@ -200,7 +200,7 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
             return;
         }
 
-        RaycastResult firstRaycastResult = raycaster.FirstRaycastResult();
+        RaycastResult firstRaycastResult = raycaster.FirstRaycastResult(); // 当前仅支持右手的选择模式
 
         if (!firstRaycastResult.isValid || firstRaycastResult.gameObject.name != transform.name)
         {
@@ -244,7 +244,7 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
             }
 
             Debug.Log("[Player] Select exhibit: " + hoverExhibit.name);
-            grabbableExhibits.ActiveGrabbableItem(hoverExhibit);
+            grabbablePanel.ActiveGrabbableItem(hoverExhibit);
             hoverExhibit.SetActive(false);
             PlaySound(selectExhibits);
         }
