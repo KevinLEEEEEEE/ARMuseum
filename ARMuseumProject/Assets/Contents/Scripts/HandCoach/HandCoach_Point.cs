@@ -5,21 +5,20 @@ using NRKernal;
 
 public class HandCoach_Point : MonoBehaviour
 {
-    public InteractionHint _HandCoach;
-    public float ForwardOffset;
-    private GameObject CenterCameraAnchor;
+    public InteractionHint interactionHint;
+    private Transform centerAnchor
+    {
+        get
+        {
+            return NRSessionManager.Instance.CenterCameraAnchor;
+        }
+    }
     private bool isFirstUse = true;
 
-    // Start is called before the first frame update
-    void Start()
+    public void StartHintLoop()
     {
-        
-    }
-
-    private void OnEnable()
-    {
-        CenterCameraAnchor = GameObject.Find("NRCameraRig/CenterAnchor");
-        transform.position = CenterCameraAnchor.transform.position + CenterCameraAnchor.transform.forward * ForwardOffset;
+        transform.position = centerAnchor.position + centerAnchor.forward * 0.4f;
+        interactionHint.StartHintLoop();
     }
 
     // Update is called once per frame
@@ -32,7 +31,7 @@ public class HandCoach_Point : MonoBehaviour
 
             if (rightHandState.currentGesture == HandGesture.Point || leftHandState.currentGesture == HandGesture.Point)
             {
-                _HandCoach.StopHintLoop();
+                interactionHint.StopHintLoop();
                 isFirstUse = false;
             }
         }

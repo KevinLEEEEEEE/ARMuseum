@@ -10,14 +10,14 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
     public NRPointerRaycaster raycaster;
     public GrabbablePanel grabbablePanel;
     public Frame frame;
+    public HandCoach_Point handCoach_Point;
     public GameObject exhibits;
-    public GameObject handCoach_Point;
     public GameObject status_TargetLost;
     public AudioClip showExhibits;
     public AudioClip hoverExhibits;
     public AudioClip selectExhibits;
     private AudioSource audioPlayer;
-    private bool isFirstEnter; // 不需要重置
+    private bool isHandCoached_Point = false; // 不需要重置
     private bool isNavigating;
     private bool canDetectRaycast;
     private bool freezeDuringPointerDown;
@@ -237,10 +237,11 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
                 }
             }
 
-            if (isFirstEnter)
+            if (!isHandCoached_Point)
             {
-                isFirstEnter = false;
-                handCoach_Point.SetActive(true);
+                Debug.Log("active");
+                isHandCoached_Point = true;
+                handCoach_Point.StartHintLoop();
             }
 
             Debug.Log("[Player] Select exhibit: " + hoverExhibit.name);

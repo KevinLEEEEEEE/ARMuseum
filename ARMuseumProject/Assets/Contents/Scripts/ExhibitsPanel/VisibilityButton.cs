@@ -26,7 +26,7 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
     private SpriteRenderer spriteRenderer;
     private MeshRenderer meshRenderer;
     private Animation animator;
-    private bool isFirstEnter = true;
+    private bool isHandCoached_Pinch = false; // 不需要重置
     private bool isPointerDown = false;
     private bool freezeAfterPointerDown = false;
     private bool canDetectRaycast = true;
@@ -40,9 +40,18 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
 
         gameController.StartRaycastEvent += StartRaycastDetection;
         gameController.StopRaycastEvent += StopRayastDetection;
+        gameController.FoundObserverEvent += Found;
 
         interactionHint.gameObject.SetActive(true);
         meshRenderer.enabled = false;
+    }
+
+    private void Found()
+    {
+        if(!isHandCoached_Pinch)
+        {
+            interactionHint.StartHintLoop();
+        }  
     }
 
     // Triggered by animation: OrbClick
@@ -82,9 +91,9 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
     {
         if (canDetectRaycast)
         {
-            if (isFirstEnter)
+            if (!isHandCoached_Pinch)
             {
-                isFirstEnter = false;
+                isHandCoached_Pinch = true;
                 interactionHint.StopHintLoop();
             }
 

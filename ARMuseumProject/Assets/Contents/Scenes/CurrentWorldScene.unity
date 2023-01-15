@@ -2428,10 +2428,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hideIfHandTracked: 0
-  hintDisplayDelay: 3
-  trackedHandHintDisplayDelay: 5
+  hintDisplayDelay: 2
+  trackedHandHintDisplayDelay: 4
   repeats: 2
-  autoActivate: 1
+  autoActivate: 0
   animationState: NearSelect_R
   repeatDelay: 1
 --- !u!1 &274652133
@@ -4228,8 +4228,8 @@ MonoBehaviour:
   raycaster: {fileID: 711272188}
   grabbablePanel: {fileID: 1999815224}
   frame: {fileID: 1119715350}
+  handCoach_Point: {fileID: 1761141199}
   exhibits: {fileID: 903306995}
-  handCoach_Point: {fileID: 1761141197}
   status_TargetLost: {fileID: 1167156736}
   showExhibits: {fileID: 8300000, guid: 82cc091548594a34086891f516b81846, type: 3}
   hoverExhibits: {fileID: 8300000, guid: eded8eb8b1466ee4f9e068338bbf30eb, type: 3}
@@ -10724,7 +10724,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1761141198
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10732,7 +10732,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761141197}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -3.35}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -10743,7 +10743,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.524, y: 0}
+  m_AnchoredPosition: {x: -0.52400005, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1761141199
@@ -10758,8 +10758,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ceb64fe39e341524d814032315f8c9d6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _HandCoach: {fileID: 265407318}
-  ForwardOffset: 0.38
+  interactionHint: {fileID: 265407318}
 --- !u!1 &1763578704
 GameObject:
   m_ObjectHideFlags: 0
@@ -13883,7 +13882,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &6433038356359435552
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13897,10 +13896,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hideIfHandTracked: 0
-  hintDisplayDelay: 3
-  trackedHandHintDisplayDelay: 5
+  hintDisplayDelay: 2
+  trackedHandHintDisplayDelay: 4
   repeats: 2
-  autoActivate: 1
+  autoActivate: 0
   animationState: AirTap_R
   repeatDelay: 1
 --- !u!1 &7106607001155323679
