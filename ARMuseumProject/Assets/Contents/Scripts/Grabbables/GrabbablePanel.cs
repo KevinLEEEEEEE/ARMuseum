@@ -46,9 +46,8 @@ public class GrabbablePanel : MonoBehaviour
     {
         Transform targetObject = transform.Find(obj.name);
 
-        targetObject.position = obj.transform.GetChild(0).position; // …Ë÷√≥ı ºŒª÷√
-        targetObject.rotation = obj.transform.GetChild(0).rotation;
         targetObject.gameObject.SetActive(true);
+        targetObject.GetComponent<GrabbableExhibit>().MoveToDestinationFrom(obj.transform.GetChild(0));
         PlaySound(SelectExhibit);
     }
 

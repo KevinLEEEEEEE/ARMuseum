@@ -3,37 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
 
+
 public class GrabbableExhibit : MonoBehaviour
 {
+    public GameObject Orbs;
     public Material defaultMaterial;
-    public float forwardOffset;
 
-    private GameObject objectMesh;
-    private GameObject infoOrb;
-    private Transform m_CenterAnchor;
     private Transform centerAnchor
     {
         get
         {
-            if (m_CenterAnchor == null)
-            {
-                m_CenterAnchor = NRSessionManager.Instance.NRHMDPoseTracker.centerAnchor;
-            }
-            return m_CenterAnchor;
+            return NRSessionManager.Instance.CenterCameraAnchor;
         }
     }
-    private bool canMoveTowards = true;
-    private bool isDeleting = false;
+    //private bool isDeleting = false;
 
     private void OnEnable()
-    {
-        objectMesh = transform.Find("Mesh").gameObject;
-        infoOrb = transform.Find("Orbs").gameObject;
-        objectMesh.transform.LookAt(centerAnchor);
-        ResetAll();
-    }
-
-    private void OnDisable()
     {
         ResetAll();
     }
@@ -41,30 +26,28 @@ public class GrabbableExhibit : MonoBehaviour
     public void ResetAll()
     {
         HideOrbs();
-
-        canMoveTowards = true;
-        isDeleting = false;
+        //isDeleting = false;
     }
 
     public void DeleteStart()
     {
-        isDeleting = true;
+        //isDeleting = true;
     }
 
     public void DeleteStop()
     {
-        isDeleting = false;
+        //isDeleting = false;
     }
 
     public void DeleteComplete()
     {
-        isDeleting = false;
+        //isDeleting = false;
         SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
     }
 
     public void ShowOrbs()
     {
-        foreach (Transform child in infoOrb.transform)
+        foreach (Transform child in Orbs.transform)
         {
             child.gameObject.SetActive(true);
         }
@@ -72,26 +55,23 @@ public class GrabbableExhibit : MonoBehaviour
 
     public void HideOrbs()
     {
-        foreach (Transform child in infoOrb.transform)
+        foreach (Transform child in Orbs.transform)
         {
             child.gameObject.SetActive(false);
         }
     }
 
-    void Update()
+    public void MoveToDestinationFrom(Transform point)
     {
-        if (canMoveTowards)
-        {
-            Vector3 target = centerAnchor.position + centerAnchor.forward * forwardOffset;
+        Vector3 startPoint = point.position;
+        Vector3 endPoint = centerAnchor.position + centerAnchor.forward * 0.4f;
 
-            if (Vector3.Distance(transform.position, target) >= 0.01f)
-            {
-                transform.position = Vector3.MoveTowards(transform.position, target, 0.02f);
-            }
-            else
-            {
-                canMoveTowards = false;
-            }
-        }
+        StartCoroutine(.4f.Tweeng((p) => {
+            transform.position = p;
+            transform.LookAt(2 * transform.position - centerAnchor.transform.position);
+        }, startPoint, endPoint));
+        
     }
 }
+
+
