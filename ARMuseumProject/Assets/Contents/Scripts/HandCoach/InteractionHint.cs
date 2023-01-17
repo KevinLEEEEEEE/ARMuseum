@@ -265,7 +265,8 @@ namespace NRKernal
             if (animationHideDuration > 0)
             {
                 // Tell the animator to play the animation
-                if (animator != null)
+                // 新增了 VisualsRoot.activeSelf 检测，如果交互说明未启动，则无需 fadeout
+                if (animator != null && VisualsRoot.activeSelf)
                 {
                     animator.Play(fadeOutAnimationState);
                 }
