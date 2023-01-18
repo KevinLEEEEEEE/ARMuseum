@@ -8,20 +8,20 @@ public class Exhibits : MonoBehaviour
     public Material HoverMaterial;
     public float ShowSlefDelay = 0;
 
-    private Transform ObjectTransform;
-    private Renderer ObjectRenderer;
-    private Animation ObjectAnimation;
+    private Transform exhibitTransform;
+    private Renderer exhibitRenderer;
+    private Animation exhibitAnimation;
     private bool isFirstInitialize = true;
     private bool isInitializing = false;
 
     private void OnEnable()
     {
-        ObjectTransform = transform.GetChild(0);
-        ObjectRenderer = ObjectTransform.GetComponent<Renderer>();
-        ObjectAnimation = ObjectTransform.GetComponent<Animation>();
-        ObjectTransform.gameObject.SetActive(false);
+        exhibitTransform = transform.GetChild(0);
+        exhibitRenderer = exhibitTransform.GetComponent<Renderer>();
+        exhibitAnimation = exhibitTransform.GetComponent<Animation>();
+        exhibitTransform.gameObject.SetActive(false);
 
-        Invoke("RunShowExhibitsAnimation", isFirstInitialize ? ShowSlefDelay : 0.6f);
+        Invoke("RunShowExhibitsAnimation", isFirstInitialize ? ShowSlefDelay : 0);
         SendMessageUpwards("BeginInitializing");
         isInitializing = true;
     }
@@ -43,10 +43,8 @@ public class Exhibits : MonoBehaviour
 
     private void RunShowExhibitsAnimation()
     {
-        
-        ObjectTransform.gameObject.SetActive(true);
-        ObjectAnimation.Play("ShowExhibits");
-        
+        exhibitTransform.gameObject.SetActive(true);
+        exhibitAnimation.Play("ShowExhibits");
     }
 
     public void FinishInitializingObject()
@@ -58,14 +56,14 @@ public class Exhibits : MonoBehaviour
 
     public void ChangeToHoverState()
     {
-        ObjectRenderer.material = HoverMaterial;
-        ObjectAnimation.Play("HightlightExhibits");
+        exhibitRenderer.material = HoverMaterial;
+        exhibitAnimation.Play("HightlightExhibits");
     }
 
     public void ChangeToDefaultState()
     {
-        ObjectRenderer.material = DefaultMaterial;
-        ObjectAnimation.Stop("HightlightExhibits");
-        ObjectTransform.localPosition = new Vector3(0, 0, 0);
+        exhibitRenderer.material = DefaultMaterial;
+        exhibitAnimation.Stop("HightlightExhibits");
+        exhibitTransform.localPosition = new Vector3(0, 0, 0);
     }
 }

@@ -7206,8 +7206,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c79f4f06a9172240bfc8ccd1da5c5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mesh: {fileID: 1794445642}
   Orbs: {fileID: 1612778889}
-  defaultMaterial: {fileID: 2100000, guid: 9c54f29cec54009408883bc9047b15d6, type: 2}
 --- !u!114 &1136514471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10062,8 +10062,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c79f4f06a9172240bfc8ccd1da5c5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mesh: {fileID: 1302054586}
   Orbs: {fileID: 823434531}
-  defaultMaterial: {fileID: 2100000, guid: e85bdd09f6cb00a4bb75e15ca10970d3, type: 2}
 --- !u!136 &1608051821
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -10743,7 +10743,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -0.52400005, y: 0}
+  m_AnchoredPosition: {x: -0.52400005, y: -0.1109}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1761141199
@@ -12076,8 +12076,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0c79f4f06a9172240bfc8ccd1da5c5aa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mesh: {fileID: 5991531375626755249}
   Orbs: {fileID: 1314680045}
-  defaultMaterial: {fileID: 2100000, guid: a9537d8a8e2da3e478c878b0a5c0791d, type: 2}
 --- !u!114 &2005352026
 MonoBehaviour:
   m_ObjectHideFlags: 0

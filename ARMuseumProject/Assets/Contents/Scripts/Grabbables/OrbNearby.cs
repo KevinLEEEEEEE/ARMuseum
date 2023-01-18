@@ -27,6 +27,11 @@ public class OrbNearby : MonoBehaviour
         ResetAll();
     }
 
+    private void OnDisable()
+    {
+        ResetAll();
+    }
+
     public void ResetAll()
     {
         currentMaterial.SetFloat("_RimLight", MaxRimPower);

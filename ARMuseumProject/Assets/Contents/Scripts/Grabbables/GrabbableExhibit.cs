@@ -6,9 +6,9 @@ using NRKernal;
 
 public class GrabbableExhibit : MonoBehaviour
 {
+    public GameObject mesh;
     public GameObject Orbs;
-    public Material defaultMaterial;
-
+    private Material emissiveMaterial;
     private Transform centerAnchor
     {
         get
@@ -16,7 +16,11 @@ public class GrabbableExhibit : MonoBehaviour
             return NRSessionManager.Instance.CenterCameraAnchor;
         }
     }
-    //private bool isDeleting = false;
+
+    private void Start()
+    {
+        emissiveMaterial = mesh.GetComponent<MeshRenderer>().material;
+    }
 
     private void OnEnable()
     {
@@ -26,22 +30,27 @@ public class GrabbableExhibit : MonoBehaviour
     public void ResetAll()
     {
         HideOrbs();
-        //isDeleting = false;
+        DeleteStop();
     }
 
     public void DeleteStart()
     {
-        //isDeleting = true;
+        emissiveMaterial.EnableKeyword("_EMISSION");
+        StartCoroutine(.6f.Tweeng((p) =>
+        {
+            emissiveMaterial.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * p);
+        }, 2.5f, 0));  
     }
 
     public void DeleteStop()
     {
-        //isDeleting = false;
+        emissiveMaterial.DisableKeyword("_EMISSION");
+        emissiveMaterial.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * 2.5f);
     }
 
     public void DeleteComplete()
     {
-        //isDeleting = false;
+        DeleteStop();
         SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
     }
 
