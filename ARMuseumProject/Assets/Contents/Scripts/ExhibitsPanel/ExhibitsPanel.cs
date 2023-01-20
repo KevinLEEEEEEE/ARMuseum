@@ -17,7 +17,6 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
     public AudioClip hoverExhibits;
     public AudioClip selectExhibits;
     private AudioSource audioPlayer;
-    private bool isHandCoached_Point = false; // 不需要重置
     private bool isNavigating;
     private bool canDetectRaycast;
     private bool freezeDuringPointerDown;
@@ -237,15 +236,9 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
                 }
             }
 
-            if (!isHandCoached_Point)
-            {
-                Debug.Log("active");
-                isHandCoached_Point = true;
-                handCoach_Point.StartHintLoop();
-            }
-
             Debug.Log("[Player] Select exhibit: " + hoverExhibit.name);
             grabbablePanel.ActiveGrabbableItem(hoverExhibit);
+            handCoach_Point.StartHintLoop();
             hoverExhibit.SetActive(false);
             PlaySound(selectExhibits);
         }

@@ -6,6 +6,7 @@ using NRKernal;
 public class HandCoach_Point : MonoBehaviour
 {
     public InteractionHint interactionHint;
+    public GameController gameController;
     private Transform centerAnchor
     {
         get
@@ -15,10 +16,27 @@ public class HandCoach_Point : MonoBehaviour
     }
     private bool isFirstUse = true;
 
+    private void Start()
+    {
+        gameController.StopRaycastEvent += GrabStart;
+    }
+
     public void StartHintLoop()
     {
-        transform.position = centerAnchor.position + centerAnchor.forward * 0.4f;
-        interactionHint.StartHintLoop();
+        if (isFirstUse)
+        {
+            transform.position = centerAnchor.position + centerAnchor.forward * 0.4f;
+            interactionHint.StartHintLoop();
+        }
+    }
+
+    private void GrabStart()
+    {
+        if(isFirstUse)
+        {
+            interactionHint.StopHintLoop();
+            isFirstUse = false;
+        }
     }
 
     // Update is called once per frame

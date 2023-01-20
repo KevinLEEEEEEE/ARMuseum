@@ -6,27 +6,30 @@ using NRKernal;
 public class GlowingOrb : MonoBehaviour
 {
     public GameObject orbPrefab;
+    public GameObject hitVisualizer;
     public AnimationCurve speedCurve;
+    public AnimationCurve scaleCurve;
 
     private GameObject orb;
     private Rigidbody orbRigidbody;
-    private bool canFollow;
+    private int planeMask = 1 << 8;
+    private float maxRayDistance = 1;
+    private float orbFloatDistance = 0.04f;
 
-    // Start is called before the first frame update
     void Start()
     {
         ResetAll();
-        InvokeRepeating("AddRandomForce", 2f, 0.2f);
+        //InvokeRepeating("AddRandomForce", 2f, 0.2f);
     }
 
     private void OnDisable()
     {
-        CancelInvoke("AddRandomForce");
+        //CancelInvoke("AddRandomForce");
     }
 
     public void ResetAll()
     {
-        canFollow = false;
+        HideHitVisualizer();
         DestoryOrb();
     }
 
@@ -59,50 +62,78 @@ public class GlowingOrb : MonoBehaviour
             Rigidbody rigid = orb.AddComponent<Rigidbody>();
             orbRigidbody = rigid;
             rigid.useGravity = false;
-            rigid.mass = 3;
-            rigid.drag = 2f;
+            rigid.mass = 2;
+            rigid.drag = 3f;
         }      
     }
 
-    public void StartFollow()
+    private Vector3 GetTargetLocation(HandState domainHandState) // 暂时使用该位置，后期需要设定更加自然、灵动的跟随策略
     {
-        canFollow = true;
-    }
-
-    public void StopFollow()
-    {
-        canFollow = false;
-    }
-
-    private Vector3 GetFollowingPoint() // 暂时使用该位置，后期需要设定更加自然、灵动的跟随策略
-    {
-        HandState domainHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
-
-        if (domainHandState.currentGesture != HandGesture.Point)
+        if (!domainHandState.isTracked)
         {
             Transform anchor = NRSessionManager.Instance.CenterCameraAnchor;
             return anchor.position + anchor.transform.forward * 0.6f;
         }else
         {
-            return domainHandState.GetJointPose(HandJointID.IndexTip).position + Vector3.up * 0.05f;
+            Pose palmPose = domainHandState.GetJointPose(HandJointID.Palm);
+            return palmPose.position + Vector3.up * orbFloatDistance;
         } 
     }
 
-    private void AddRandomForce()
+    private void UpdateHitVisualizer(Vector3 hitPoint, float distance)
     {
-        if (!orbRigidbody) return;
+        if (!hitVisualizer.activeSelf)
+        {
+            hitVisualizer.gameObject.SetActive(true);
+        }
 
-        orbRigidbody.AddForce(Random.onUnitSphere / 3);
+        float scale = scaleCurve.Evaluate(distance / maxRayDistance);
+
+        hitVisualizer.transform.position = hitPoint;
+        hitVisualizer.transform.localScale = new Vector3(scale, 1, scale);
     }
+
+    private void HideHitVisualizer()
+    {
+        if (hitVisualizer.activeSelf)
+        {
+            hitVisualizer.gameObject.SetActive(false);
+            hitVisualizer.transform.localScale = new Vector3(1, 1, 1);
+        }
+    }
+
+    //private void AddRandomForce()
+    //{
+    //    if (!orbRigidbody) return;
+
+    //    orbRigidbody.AddForce(Random.onUnitSphere / 3);
+    //}
 
     void Update()
     {
-        if(orb && canFollow)
+        if (!orb || !orb.activeSelf) return;
+
+        HandState domainHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+        Vector3 start = orb.transform.position;
+        Vector3 end = GetTargetLocation(domainHandState);
+        float ratio = speedCurve.Evaluate(Vector3.Distance(start, end));
+        orbRigidbody.AddForce((end - start) * ratio);
+
+        if(domainHandState.isTracked)
         {
-            Vector3 start = orb.transform.position;
-            Vector3 end = GetFollowingPoint();
-            float ratio = speedCurve.Evaluate(Vector3.Distance(start, end));
-            orbRigidbody.AddForce((end - start) * ratio);
+            Vector3 raycastStart = start - Vector3.down * orbFloatDistance;
+
+            if (Physics.Raycast(new Ray(raycastStart, Vector3.down), out var hitResult, maxRayDistance, planeMask))
+            {
+                UpdateHitVisualizer(hitResult.point, hitResult.distance);
+            } else
+            {
+                HideHitVisualizer();
+            }
+        } else
+        {
+            HideHitVisualizer();
         }
+        
     }
 }

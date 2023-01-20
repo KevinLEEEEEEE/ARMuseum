@@ -2428,8 +2428,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   hideIfHandTracked: 0
-  hintDisplayDelay: 2
-  trackedHandHintDisplayDelay: 4
+  hintDisplayDelay: 1.5
+  trackedHandHintDisplayDelay: 1
   repeats: 2
   autoActivate: 0
   animationState: NearSelect_R
@@ -10759,6 +10759,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactionHint: {fileID: 265407318}
+  gameController: {fileID: 1729450201}
 --- !u!1 &1763578704
 GameObject:
   m_ObjectHideFlags: 0
