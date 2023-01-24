@@ -16,7 +16,7 @@ public class GameController_S2 : MonoBehaviour
         act1.StartAct();
     }
 
-    public void SetStoryAnchor(RaycastHit hit, HandEnum domainHand)
+    public void SetStoryAnchor(RaycastHit hit)
     {
         planeDetector.LockTargetPlane(hit.collider.gameObject);
         //ConfirmAnchoredPlane(hit.point);

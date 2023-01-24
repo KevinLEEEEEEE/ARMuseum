@@ -8,6 +8,7 @@ public class Act1 : MonoBehaviour
     public DialogGenerator dialogGenerator;
     public GameController_S2 gameController;
     public GlowingOrb glowingOrb;
+    public Progress progressUI;
     public AudioClip handEntrySound;
     public AudioClip handStableSound;
     public AudioClip handActiveSound;
@@ -15,9 +16,10 @@ public class Act1 : MonoBehaviour
     private AudioSource handEntryPlayer;
     private AudioSource handStablePlayer;
     private AudioSource handActivePlayer;
-    private HandEnum domainHand = HandEnum.RightHand;
+    private float handEntryBaseVolum = 0.3f;
     private float activationRange = 0.16f;
     private bool isActivationTiming;
+    private bool isAnchored;
     private Vector3 prePosition;
     private int motionCount;
     private RaycastHit hitResult;
@@ -40,7 +42,7 @@ public class Act1 : MonoBehaviour
         handActivePlayer = gameObject.AddComponent<AudioSource>();
         handEntryPlayer.clip = handEntrySound;
         handEntryPlayer.loop = true;
-        handEntryPlayer.volume = 0;
+        handEntryPlayer.volume = handEntryBaseVolum;
         handStablePlayer.clip = handStableSound;
         handActivePlayer.clip = handActiveSound;
 
@@ -51,6 +53,7 @@ public class Act1 : MonoBehaviour
     {
         isActivationTiming = false;
         canDetectRange = false;
+        isAnchored = false;
         motionCount = -1;
         currentRange = HandRange.outRange;
     }
@@ -65,7 +68,6 @@ public class Act1 : MonoBehaviour
         float delayBeforeDialog = 2f;
         float delayAfterDialog = 2f;
 
-        // orb一开始灰暗
         glowingOrb.InitOrb(new Vector3(0, 0, 1)); // 由上一个场景传入参数
         glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
 
@@ -77,11 +79,37 @@ public class Act1 : MonoBehaviour
 
         dialogGenerator.GenerateDialog("现在，触碰远古的痕迹......\n唤醒大地的回忆......");
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration + delayAfterDialog);
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration);
+
+        glowingOrb.ActiveOrb();
+        handEntryPlayer.Play();
+
+        yield return new WaitForSeconds(delayAfterDialog);
 
         glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.handJoint);
-        // orb变亮，且其亮度随着距离平面的变而变化
         canDetectRange = true;
+    }
+
+    private IEnumerator EndingScene()
+    {
+        handStablePlayer.Play();
+        isAnchored = true;
+        UpdateHandEntryVolume(handEntryBaseVolum);
+
+        yield return new WaitForSeconds(2f);
+
+        dialogGenerator.GenerateDialog("历史已被唤醒......");
+        glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.spaceAnchor);
+
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 3f);
+
+        glowingOrb.FadeOut();
+        UpdateHandEntryVolume(0.2f);
+
+        yield return new WaitForSeconds(8.5f); // 等待动画结束
+
+        UpdateHandEntryVolume(0);
+        gameController.SetStoryAnchor(hitResult);
     }
 
     public void EndAct()
@@ -109,46 +137,52 @@ public class Act1 : MonoBehaviour
         }
     }
 
-    //private IEnumerator ActivationProcess()
-    //{
-    //    // 首先播放声音，告知进入区域
-
-    //    yield return new WaitForSeconds
-    //}
-
     private void MotionDetection()
     {
-        HandState domainHandState = NRInput.Hands.GetHandState(domainHand);
+        HandState domainHandState = gameController.GetDomainHandState();
         Vector3 motionAnchor = domainHandState.GetJointPose(HandJointID.Palm).position;
 
         if (motionCount == -1)
-        { 
+        {
+            progressUI.HideProgress();
             motionCount++;
-        } else if (motionCount == 5)
-        {   
+        } else if (motionCount == 3)
+        {
+            progressUI.StartRadialProgress();
+            progressUI.ShowProgress();
+            glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.planeAnchor);
+            motionCount++;
+        } else if (motionCount == 7) {
+            glowingOrb.SetPlaneAnchor(hitResult.point, true);
+            motionCount++;
+        } else if (motionCount == 9)
+        {
             StopActivationTiming();
-            gameController.SetStoryAnchor(hitResult, domainHand);
+            StartCoroutine("EndingScene");
         } else
         {
-            if (Vector3.Distance(motionAnchor, prePosition) <= 0.025f) // 在0.5s内运动距离小于1cm，视为静止
+            if (Vector3.Distance(motionAnchor, prePosition) <= 0.01f) // 在0.5s内运动距离小于1cm，视为静止
             {
                 motionCount++;
             }
             else
             {
-                motionCount = 0; // 否则重新计数
+                if (motionCount > 3)
+                {
+                    motionCount = 3;
+                } else
+                {
+                    motionCount = 0;
+                }
+
+                progressUI.HideProgress();
+                glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.handJoint);
             }
         }
 
+        Debug.Log("count: " + motionCount);
+        glowingOrb.SetPlaneAnchor(hitResult.point, false);
         prePosition = motionAnchor;
-    }
-
-    private void PlayHandEntrySound()
-    {
-        if(!handEntryPlayer.isPlaying)
-        {
-            handEntryPlayer.Play();
-        }
     }
 
     private void UpdateHandEntryVolume(float volume)
@@ -173,17 +207,18 @@ public class Act1 : MonoBehaviour
         }
 
         HandState domainHandState = gameController.GetDomainHandState();
+        float volume = handEntryBaseVolum;
 
         if (!domainHandState.isTracked)
         {
             StopActivationTiming();
+            UpdateHandEntryVolume(volume);
             return;
         }
 
-        Pose middleTipPose = domainHandState.GetJointPose(HandJointID.MiddleTip);
-        Vector3 laserAnchor = middleTipPose.position + middleTipPose.up * 0.025f;
-        float volume = 0f;
-
+        Pose jointPose = domainHandState.GetJointPose(HandJointID.MiddleTip);
+        Vector3 laserAnchor = jointPose.position + jointPose.up * 0.025f;
+        
         Debug.DrawRay(laserAnchor, Vector3.down, Color.blue); // 画一条debug线，模拟射线
 
         if (Physics.Raycast(new Ray(laserAnchor, Vector3.down), out hitResult, maxRayDistance, planeMask))
@@ -193,7 +228,6 @@ public class Act1 : MonoBehaviour
                 if(currentRange != HandRange.activationRange)
                 {
                     currentRange = HandRange.activationRange;
-                    PlayHandEntrySound();
                     StartActivationTiming();
                 }
             } else
@@ -202,7 +236,7 @@ public class Act1 : MonoBehaviour
                 StopActivationTiming();
             }
 
-            volume = (maxRayDistance - hitResult.distance) * 3;
+            volume += (maxRayDistance - hitResult.distance) * 3;
         }
         else
         {
