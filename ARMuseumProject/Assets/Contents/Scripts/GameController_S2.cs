@@ -6,6 +6,7 @@ using NRKernal;
 public class GameController_S2 : MonoBehaviour
 {
     public Act1 act1;
+    public Act1 act2;
     public PlaneDetector planeDetector;
 
     // Start is called before the first frame update
@@ -20,6 +21,11 @@ public class GameController_S2 : MonoBehaviour
     {
         planeDetector.LockTargetPlane(hit.collider.gameObject);
         //ConfirmAnchoredPlane(hit.point);
+    }
+
+    public void NextAct()
+    {
+        Debug.Log("NextAct");
     }
 
     public HandState GetDomainHandState()
