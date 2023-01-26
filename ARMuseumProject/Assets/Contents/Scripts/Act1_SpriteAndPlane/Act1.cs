@@ -27,13 +27,6 @@ public class Act1 : MonoBehaviour
     private int motionCount;
     private RaycastHit hitResult;
     private bool canDetectRange;
-    //private HandRange currentRange;
-    //private enum HandRange
-    //{
-    //    outRange,
-    //    inRange,
-    //    activationRange,
-    //}
 
     private int planeMask = 1 << 8;
     private float maxRayDistance = 0.5f;
@@ -58,7 +51,6 @@ public class Act1 : MonoBehaviour
         canDetectRange = false;
         isAnchored = false;
         motionCount = -1;
-        //currentRange = HandRange.outRange;
     }
 
     public void StartAct()
@@ -85,16 +77,17 @@ public class Act1 : MonoBehaviour
         yield return new WaitForSeconds(DialogGenerator.dialogDuration);
 
         handEntryPlayer.Play();
+        canDetectRange = true;
 
         yield return new WaitForSeconds(delayAfterDialog);
 
-        glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.handJoint);
-        canDetectRange = true;
+        gameController.StartPlaneHint();   
     }
 
     private IEnumerator EndingScene()
     {
         handStablePlayer.Play();
+        gameController.StopPlaneHint();
         UpdateHandEntryVolume(handEntryBaseVolum);
 
         yield return new WaitForSeconds(2f);
@@ -108,7 +101,7 @@ public class Act1 : MonoBehaviour
         UpdateHandEntryVolume(0.2f);
         gameController.SetStoryAnchor(hitResult);
 
-        yield return new WaitForSeconds(4.4f); // µÈ´ý×²»÷
+        yield return new WaitForSeconds(4.47f); // µÈ´ý×²»÷
 
         foreach (ParticleSystem sys in groundEffects)
         {
@@ -158,7 +151,7 @@ public class Act1 : MonoBehaviour
         Pose jointPose = domainHandState.GetJointPose(HandJointID.MiddleTip);
         Vector3 point = hitResult.point + jointPose.up * 0.1f;
         Vector3 planeNormal = hitResult.collider.transform.up;
-        Vector3 planePosition = hitResult.collider.transform.position;
+        Vector3 planePosition = hitResult.point;
         Plane plane = new Plane(planeNormal, planePosition);
 
         return plane.ClosestPointOnPlane(point);
@@ -205,7 +198,7 @@ public class Act1 : MonoBehaviour
                 }
 
                 progressUI.HideProgress();
-                glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.handJoint);
+                glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
             }
         }
 
@@ -253,11 +246,9 @@ public class Act1 : MonoBehaviour
         {
             if(hitResult.distance <= activationRange)
             {
-                //currentRange = HandRange.activationRange;
                 StartActivationTiming();
             } else
             {
-                //currentRange = HandRange.inRange;
                 StopActivationTiming();
             }
 
@@ -265,7 +256,6 @@ public class Act1 : MonoBehaviour
         }
         else
         {
-            //currentRange = HandRange.outRange;
             StopActivationTiming();
         }
 

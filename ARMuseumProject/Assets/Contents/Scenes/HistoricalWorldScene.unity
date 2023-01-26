@@ -200,7 +200,7 @@ Transform:
   m_GameObject: {fileID: 15654310}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -0.051, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.1, z: 0.2}
+  m_LocalScale: {x: 0.25, y: 0.1, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 515925210}
@@ -1224,7 +1224,7 @@ Transform:
   m_GameObject: {fileID: 596625101}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
+  m_LocalScale: {x: 0.045000006, y: 0.045000006, z: 0.045000006}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 274188444}
@@ -6106,7 +6106,7 @@ Transform:
   m_GameObject: {fileID: 598230214}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.035, y: 0.035, z: 0.035}
+  m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2085695220}
@@ -11444,7 +11444,7 @@ Transform:
   m_GameObject: {fileID: 855957109}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.03, y: 0.03, z: 0.03}
+  m_LocalScale: {x: 0.035, y: 0.035, z: 0.035}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 274188444}
@@ -17647,7 +17647,7 @@ Transform:
   m_GameObject: {fileID: 1175434515}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.03, y: 0.03, z: 0.03}
+  m_LocalScale: {x: 0.04, y: 0.03, z: 0.03}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2085695220}
@@ -23389,8 +23389,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   act1: {fileID: 1034122710}
-  act2: {fileID: 0}
-  planeDetector: {fileID: 1362111713}
+  planeDetector: {fileID: 1362111712}
 --- !u!4 &1457940029
 Transform:
   m_ObjectHideFlags: 0
@@ -23936,7 +23935,7 @@ GameObject:
   - component: {fileID: 1728806152}
   - component: {fileID: 1728806151}
   m_Layer: 0
-  m_Name: Wave
+  m_Name: LightWave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23951,7 +23950,7 @@ Transform:
   m_GameObject: {fileID: 1728806149}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.03, y: 0.03, z: 0.03}
+  m_LocalScale: {x: 0.04, y: 0.04, z: 0.04}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2085695220}
@@ -29881,7 +29880,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0.015, y: 0.015}
+  m_SizeDelta: {x: 0.02, y: 0.02}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1634530203381747565
 CanvasRenderer:

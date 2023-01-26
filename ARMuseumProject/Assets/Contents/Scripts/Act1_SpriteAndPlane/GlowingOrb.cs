@@ -13,11 +13,10 @@ public class GlowingOrb : MonoBehaviour
     private Rigidbody orbRigidbody;
     private Vector3 planeAnchor;
     private bool isPlaneAnchorConfirmed = false;
-    private float orbFloatDistance = 0.04f;
     public enum OrbTarget
     {
         centerCamera,
-        handJoint,
+        //handJoint,  考虑不采用跟手的方式，而是在屏幕中央可以与手互动；Act可以设置优先定位点，按优先级排序
         planeAnchor,
     }
     private OrbTarget currentOrbTarget = OrbTarget.centerCamera;
@@ -75,28 +74,14 @@ public class GlowingOrb : MonoBehaviour
 
     private Vector3 GetTargetLocation() // 暂时使用该位置，后期需要设定更加自然、灵动的跟随策略
     {
-        HandState domainHandState = gameController.GetDomainHandState();
-
         if (currentOrbTarget == OrbTarget.centerCamera)
         {
             Transform anchor = NRSessionManager.Instance.CenterCameraAnchor;
-            return anchor.position + anchor.transform.forward * 0.6f;
-        }
-        else if (currentOrbTarget == OrbTarget.handJoint)
-        {
-            if(!domainHandState.isTracked)
-            {
-                Transform anchor = NRSessionManager.Instance.CenterCameraAnchor;
-                return anchor.position + anchor.transform.forward * 0.6f;
-            } else
-            {
-                Pose tipPose = domainHandState.GetJointPose(HandJointID.IndexTip);
-                return tipPose.position + Vector3.up * orbFloatDistance;
-            }
+            return anchor.position + anchor.transform.forward * 0.5f + Vector3.down * 0.02f;
         }
         else
         {
-            return planeAnchor + Vector3.up * 0.08f; // 目标位置
+            return planeAnchor + Vector3.up * 0.15f; // 目标位置
         }
     }
 
@@ -108,10 +93,7 @@ public class GlowingOrb : MonoBehaviour
 
         if(currentOrbTarget == OrbTarget.planeAnchor)
         {
-            ratio = ratio / 3.5f;
-        } else
-        {
-            ratio = ratio / 1.25f;
+            ratio = ratio / 2.5f;
         }
 
         orbRigidbody.AddForce((end - start) * ratio);
