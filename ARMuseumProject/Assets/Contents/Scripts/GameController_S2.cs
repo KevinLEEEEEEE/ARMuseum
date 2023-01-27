@@ -5,41 +5,76 @@ using NRKernal;
 
 public class GameController_S2 : MonoBehaviour
 {
-    public Act1 act1;
-    //public Act2 act2;
+    public Scene1 scene1;
+    public Scene2 scene2;
     public Transform planeDetector;
-    //public PlaneDetector planeDetector;
+    public AudioSource env_Wind;
+    public float ambientSoundBasicVolume;
 
-    // Start is called before the first frame update
+    private EventAnchor confirmedEventAnchor;
+    private float ambientSoundVolume;
+    private HandEnum domainHand = HandEnum.RightHand;
+
     void Start()
     {
         NRInput.RaycastersActive = false;
 
-        act1.StartAct();
+        scene1.StartAct(new Vector3(0, 0, 1));
     }
 
-    public void SetStoryAnchor(RaycastHit hit)
+    public void UpdateEventAnchor(EventAnchor anchor)
     {
-        //planeDetector.LockTargetPlane(hit.collider.gameObject);
-        //ConfirmAnchoredPlane(hit.point);
+        planeDetector.GetComponent<PlaneDetector>().LockTargetPlane(anchor.GetHitObject());
+        confirmedEventAnchor = anchor;
     }
 
-    public void NextAct()
+    public void NextScene()
     {
-        Debug.Log("NextAct");
+        scene2.StartScene(confirmedEventAnchor.GetHitPoint(), confirmedEventAnchor.GetHitDirection());
+    }
+
+    public void PlayAmbientSound()
+    {
+        env_Wind.Play();
+        env_Wind.volume = 0;
+        UpdateAmbientSoundVolume(0);
+    }
+
+    public void StopAmbientSound()
+    {
+        env_Wind.Stop();
+        env_Wind.volume = 0;
+        UpdateAmbientSoundVolume(0);
+    }
+
+    public void UpdateAmbientSoundVolume(float volume)
+    {
+        ambientSoundVolume = volume + ambientSoundBasicVolume;
+    }
+
+    private void UpdateAmbientSoundVolume()
+    {
+        float delta = ambientSoundVolume - env_Wind.volume;
+        delta *= Time.deltaTime;
+        env_Wind.volume += delta;
     }
 
     public HandState GetDomainHandState()
     {
-        return NRInput.Hands.GetHandState(HandEnum.RightHand);
+        return NRInput.Hands.GetHandState(domainHand);
+    }
+
+    public Pose getHandJointPose(HandJointID jointID)
+    {
+        return GetDomainHandState().GetJointPose(jointID);
+    }
+
+    public bool getHandTrackingState()
+    {
+        return GetDomainHandState().isTracked;
     }
 
     public void StartPlaneHint()
-    {
-        InvokeRepeating("RunHintAnimation", 0, 3.5f);
-    }
-
-    private void RunHintAnimation()
     {
         foreach (Transform plane in planeDetector)
         {
@@ -49,12 +84,17 @@ public class GameController_S2 : MonoBehaviour
 
     public void StopPlaneHint()
     {
-        CancelInvoke("RunHintAnimation");
+        foreach (Transform plane in planeDetector)
+        {
+            plane.GetComponent<Animation>().Stop();
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if(env_Wind.isPlaying)
+        {
+            UpdateAmbientSoundVolume();
+        }
     }
 }

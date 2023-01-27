@@ -12,11 +12,9 @@ public class GlowingOrb : MonoBehaviour
 
     private Rigidbody orbRigidbody;
     private Vector3 planeAnchor;
-    private bool isPlaneAnchorConfirmed = false;
     public enum OrbTarget
     {
         centerCamera,
-        //handJoint,  考虑不采用跟手的方式，而是在屏幕中央可以与手互动；Act可以设置优先定位点，按优先级排序
         planeAnchor,
     }
     private OrbTarget currentOrbTarget = OrbTarget.centerCamera;
@@ -35,29 +33,11 @@ public class GlowingOrb : MonoBehaviour
     public void SetOrbTarget(OrbTarget target)
     {
         currentOrbTarget = target;
-
-        if(target != OrbTarget.planeAnchor)
-        {
-            isPlaneAnchorConfirmed = false;
-        }
-
-        if(target == OrbTarget.planeAnchor)
-        {
-            orbRigidbody.velocity = Vector3.zero;
-        }
     }
 
-    public void SetPlaneAnchor(Vector3 anchor, bool isConfirmed)
+    public void SetPlaneAnchor(EventAnchor anchor)
     {
-        if(isConfirmed)
-        {
-            isPlaneAnchorConfirmed = true;
-        }
-
-        if(!isPlaneAnchorConfirmed)
-        {
-            planeAnchor = anchor;
-        }
+        planeAnchor = anchor.GetCorrectedHitPoint();
     }
 
     public void DestoryOrb()
@@ -81,7 +61,7 @@ public class GlowingOrb : MonoBehaviour
         }
         else
         {
-            return planeAnchor + Vector3.up * 0.15f; // 目标位置
+            return planeAnchor + Vector3.up * 0.12f; // 目标位置
         }
     }
 
@@ -91,9 +71,9 @@ public class GlowingOrb : MonoBehaviour
         Vector3 end = GetTargetLocation();
         float ratio = speedCurve.Evaluate(Vector3.Distance(start, end));
 
-        if(currentOrbTarget == OrbTarget.planeAnchor)
+        if (currentOrbTarget == OrbTarget.planeAnchor)
         {
-            ratio = ratio / 2.5f;
+            ratio /= 1.5f;
         }
 
         orbRigidbody.AddForce((end - start) * ratio);
