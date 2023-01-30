@@ -22,6 +22,7 @@ public class GlowingOrb : MonoBehaviour
     private void Start()
     {
         orbRigidbody = transform.GetComponent<Rigidbody>();
+        transform.GetChild(0).gameObject.SetActive(false);
     }
 
     public void InitOrb(Vector3 position)

@@ -19,7 +19,9 @@ public class GameController_S2 : MonoBehaviour
     {
         NRInput.RaycastersActive = false;
 
-        scene1.StartAct(new Vector3(0, 0, 1));
+        //scene1.StartAct(new Vector3(0, 0, 1));
+
+        scene2.StartScene(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
     }
 
     public void UpdateEventAnchor(EventAnchor anchor)

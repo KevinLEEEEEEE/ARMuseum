@@ -11,6 +11,7 @@ public class EventAnchor
 
     public EventAnchor(RaycastHit res, Vector3 dir, float distanceFromCenter, float handModelOffset)
     {
+
         hitResult = res;
         hitDirection = dir;
         offset = distanceFromCenter + handModelOffset;
@@ -26,7 +27,7 @@ public class EventAnchor
         Vector3 point = hitResult.point + hitDirection * offset;
         Vector3 planeNormal = hitResult.collider.transform.up;
         Vector3 planeCenter = hitResult.point;
-        Plane plane = new Plane(planeNormal, planeCenter);
+        Plane plane = new(planeNormal, planeCenter);
 
         return plane.ClosestPointOnPlane(point);
     }
@@ -38,7 +39,9 @@ public class EventAnchor
 
     public Vector3 GetHitDirection()
     {
-        return hitDirection;
+        Vector3 planeNormal = hitResult.collider.transform.up;
+
+        return Vector3.ProjectOnPlane(hitDirection, planeNormal);
     }
 }
 
