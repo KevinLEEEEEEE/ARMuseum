@@ -21,7 +21,7 @@ public class GameController_S2 : MonoBehaviour
 
         //scene1.StartAct(new Vector3(0, 0, 1));
 
-        scene2.StartScene(new Vector3(0, 0, 0), new Vector3(0, 1, 0));
+        scene2.StartScene(new Vector3(0, 0, 1), new Vector3(0, 0, 10));
     }
 
     public void UpdateEventAnchor(EventAnchor anchor)
@@ -32,7 +32,7 @@ public class GameController_S2 : MonoBehaviour
 
     public void NextScene()
     {
-        scene2.StartScene(confirmedEventAnchor.GetHitPoint(), confirmedEventAnchor.GetHitDirection());
+        scene2.StartScene(confirmedEventAnchor.GetCorrectedHitPoint(), confirmedEventAnchor.GetHitDirection());
     }
 
     public void PlayAmbientSound()
