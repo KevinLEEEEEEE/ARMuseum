@@ -2,17 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using EZCameraShake;
+using NRKernal;
 
 public class Scene2 : MonoBehaviour
 {
+    public GameObject instruction_L;
+    public GameObject instruction_R;
+    public GameObject interactionHint_L;
+    public GameObject interactionHint_R;
+    public GameObject groundMask;
+    public GameObject voxelGenerator;
     private CameraShakeInstance shake;
     private AudioSource quakeSoundPlayer;
     private Animation voxelAppear;
+    private bool isFirstSub = true;
 
     void Start()
     {
         quakeSoundPlayer = transform.GetComponent<AudioSource>();
         voxelAppear = transform.GetComponent<Animation>();
+
+        instruction_L.SetActive(false);
+        instruction_R.SetActive(false);
+        voxelGenerator.SetActive(false);
     }
 
     public void StartScene(Vector3 point, Vector3 direction)
@@ -25,7 +37,7 @@ public class Scene2 : MonoBehaviour
 
     private IEnumerator OpeningScene()
     {
-        ShowSceneObjects();
+        groundMask.SetActive(true);
         quakeSoundPlayer.Play();
 
         yield return new WaitForSeconds(0.5f);
@@ -35,17 +47,53 @@ public class Scene2 : MonoBehaviour
         yield return new WaitForSeconds(0.75f);
 
         voxelAppear.Play();
+        voxelGenerator.SetActive(true);
 
         yield return new WaitForSeconds(2f);
 
         shake.StartFadeOut(2.5f);
+
+        yield return new WaitForSeconds(2f);
+
+        StartCoroutine(ShowInstruction(instruction_R, interactionHint_R, "R"));
     }
 
-    private void ShowSceneObjects()
+    public void AddVoxel()
     {
-        foreach(Transform child in transform)
+        StartCoroutine(HideInstruction(instruction_R, interactionHint_R, "R"));
+
+        if (isFirstSub)
         {
-            child.gameObject.SetActive(true);
+            StartCoroutine(ShowInstruction(instruction_L, interactionHint_L, "L"));
         }
-    } 
+    }
+
+    public void SubVoxel()
+    {
+        if (isFirstSub && instruction_L.activeSelf)
+        {
+            StartCoroutine(HideInstruction(instruction_L, interactionHint_L, "L"));
+        }
+
+        isFirstSub = false;  
+    }
+
+    private IEnumerator ShowInstruction(GameObject instruction, GameObject interaction, string side)
+    {
+        yield return new WaitForSeconds(3f);
+
+        instruction.GetComponent<Animation>().Play("InstructionFadeIn_" + side);
+        instruction.SetActive(true);
+        interaction.GetComponent<InteractionHint>().StartHintLoop();
+    }
+
+    private IEnumerator HideInstruction(GameObject instruction, GameObject interaction, string side)
+    {
+        instruction.GetComponent<Animation>().Play("InstructionFadeOut_" + side);
+        interaction.GetComponent<InteractionHint>().StopHintLoop();
+
+        yield return new WaitForSeconds(1f);
+
+        instruction.SetActive(false);
+    }
 }

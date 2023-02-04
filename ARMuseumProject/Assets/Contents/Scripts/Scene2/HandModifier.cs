@@ -34,6 +34,8 @@ public class HandModifier : MonoBehaviour
     private VoxelModifier modifier;
     private int layerMask = 1 << 13;
     private bool isAddActive = false;
+    private bool isFirstAdd = true;
+    private bool isFirstSub = true;
 
     private void Start()
     {
@@ -43,6 +45,16 @@ public class HandModifier : MonoBehaviour
 
     private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos)
     {
+        if(mode == VoxelModifyMode.Additive || isFirstAdd)
+        {
+            SendMessageUpwards("AddVoxel");
+            isFirstAdd = false;
+        } else if (mode == VoxelModifyMode.Subtractive || isFirstSub)
+        {
+            SendMessageUpwards("SubVoxel");
+            isFirstSub = true;
+        }
+
         if (modifier.Mode != mode)
         {
             modifier.SetModificationMode(mode);
