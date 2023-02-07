@@ -6,24 +6,27 @@ using NRKernal;
 
 public class Scene2 : MonoBehaviour
 {
+    public GameController_S2 gameController;
     public GameObject instruction_L;
     public GameObject instruction_R;
     public GameObject interactionHint_L;
     public GameObject interactionHint_R;
     public GameObject groundMask;
     public GameObject voxelGenerator;
+    public GameObject controllerOrb;
     private CameraShakeInstance shake;
     private AudioSource quakeSoundPlayer;
-    private Animation voxelAppear;
+    private Animation voxelAnimation;
     private bool isFirstSub = true;
 
     void Start()
     {
         quakeSoundPlayer = transform.GetComponent<AudioSource>();
-        voxelAppear = transform.GetComponent<Animation>();
+        voxelAnimation = transform.GetComponent<Animation>();
 
         instruction_L.SetActive(false);
         instruction_R.SetActive(false);
+        //controllerOrb.SetActive(false);
         voxelGenerator.SetActive(false);
     }
 
@@ -46,7 +49,7 @@ public class Scene2 : MonoBehaviour
 
         yield return new WaitForSeconds(0.75f);
 
-        voxelAppear.Play();
+        voxelAnimation.Play("VoxelMoveIn");
         voxelGenerator.SetActive(true);
 
         yield return new WaitForSeconds(2f);
@@ -56,6 +59,20 @@ public class Scene2 : MonoBehaviour
         yield return new WaitForSeconds(2f);
 
         StartCoroutine(ShowInstruction(instruction_R, interactionHint_R, "R"));
+    }
+
+    private IEnumerator EndingScene()
+    {
+        instruction_L.SetActive(false);
+        instruction_R.SetActive(false);
+        interactionHint_L.SetActive(false);
+        interactionHint_R.SetActive(false);
+        controllerOrb.SetActive(false);
+        voxelAnimation.Play("VoxelScale");
+
+        yield return new WaitForSeconds(3f);
+
+        gameController.FinshModeling();
     }
 
     public void AddVoxel()
@@ -95,5 +112,22 @@ public class Scene2 : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         instruction.SetActive(false);
+        controllerOrb.SetActive(true);
     }
+
+    private void DeleteStop()
+    {
+
+    }
+
+    private void DeleteStart()
+    {
+
+    }
+
+    private void DeleteComplete()
+    {
+        StartCoroutine("EndingScene");
+    }
+
 }

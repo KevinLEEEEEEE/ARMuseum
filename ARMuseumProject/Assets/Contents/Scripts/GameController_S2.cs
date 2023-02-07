@@ -7,6 +7,7 @@ public class GameController_S2 : MonoBehaviour
 {
     public Scene1 scene1;
     public Scene2 scene2;
+    public ShellController shell;
     public Transform planeDetector;
     public AudioSource env_Wind;
     public float ambientSoundBasicVolume;
@@ -19,9 +20,9 @@ public class GameController_S2 : MonoBehaviour
     {
         NRInput.RaycastersActive = false;
 
-        //scene1.StartAct(new Vector3(0, 0, 1));
+        scene1.StartAct(new Vector3(0, 0, 1));
 
-        scene2.StartScene(new Vector3(0, 0, 1), new Vector3(0, 0, 10));
+        //scene2.StartScene(new Vector3(0, 0, 1), new Vector3(0, 0, 10));
     }
 
     public void UpdateEventAnchor(EventAnchor anchor)
@@ -33,6 +34,12 @@ public class GameController_S2 : MonoBehaviour
     public void NextScene()
     {
         scene2.StartScene(confirmedEventAnchor.GetCorrectedHitPoint(), confirmedEventAnchor.GetHitDirection());
+    }
+
+    public void FinshModeling()
+    {
+        shell.SetTransform(confirmedEventAnchor.GetCorrectedHitPoint(), confirmedEventAnchor.GetHitDirection());
+        shell.InitShell();
     }
 
     public void PlayAmbientSound()

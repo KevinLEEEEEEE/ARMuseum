@@ -51,9 +51,7 @@ public class Scene1 : MonoBehaviour
     public GameController_S2 gameController;
     public GlowingOrb glowingOrb;
     public Progress progressUI;
-    public AudioClip handEntrySound;
     public AudioClip handStableSound;
-    public AudioClip handActiveSound;
     public GameObject groundLayer;
     public ParticleSystem[] groundEffects;
     public float distanceFromCenter;
@@ -67,7 +65,6 @@ public class Scene1 : MonoBehaviour
     private EventAnchor eventAnchor;
     private EventAnchor confirmedEventAnchor;
     private AudioSource handStablePlayer;
-    private AudioSource handActivePlayer;
     private Vector3 prePosition;
     private int motionCount;
     private int planeMask = 1 << 8;
@@ -83,9 +80,7 @@ public class Scene1 : MonoBehaviour
     void Start()
     {
         handStablePlayer = gameObject.AddComponent<AudioSource>();
-        handActivePlayer = gameObject.AddComponent<AudioSource>();
         handStablePlayer.clip = handStableSound;
-        handActivePlayer.clip = handActiveSound;
         ResetAll();
     }
 

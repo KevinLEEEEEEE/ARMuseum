@@ -324,11 +324,6 @@ namespace NRKernal
                     {
                         // Yield while deactivate anim is playing (or instant deactivate if not animating)
                         yield return FadeOutHint();
-
-                        Debug.Log(shouldHide);
-                        Debug.Log(playCount == Repeats - 1);
-                        Debug.Log(!loopRunning);
-
                         // if fade out was caused by user interacting, we've reached the repeat limit, or we've stopped the loop, break out
                         if (shouldHide || playCount == Repeats - 1 || !loopRunning)
                         {
@@ -338,8 +333,6 @@ namespace NRKernal
                         else
                         {  
                             yield return new WaitForSeconds(RepeatDelay);
-
-                            Debug.Log("run again");
 
                             SetActive(VisualsRoot, true);
                             if (animator != null)
