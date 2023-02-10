@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
+using NRKernal.NRExamples;
 using NRKernal;
 
 public class GameController_S2 : MonoBehaviour
@@ -20,9 +22,11 @@ public class GameController_S2 : MonoBehaviour
     {
         NRInput.RaycastersActive = false;
 
-        scene1.StartAct(new Vector3(0, 0, 1));
+        //scene1.StartAct(new Vector3(0, 0, 1));
 
         //scene2.StartScene(new Vector3(0, 0, 1), new Vector3(0, 0, 10));
+
+        shell.InitShell();
     }
 
     public void UpdateEventAnchor(EventAnchor anchor)
@@ -78,9 +82,14 @@ public class GameController_S2 : MonoBehaviour
         return GetDomainHandState().GetJointPose(jointID);
     }
 
-    public bool getHandTrackingState()
+    public bool GetHandTrackingState()
     {
         return GetDomainHandState().isTracked;
+    }
+
+    public bool GetHandPinchState()
+    {
+        return GetDomainHandState().isPinching;
     }
 
     public void StartPlaneHint()

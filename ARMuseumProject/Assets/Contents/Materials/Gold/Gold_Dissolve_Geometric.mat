@@ -7,13 +7,14 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Gold_Dissolve
+  m_Name: Gold_Dissolve_Geometric
   m_Shader: {fileID: 4800000, guid: 977ce85d64e1849409668a559c7d1c4d, type: 3}
   m_ValidKeywords:
   - _AD_CUTOUT_GEOMETRIC_TYPE_SPHERE
   - _AD_CUTOUT_STANDARD_SOURCE_CUSTOM_MAP
   - _AD_EDGE_BASE_SOURCE_CUTOUT_GEOMETRIC
   - _AD_STATE_ENABLED
+  - _EMISSION
   - _METALLICGLOSSMAP
   - _NORMALMAP
   - _PARALLAXMAP
@@ -25,7 +26,7 @@ Material:
   - _AD_EDGE_UV_DISTORTION_SOURCE_DEFAULT
   - _AD_GLOBAL_CONTROL_ID_NONE
   - _DOUBLESIDED_ON
-  m_LightmapFlags: 4
+  m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -192,7 +193,7 @@ Material:
     - _AdvancedDissolveCutoutBaseInvert: 0
     - _AdvancedDissolveCutoutClip: 0
     - _AdvancedDissolveCutoutGeometric1Height: 1
-    - _AdvancedDissolveCutoutGeometric1Radius: 0.2
+    - _AdvancedDissolveCutoutGeometric1Radius: 0.4
     - _AdvancedDissolveCutoutGeometric2Height: 1
     - _AdvancedDissolveCutoutGeometric2Radius: 0
     - _AdvancedDissolveCutoutGeometric3Height: 1
@@ -282,12 +283,12 @@ Material:
     - _AdvancedDissolveEdgeAdditionalColorPhaseOffset: 0
     - _AdvancedDissolveEdgeAdditionalColorTransparency: 1
     - _AdvancedDissolveEdgeAlphaOffset: 0
-    - _AdvancedDissolveEdgeBaseColorTransparency: 0.95
+    - _AdvancedDissolveEdgeBaseColorTransparency: 1
     - _AdvancedDissolveEdgeBaseShape: 1
-    - _AdvancedDissolveEdgeBaseWidthGeometric: 0.04
+    - _AdvancedDissolveEdgeBaseWidthGeometric: 0.05
     - _AdvancedDissolveEdgeBaseWidthParametric: 0.1
     - _AdvancedDissolveEdgeBaseWidthSimple: 0.1
-    - _AdvancedDissolveEdgeBaseWidthStandard: 0.1
+    - _AdvancedDissolveEdgeBaseWidthStandard: 0.15
     - _AdvancedDissolveEdgeColor2Transparency: 1
     - _AdvancedDissolveEdgeColorTransparency: 1
     - _AdvancedDissolveEdgeGIMetaPassMultiplier: 1
@@ -380,7 +381,7 @@ Material:
     - _EnableBlendModePreserveSpecularLighting: 0
     - _EnableFogOnTransparent: 1
     - _EnvironmentReflections: 1
-    - _GlossMapScale: 0.88
+    - _GlossMapScale: 0.7
     - _Glossiness: 0
     - _GlossyReflections: 1
     - _IncludeVertexColor: 0
@@ -441,7 +442,7 @@ Material:
     m_Colors:
     - _AdvancedDissolveBakedKeywords: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric1Normal: {r: -0.9656543, g: -0.00000008381903, b: -0.25983065, a: 0}
-    - _AdvancedDissolveCutoutGeometric1Position: {r: 5.0059996, g: 0.524, b: -0.32099998, a: 0}
+    - _AdvancedDissolveCutoutGeometric1Position: {r: -0.0921, g: -0.16340002, b: 0.32999998, a: 0}
     - _AdvancedDissolveCutoutGeometric2Normal: {r: 1, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric2Position: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric3Normal: {r: 1, g: 0, b: 0, a: 0}
@@ -498,7 +499,7 @@ Material:
     - _AdvancedDissolveEdgeAdditionalColorMapOffset: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeAdditionalColorMapScroll: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeAdditionalColorMapTiling: {r: 1, g: 1, b: 0, a: 0}
-    - _AdvancedDissolveEdgeBaseColor: {r: 0.7835379, g: 0.27467737, b: 0.025186857, a: 1}
+    - _AdvancedDissolveEdgeBaseColor: {r: 0.7835379, g: 0.30692774, b: 0.025186857, a: 1}
     - _AdvancedDissolveEdgeBaseColorIntensity: {r: 1.5, g: 3.481689, b: 0, a: 0}
     - _AdvancedDissolveEdgeColor: {r: 0.006119758, g: 0.2152672, b: 0.87603444, a: 1}
     - _AdvancedDissolveEdgeColor2: {r: 1, g: 0, b: 0, a: 1}
@@ -521,7 +522,7 @@ Material:
     - _DissolveMaskPosition: {r: 0, g: 0, b: 0, a: 0}
     - _Dissolve_ObjectWorldPos: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
-    - _EmissionColor: {r: 0.3077861, g: 0.2220888, b: 0.09776735, a: 0}
+    - _EmissionColor: {r: 0.70668226, g: 0.4847772, b: 0.22531898, a: 0}
     - _EmissionColorUI: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionMap_Scroll: {r: 0, g: 0, b: 0, a: 0}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 0}

@@ -3,39 +3,45 @@
     "m_SelectedPackage": {
         "deviceId": "192.168.3.37:6666",
         "name": "com.Aillo.ARMuseum",
-        "processId": 3566,
+        "processId": 11656,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 8225,
-            "exited": true
-        },
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 27567,
-            "exited": true
-        },
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 19168,
-            "exited": true
-        },
-        {
-            "deviceId": "192.168.3.37:6666",
-            "name": "com.DefaultCompany.ARMuseumProject",
-            "processId": 23742,
+            "name": "com.Aillo.ARMuseum",
+            "processId": 29854,
             "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.Aillo.ARMuseum",
-            "processId": 3566,
+            "processId": 32681,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "ai.nreal.nebula.mainland:space",
+            "processId": 11295,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "com.Aillo.ARMuseum",
+            "processId": 11788,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "ai.nreal.nebula.mainland:space",
+            "processId": 11171,
+            "exited": false
+        },
+        {
+            "deviceId": "192.168.3.37:6666",
+            "name": "com.Aillo.ARMuseum",
+            "processId": 11656,
             "exited": false
         }
     ],

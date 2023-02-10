@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.adrenak.restsharp.unity": "1.1.0",
     "com.unity.burst": "1.4.7",
     "com.unity.collab-proxy": "1.17.2",
     "com.unity.collections": "1.4.0",
@@ -50,9 +51,7 @@
       "name": "package.openupm.com",
       "url": "https://package.openupm.com",
       "scopes": [
-        "com.openupm",
-        "com.proyecto26.restclient",
-        "com.rsg.promise"
+        "com.adrenak.restsharp.unity"
       ]
     }
   ]

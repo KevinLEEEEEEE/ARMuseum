@@ -7,24 +7,26 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Clay_Fired_Dissolve
+  m_Name: Gold_Dissolve_Standard
   m_Shader: {fileID: 4800000, guid: 977ce85d64e1849409668a559c7d1c4d, type: 3}
   m_ValidKeywords:
-  - _AD_CUTOUT_GEOMETRIC_TYPE_SPHERE
   - _AD_CUTOUT_STANDARD_SOURCE_CUSTOM_MAP
-  - _AD_EDGE_BASE_SOURCE_CUTOUT_GEOMETRIC
+  - _AD_EDGE_BASE_SOURCE_CUTOUT_STANDARD
   - _AD_STATE_ENABLED
+  - _EMISSION
   - _METALLICGLOSSMAP
   - _NORMALMAP
+  - _PARALLAXMAP
   m_InvalidKeywords:
   - _AD_CUTOUT_GEOMETRIC_COUNT_ONE
+  - _AD_CUTOUT_GEOMETRIC_TYPE_NONE
   - _AD_CUTOUT_STANDARD_MAPS_MAPPING_TYPE_DEFAULT
   - _AD_CUTOUT_STANDARD_SOURCE_MAPS_MAPPING_TYPE_DEFAULT
   - _AD_EDGE_ADDITIONAL_COLOR_NONE
   - _AD_EDGE_UV_DISTORTION_SOURCE_DEFAULT
   - _AD_GLOBAL_CONTROL_ID_NONE
   - _DOUBLESIDED_ON
-  m_LightmapFlags: 4
+  m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
@@ -90,7 +92,7 @@ Material:
         m_Scale: {x: 7, y: 7}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: e8821e8a8a1cf8a4f90f815862265e43, type: 3}
+        m_Texture: {fileID: 2800000, guid: 98d6e9f6e8cef264cb8a65af21e9ef4c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -134,7 +136,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 46e61a49a99fce249a197c5b03c12a30, type: 3}
+        m_Texture: {fileID: 2800000, guid: 3e803f2680254314b857c332e6c0b6f3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MaskMap:
@@ -142,7 +144,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
-        m_Texture: {fileID: 2800000, guid: c428c39a7806c134cb9762df57654f35, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6fcb0b8f850fc0041a5db376a5c8e743, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
@@ -154,7 +156,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: d81ab5ac6189ce14dbdbc0fbf8641d8c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ReflectionCubeMap:
@@ -191,15 +193,15 @@ Material:
     - _AdvancedDissolveCutoutBaseInvert: 0
     - _AdvancedDissolveCutoutClip: 0
     - _AdvancedDissolveCutoutGeometric1Height: 1
-    - _AdvancedDissolveCutoutGeometric1Radius: 0.2
+    - _AdvancedDissolveCutoutGeometric1Radius: 0.4
     - _AdvancedDissolveCutoutGeometric2Height: 1
-    - _AdvancedDissolveCutoutGeometric2Radius: 1
+    - _AdvancedDissolveCutoutGeometric2Radius: 0
     - _AdvancedDissolveCutoutGeometric3Height: 1
     - _AdvancedDissolveCutoutGeometric3Radius: 1
     - _AdvancedDissolveCutoutGeometric4Height: 1
     - _AdvancedDissolveCutoutGeometric4Radius: 1
-    - _AdvancedDissolveCutoutGeometricInvert: 1
-    - _AdvancedDissolveCutoutGeometricNoise: 0.05
+    - _AdvancedDissolveCutoutGeometricInvert: 0
+    - _AdvancedDissolveCutoutGeometricNoise: 0.08
     - _AdvancedDissolveCutoutGeometricXYZAxis: 0
     - _AdvancedDissolveCutoutGeometricXYZForm: 0
     - _AdvancedDissolveCutoutGeometricXYZRollout: 0
@@ -283,7 +285,7 @@ Material:
     - _AdvancedDissolveEdgeAlphaOffset: 0
     - _AdvancedDissolveEdgeBaseColorTransparency: 0.95
     - _AdvancedDissolveEdgeBaseShape: 1
-    - _AdvancedDissolveEdgeBaseWidthGeometric: 0.04
+    - _AdvancedDissolveEdgeBaseWidthGeometric: 0.06
     - _AdvancedDissolveEdgeBaseWidthParametric: 0.1
     - _AdvancedDissolveEdgeBaseWidthSimple: 0.1
     - _AdvancedDissolveEdgeBaseWidthStandard: 0.1
@@ -298,7 +300,7 @@ Material:
     - _AdvancedDissolveEdgeUVDistortionStrength: 0
     - _AdvancedDissolveEdgeWidth: 0.1
     - _AdvancedDissolveKeywordCutoutGeometricCount: 0
-    - _AdvancedDissolveKeywordCutoutGeometricType: 3
+    - _AdvancedDissolveKeywordCutoutGeometricType: 0
     - _AdvancedDissolveKeywordCutoutMappingType: 0
     - _AdvancedDissolveKeywordCutoutParametricCount: 0
     - _AdvancedDissolveKeywordCutoutParametricType: 2
@@ -311,7 +313,7 @@ Material:
     - _AdvancedDissolveKeywordDynamicMaskCount: 0
     - _AdvancedDissolveKeywordDynamicMaskType: 2
     - _AdvancedDissolveKeywordEdgeAdditionalColorSource: 0
-    - _AdvancedDissolveKeywordEdgeBaseSource: 2
+    - _AdvancedDissolveKeywordEdgeBaseSource: 1
     - _AdvancedDissolveKeywordEdgeBlendColor: 2
     - _AdvancedDissolveKeywordEdgeUVDistortionSource: 0
     - _AdvancedDissolveKeywordGlobalControlID: 0
@@ -379,7 +381,7 @@ Material:
     - _EnableBlendModePreserveSpecularLighting: 0
     - _EnableFogOnTransparent: 1
     - _EnvironmentReflections: 1
-    - _GlossMapScale: 1
+    - _GlossMapScale: 0.7
     - _Glossiness: 0
     - _GlossyReflections: 1
     - _IncludeVertexColor: 0
@@ -439,8 +441,8 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _AdvancedDissolveBakedKeywords: {r: 0, g: 0, b: 0, a: 0}
-    - _AdvancedDissolveCutoutGeometric1Normal: {r: 0, g: 1, b: 0, a: 0}
-    - _AdvancedDissolveCutoutGeometric1Position: {r: 5.0059996, g: 0.524, b: -0.32099998, a: 0}
+    - _AdvancedDissolveCutoutGeometric1Normal: {r: -0.9656543, g: -0.00000008381903, b: -0.25983065, a: 0}
+    - _AdvancedDissolveCutoutGeometric1Position: {r: -0.0921, g: -0.16340002, b: 0.32999998, a: 0}
     - _AdvancedDissolveCutoutGeometric2Normal: {r: 1, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric2Position: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric3Normal: {r: 1, g: 0, b: 0, a: 0}
@@ -520,7 +522,7 @@ Material:
     - _DissolveMaskPosition: {r: 0, g: 0, b: 0, a: 0}
     - _Dissolve_ObjectWorldPos: {r: 0, g: 0, b: 0, a: 0}
     - _DoubleSidedConstants: {r: 1, g: 1, b: -1, a: 0}
-    - _EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _EmissionColor: {r: 0.70668226, g: 0.4847772, b: 0.22531898, a: 0}
     - _EmissionColorUI: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionMap_Scroll: {r: 0, g: 0, b: 0, a: 0}
     - _EmissiveColor: {r: 0, g: 0, b: 0, a: 0}

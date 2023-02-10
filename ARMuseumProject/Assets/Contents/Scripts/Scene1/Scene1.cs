@@ -215,7 +215,7 @@ public class Scene1 : MonoBehaviour
 
         float volume = 0;
 
-        if (!gameController.getHandTrackingState())
+        if (!gameController.GetHandTrackingState())
         {
             StopActivationTiming();
             gameController.UpdateAmbientSoundVolume(volume);
