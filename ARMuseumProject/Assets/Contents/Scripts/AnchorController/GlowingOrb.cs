@@ -5,12 +5,15 @@ using NRKernal;
 
 public class GlowingOrb : MonoBehaviour
 {
-    public AnimationCurve speedCurve;
-    public AnimationCurve startSizeCurve;
-    public GameController_S2 gameController;
+    public GameObject orbBody;
+    public GameObject orbTrail;
     public ParticleSystem curveEffect;
+    public AudioClip audioClip_orbActive;
+    public AnimationCurve speedCurve;
 
+    private AudioGenerator audioSource_orbActive;
     private Rigidbody orbRigidbody;
+    private Animation orbAnimation;
     private Vector3 planeAnchor;
     public enum OrbTarget
     {
@@ -22,13 +25,30 @@ public class GlowingOrb : MonoBehaviour
     private void Start()
     {
         orbRigidbody = transform.GetComponent<Rigidbody>();
-        transform.GetChild(0).gameObject.SetActive(false);
+        orbAnimation = transform.GetComponent<Animation>();
+        audioSource_orbActive = new AudioGenerator(gameObject, audioClip_orbActive);
+        HideBody();
+        HideTrail();
     }
 
-    public void InitOrb(Vector3 position)
+    public void ShowBody()
     {
-        transform.position = position;   
-        transform.GetChild(0).gameObject.SetActive(true);
+        orbBody.SetActive(true);
+    }
+
+    public void HideBody()
+    {
+        orbBody.SetActive(false);
+    }
+
+    public void ShowTrail()
+    {
+        orbTrail.SetActive(true);
+    }
+
+    public void HideTrail()
+    {
+        orbTrail.SetActive(false);
     }
 
     public void SetOrbTarget(OrbTarget target)
@@ -36,20 +56,15 @@ public class GlowingOrb : MonoBehaviour
         currentOrbTarget = target;
     }
 
-    public void SetPlaneAnchor(EventAnchor anchor)
+    public void SetEventAnchor(EventAnchor anchor)
     {
         planeAnchor = anchor.GetCorrectedHitPoint();
     }
 
-    public void DestoryOrb()
-    {
-        transform.GetChild(0).gameObject.SetActive(false);
-    }
-
     public void FadeOut()
     {
-        transform.GetComponent<Animation>().Play();
-        transform.GetComponent<AudioSource>().Play();
+        audioSource_orbActive.Play();
+        orbAnimation.Play();
         curveEffect.Play();
     }
 

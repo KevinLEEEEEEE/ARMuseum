@@ -45,14 +45,13 @@ public class EventAnchor
     }
 }
 
-public class Scene1 : MonoBehaviour
+public class AnchorController : MonoBehaviour
 {
     public DialogGenerator dialogGenerator;
     public GameController_S2 gameController;
     public GlowingOrb glowingOrb;
     public Progress progressUI;
-    public AudioClip handStableSound;
-    public GameObject groundLayer;
+    //public GameObject groundLayer;
     public ParticleSystem[] groundEffects;
     public float distanceFromCenter;
     public float handModelOffset;
@@ -62,12 +61,14 @@ public class Scene1 : MonoBehaviour
     public float delayAfterDialog = 2f;
     public float motionThreshold = 0.016f;
 
+    public AudioClip audioClip_planeActive;
+    private AudioGenerator audioSource_planeActive;
+
     private EventAnchor eventAnchor;
     private EventAnchor confirmedEventAnchor;
-    private AudioSource handStablePlayer;
     private Vector3 prePosition;
     private int motionCount;
-    private int planeMask = 1 << 8;
+    private readonly int planeMask = 1 << 8;
     private enum SceneState
     {
         Suspend,
@@ -79,8 +80,7 @@ public class Scene1 : MonoBehaviour
 
     void Start()
     {
-        handStablePlayer = gameObject.AddComponent<AudioSource>();
-        handStablePlayer.clip = handStableSound;
+        audioSource_planeActive = new AudioGenerator(gameObject, audioClip_planeActive);
         ResetAll();
     }
 
@@ -97,8 +97,10 @@ public class Scene1 : MonoBehaviour
 
     private IEnumerator OpeningScene(Vector3 startPoint)
     {
-        glowingOrb.InitOrb(startPoint);
+        glowingOrb.transform.position = startPoint;
         glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
+        glowingOrb.ShowBody();
+        glowingOrb.ShowTrail();
 
         yield return new WaitForSeconds(delayBeforeDialog);
 
@@ -121,19 +123,20 @@ public class Scene1 : MonoBehaviour
     private IEnumerator EndingScene()
     {
         currentState = SceneState.Anchored;
-        handStablePlayer.Play();
+        audioSource_planeActive.Play();
         gameController.StopPlaneHint();
         gameController.UpdateAmbientSoundVolume(0);
-        gameController.UpdateEventAnchor(confirmedEventAnchor);
+        gameController.SetEventAnchor(confirmedEventAnchor);
 
         yield return new WaitForSeconds(delayBeforeDialog);
 
         dialogGenerator.GenerateDialog("历史已被唤醒......\n现在，可以收回手掌......");
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
 
-        groundLayer.transform.position = confirmedEventAnchor.GetCorrectedHitPoint();
-        groundLayer.SetActive(true);
+        //groundLayer.transform.position = confirmedEventAnchor.GetCorrectedHitPoint();
+        //groundLayer.SetActive(true);
+        glowingOrb.HideTrail();
         glowingOrb.FadeOut();
 
         yield return new WaitForSeconds(4.47f); // 等待撞击
@@ -146,8 +149,9 @@ public class Scene1 : MonoBehaviour
         yield return new WaitForSeconds(4f); // 等待动画结束
 
         currentState = SceneState.Suspend;
-        glowingOrb.DestoryOrb();
-        groundLayer.SetActive(false);
+        glowingOrb.HideBody();
+        glowingOrb.gameObject.SetActive(false);
+        //groundLayer.SetActive(false);
         gameController.NextScene();
     }
 
@@ -156,7 +160,7 @@ public class Scene1 : MonoBehaviour
         if(currentState == SceneState.Ready)
         {
             currentState = SceneState.Counting;
-            InvokeRepeating("MotionDetection", 0, 0.5f);
+            InvokeRepeating(nameof(MotionDetection), 0, 0.5f);
         }
     }
 
@@ -187,7 +191,7 @@ public class Scene1 : MonoBehaviour
         } else if (motionCount == 5)
         {
             StopActivationTiming();
-            StartCoroutine("EndingScene");
+            StartCoroutine(nameof(EndingScene));
         } else
         {
             if (Vector3.Distance(motionAnchor, prePosition) <= motionThreshold)
@@ -202,7 +206,7 @@ public class Scene1 : MonoBehaviour
             }
         }
 
-        Debug.Log("count: " + motionCount);
+        Debug.Log("[AnchorController] Motion counting: " + motionCount);
         prePosition = motionAnchor;
     }
 
@@ -226,7 +230,7 @@ public class Scene1 : MonoBehaviour
         Pose jointPose = gameController.getHandJointPose(HandJointID.MiddleTip);
         Vector3 laserPosition = jointPose.position;
         Vector3 laserDirection = jointPose.up;
-        Ray laser = new Ray(laserPosition, Vector3.down);
+        Ray laser = new(laserPosition, Vector3.down);
 
         if (Physics.Raycast(laser, out var hitResult, maxRayDistance, planeMask))
         {
@@ -242,7 +246,7 @@ public class Scene1 : MonoBehaviour
             volume = (maxRayDistance - hitResult.distance) * 3;
             eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset);
 
-            glowingOrb.SetPlaneAnchor(confirmedEventAnchor != null ? confirmedEventAnchor : eventAnchor);
+            glowingOrb.SetEventAnchor(confirmedEventAnchor ?? eventAnchor);
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.planeAnchor);
         }
         else

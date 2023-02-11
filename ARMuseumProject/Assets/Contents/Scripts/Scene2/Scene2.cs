@@ -35,7 +35,7 @@ public class Scene2 : MonoBehaviour
         transform.position = point;
         transform.forward = direction;
 
-        StartCoroutine("OpeningScene");
+        StartCoroutine(nameof(OpeningScene));
     }
 
     private IEnumerator OpeningScene()

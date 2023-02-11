@@ -7,10 +7,12 @@ using NRKernal;
 
 public class GameController_S2 : MonoBehaviour
 {
-    public Scene1 scene1;
+    public AnchorController anchorController;
     public Scene2 scene2;
     public ShellController shell;
-    public Transform planeDetector;
+    public Transform[] eventAnchorListener;
+    public GameObject planeDetector;
+    public GameObject groundMask;
     public AudioSource env_Wind;
     public float ambientSoundBasicVolume;
 
@@ -22,17 +24,27 @@ public class GameController_S2 : MonoBehaviour
     {
         NRInput.RaycastersActive = false;
 
-        //scene1.StartAct(new Vector3(0, 0, 1));
+        anchorController.StartAct(new Vector3(0, 0, 1));
 
         //scene2.StartScene(new Vector3(0, 0, 1), new Vector3(0, 0, 10));
 
-        shell.InitShell();
+        //shell.InitShell();
     }
 
-    public void UpdateEventAnchor(EventAnchor anchor)
+    public void SetEventAnchor(EventAnchor anchor)
     {
         planeDetector.GetComponent<PlaneDetector>().LockTargetPlane(anchor.GetHitObject());
-        confirmedEventAnchor = anchor;
+
+        Vector3 position = anchor.GetCorrectedHitPoint();
+        Vector3 forward = anchor.GetHitDirection();
+
+        foreach (Transform trans in eventAnchorListener)
+        {
+            trans.position = position;
+            trans.forward = forward;
+        }
+
+        groundMask.SetActive(true);
     }
 
     public void NextScene()
@@ -94,7 +106,7 @@ public class GameController_S2 : MonoBehaviour
 
     public void StartPlaneHint()
     {
-        foreach (Transform plane in planeDetector)
+        foreach (Transform plane in planeDetector.transform)
         {
             plane.GetComponent<Animation>().Play();
         }
@@ -102,7 +114,7 @@ public class GameController_S2 : MonoBehaviour
 
     public void StopPlaneHint()
     {
-        foreach (Transform plane in planeDetector)
+        foreach (Transform plane in planeDetector.transform)
         {
             plane.GetComponent<Animation>().Stop();
         }

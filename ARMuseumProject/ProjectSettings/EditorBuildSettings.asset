@@ -11,9 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Contents/Scenes/HistoricalWorldScene.unity
     guid: da9e1f14f0139474f9d47f998e08f50d
-  - enabled: 0
-    path: Assets/NRSDK/Demos/RGBCamera.unity
-    guid: 993f597e755bea3458ddb3a66c40bdd2
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 7a7f94dcb6caf7847a42f0bc7344116d, type: 2}
     com.unity.xr.management.nrsettings: {fileID: 11400000, guid: 6bfd9837adf1f2a499ed52c285989388, type: 2}

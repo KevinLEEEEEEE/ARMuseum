@@ -8,7 +8,7 @@ public class GrabbableExhibit : MonoBehaviour
 {
     public GameObject mesh;
     public GameObject Orbs;
-    private Material emissiveMaterial;
+    public Material emissiveMaterial;
     private Transform centerAnchor
     {
         get
@@ -19,7 +19,7 @@ public class GrabbableExhibit : MonoBehaviour
 
     private void Start()
     {
-        emissiveMaterial = mesh.GetComponent<MeshRenderer>().material;
+        //emissiveMaterial = mesh.GetComponent<MeshRenderer>().material;
     }
 
     private void OnEnable()
