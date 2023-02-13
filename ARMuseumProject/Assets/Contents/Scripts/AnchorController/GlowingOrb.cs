@@ -10,6 +10,7 @@ public class GlowingOrb : MonoBehaviour
     public ParticleSystem curveEffect;
     public AudioClip audioClip_orbActive;
     public AnimationCurve speedCurve;
+    public OrbTarget currentOrbTarget = OrbTarget.centerCamera;
 
     private AudioGenerator audioSource_orbActive;
     private Rigidbody orbRigidbody;
@@ -20,7 +21,7 @@ public class GlowingOrb : MonoBehaviour
         centerCamera,
         planeAnchor,
     }
-    private OrbTarget currentOrbTarget = OrbTarget.centerCamera;
+    
 
     private void Start()
     {

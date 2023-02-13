@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
+using System;
 
 public class EventAnchor
 {
@@ -48,24 +49,22 @@ public class EventAnchor
 public class AnchorController : MonoBehaviour
 {
     public DialogGenerator dialogGenerator;
+    public InstructionGenerator instructionGenerator;
     public GameController_S2 gameController;
     public GlowingOrb glowingOrb;
     public Progress progressUI;
-    //public GameObject groundLayer;
-    public ParticleSystem[] groundEffects;
+    public ParticleSystem[] groundEffect_orbHit;
+    public ParticleSystem[] groundEffect_planeActive;
+    public GameObject effectLayer_planeActive;
     public float distanceFromCenter;
     public float handModelOffset;
     public float activationRange;
-    public float maxRayDistance;
-    public float delayBeforeDialog = 2f;
-    public float delayAfterDialog = 2f;
-    public float motionThreshold = 0.016f;
-
+    public float motionThreshold;
     public AudioClip audioClip_planeActive;
     private AudioGenerator audioSource_planeActive;
-
     private EventAnchor eventAnchor;
     private EventAnchor confirmedEventAnchor;
+    private Action planeActivateInstruction;
     private Vector3 prePosition;
     private int motionCount;
     private readonly int planeMask = 1 << 8;
@@ -87,35 +86,35 @@ public class AnchorController : MonoBehaviour
     public void ResetAll()
     {
         currentState = SceneState.Suspend;
+        eventAnchor = null;
         motionCount = -1;
     }
 
-    public void StartAct(Vector3 point)
+    public void Init()
     {
-        StartCoroutine(OpeningScene(point));
+        StartCoroutine(nameof(OpeningScene));
     }
 
-    private IEnumerator OpeningScene(Vector3 startPoint)
+    private IEnumerator OpeningScene()
     {
-        glowingOrb.transform.position = startPoint;
-        glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
         glowingOrb.ShowBody();
         glowingOrb.ShowTrail();
 
-        yield return new WaitForSeconds(delayBeforeDialog);
+        yield return new WaitForSeconds(2f);
 
         dialogGenerator.GenerateDialog("你集齐了历史碎片");
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration + delayAfterDialog);
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
 
-        dialogGenerator.GenerateDialog("现在，伸手掌按住手印......\n唤醒久远的记忆......");
+        dialogGenerator.GenerateDialog("现在，激活遗迹......\n唤醒久远的回忆......");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration / 2);
 
-        gameController.PlayAmbientSound();
-        
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration / 2 + delayAfterDialog);
+        gameController.StartAmbientSound();
 
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration / 2 + 1f);
+
+        planeActivateInstruction = instructionGenerator.GenerateInstruction("任务: 激活遗迹", "触碰平面手印处两秒以开启遗迹");
         gameController.StartPlaneHint();
         currentState = SceneState.Ready;
     }
@@ -123,36 +122,47 @@ public class AnchorController : MonoBehaviour
     private IEnumerator EndingScene()
     {
         currentState = SceneState.Anchored;
+        planeActivateInstruction();
         audioSource_planeActive.Play();
-        gameController.StopPlaneHint();
-        gameController.UpdateAmbientSoundVolume(0);
-        gameController.SetEventAnchor(confirmedEventAnchor);
 
-        yield return new WaitForSeconds(delayBeforeDialog);
+        yield return new WaitForSeconds(3f);
 
-        dialogGenerator.GenerateDialog("历史已被唤醒......\n现在，可以收回手掌......");
+        dialogGenerator.GenerateDialog("遗迹已被激活......");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
 
-        //groundLayer.transform.position = confirmedEventAnchor.GetCorrectedHitPoint();
-        //groundLayer.SetActive(true);
         glowingOrb.HideTrail();
         glowingOrb.FadeOut();
+        gameController.StopPlaneHint();
+        gameController.SetEventAnchor(confirmedEventAnchor);
+        gameController.ShowGroundMask();
 
         yield return new WaitForSeconds(4.47f); // 等待撞击
 
-        foreach (ParticleSystem sys in groundEffects)
-        {
-            sys.Play();
-        }
+        StartParticles(groundEffect_orbHit);
 
         yield return new WaitForSeconds(4f); // 等待动画结束
 
         currentState = SceneState.Suspend;
-        glowingOrb.HideBody();
         glowingOrb.gameObject.SetActive(false);
-        //groundLayer.SetActive(false);
+        gameController.HideGroundMask();
         gameController.NextScene();
+    }
+
+    private void StartParticles(ParticleSystem[] particles)
+    {
+        foreach (ParticleSystem sys in particles)
+        {
+            sys.Play();
+        }
+    }
+
+    private void StopParticles(ParticleSystem[] particles)
+    {
+        foreach (ParticleSystem sys in particles)
+        {
+            sys.Stop();
+        }
     }
 
     private void StartActivationTiming()
@@ -184,6 +194,9 @@ public class AnchorController : MonoBehaviour
         } else if (motionCount == 1)
         {
             progressUI.StartRadialProgress();
+            StartParticles(groundEffect_planeActive);
+            effectLayer_planeActive.transform.position = eventAnchor.GetCorrectedHitPoint();
+            gameController.SetAmbientVolumeInSeconds(1, 2);
             motionCount++;
         } else if (motionCount == 4) {
             confirmedEventAnchor = eventAnchor;
@@ -203,6 +216,8 @@ public class AnchorController : MonoBehaviour
                 motionCount = -1;
                 confirmedEventAnchor = null;
                 progressUI.ResetRadialProgress();
+                StopParticles(groundEffect_planeActive);
+                gameController.SetAmbientVolumeInSeconds(0, 1);
             }
         }
 
@@ -217,12 +232,9 @@ public class AnchorController : MonoBehaviour
             return;
         }
 
-        float volume = 0;
-
         if (!gameController.GetHandTrackingState())
         {
             StopActivationTiming();
-            gameController.UpdateAmbientSoundVolume(volume);
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
             return;
         }
@@ -232,20 +244,10 @@ public class AnchorController : MonoBehaviour
         Vector3 laserDirection = jointPose.up;
         Ray laser = new(laserPosition, Vector3.down);
 
-        if (Physics.Raycast(laser, out var hitResult, maxRayDistance, planeMask))
+        if (Physics.Raycast(laser, out var hitResult, activationRange, planeMask))
         {
-            if (hitResult.distance <= activationRange)
-            {
-                StartActivationTiming();
-            }
-            else
-            {
-                StopActivationTiming();
-            }
-
-            volume = (maxRayDistance - hitResult.distance) * 3;
+            StartActivationTiming();
             eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset);
-
             glowingOrb.SetEventAnchor(confirmedEventAnchor ?? eventAnchor);
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.planeAnchor);
         }
@@ -254,7 +256,5 @@ public class AnchorController : MonoBehaviour
             StopActivationTiming();
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
         }
-
-        gameController.UpdateAmbientSoundVolume(volume);
     }
 }

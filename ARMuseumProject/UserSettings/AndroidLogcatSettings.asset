@@ -3,45 +3,45 @@
     "m_SelectedPackage": {
         "deviceId": "192.168.3.37:6666",
         "name": "com.Aillo.ARMuseum",
-        "processId": 11656,
+        "processId": 30891,
         "exited": false
     },
     "m_SelectedPriority": 0,
     "m_KnownPackagesForSerialization": [
         {
             "deviceId": "192.168.3.37:6666",
-            "name": "com.Aillo.ARMuseum",
-            "processId": 29854,
+            "name": "ai.nreal.nebula.mainland:space",
+            "processId": 15532,
             "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.Aillo.ARMuseum",
-            "processId": 32681,
+            "processId": 16047,
             "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "ai.nreal.nebula.mainland:space",
-            "processId": 11295,
+            "processId": 27913,
             "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.Aillo.ARMuseum",
-            "processId": 11788,
+            "processId": 28414,
             "exited": true
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "ai.nreal.nebula.mainland:space",
-            "processId": 11171,
+            "processId": 30369,
             "exited": false
         },
         {
             "deviceId": "192.168.3.37:6666",
             "name": "com.Aillo.ARMuseum",
-            "processId": 11656,
+            "processId": 30891,
             "exited": false
         }
     ],
@@ -96,7 +96,7 @@
         "Behavior": 0
     },
     "m_FilterOptions": {
-        "m_Filter": "",
+        "m_Filter": "active",
         "m_UseRegularExpressions": true,
         "m_MatchCase": true
     },

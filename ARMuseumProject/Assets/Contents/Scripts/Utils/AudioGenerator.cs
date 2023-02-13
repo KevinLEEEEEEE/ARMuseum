@@ -7,7 +7,6 @@ public class AudioGenerator
 {
     public readonly AudioSource source;
     private readonly float _minVolume;
-    private bool isOccupied;
 
     public AudioGenerator(GameObject target, AudioClip clip, bool isLoop = false, bool playOnAwake = false, float volume = 1, float minVolume = 0)
     {
@@ -29,33 +28,26 @@ public class AudioGenerator
         source.Stop();
     }
 
+    public float GetVolume()
+    {
+        return source.volume;
+    }
+
     public void SetVolume(float volume)
     {
         source.volume = GetTargetVolume(volume);
     }
 
-    public async void SetVolumeInSeconds(float volume, float duration)
-    {
-        if(isOccupied)
-        {
-            return;
-        }
+    //public void SetVolumeInSeconds(float volume, float duration)
+    //{
 
-        isOccupied = true;
-        Debug.Log("[AudioGenerator] Start change volume.");
+    //}
 
-        duration.Tweeng((vol) =>
-        {
-            source.volume = vol;
-        }, source.volume, GetTargetVolume(volume));
+    //private void AdjustVolume()
+    //{
 
-        await Task.Delay(System.TimeSpan.FromSeconds(duration));
-
-        isOccupied = false;
-
-        Debug.Log("[AudioGenerator] Change volume successfully in " + duration + " seconds.");
-    }
-
+    //}
+         
     private float GetTargetVolume(float volume)
     {
         return volume < _minVolume ? _minVolume : volume;

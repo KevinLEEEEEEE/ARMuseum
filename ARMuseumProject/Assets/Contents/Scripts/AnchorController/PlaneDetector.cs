@@ -9,11 +9,6 @@ public class PlaneDetector : MonoBehaviour
     private List<NRTrackablePlane> m_NewPlanes = new List<NRTrackablePlane>();
     private bool canAddNewPlane = true;
 
-    void Start()
-    {
-        
-    }
-
     public void LockTargetPlane(GameObject targetPlane)
     {
         canAddNewPlane = false;

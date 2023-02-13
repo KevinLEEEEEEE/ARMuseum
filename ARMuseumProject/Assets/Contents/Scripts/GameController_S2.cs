@@ -7,28 +7,50 @@ using NRKernal;
 
 public class GameController_S2 : MonoBehaviour
 {
-    public AnchorController anchorController;
-    public Scene2 scene2;
-    public ShellController shell;
-    public Transform[] eventAnchorListener;
     public GameObject planeDetector;
     public GameObject groundMask;
-    public AudioSource env_Wind;
-    public float ambientSoundBasicVolume;
+    public AudioClip audioClip_ambientWind;
+    public float ambientBasicVolume;
+    public Transform[] eventAnchorListener;
+    public GameObject[] initMessageListener;
+    public Transform[] startPointListener;
 
-    private EventAnchor confirmedEventAnchor;
-    private float ambientSoundVolume;
+    private int initializeIndex = 0;
+    private Coroutine ambientCoroutine;
+    private AudioGenerator audioSource_ambientWind;
     private HandEnum domainHand = HandEnum.RightHand;
 
     void Start()
     {
-        NRInput.RaycastersActive = false;
+        audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
+        NRInput.RaycastersActive = false;   
 
-        anchorController.StartAct(new Vector3(0, 0, 1));
+        SetStartPoint(new Vector3(0, 0, 0.7f));
+        NextScene();
 
-        //scene2.StartScene(new Vector3(0, 0, 1), new Vector3(0, 0, 10));
+        // Skip to voxel
 
-        //shell.InitShell();
+        //foreach (Transform trans in eventAnchorListener)
+        //{
+        //    trans.position = new Vector3(0, 0, 0);
+        //    trans.forward = new Vector3(0, 0, 10);
+        //}
+
+        //initMessageListener[1].SendMessage("Init");
+
+        // Skip to shel
+    }
+
+    private void SetStartPoint(Vector3 point)
+    {
+        foreach(Transform trans in startPointListener)
+        {
+            if(trans)
+            {
+                trans.position = point;
+            }
+            
+        }
     }
 
     public void SetEventAnchor(EventAnchor anchor)
@@ -40,48 +62,70 @@ public class GameController_S2 : MonoBehaviour
 
         foreach (Transform trans in eventAnchorListener)
         {
-            trans.position = position;
-            trans.forward = forward;
+            if(trans)
+            {
+                trans.position = position;
+                trans.forward = forward;
+            }
         }
-
-        groundMask.SetActive(true);
     }
 
     public void NextScene()
     {
-        scene2.StartScene(confirmedEventAnchor.GetCorrectedHitPoint(), confirmedEventAnchor.GetHitDirection());
+        Debug.Log("[GameController] Init scene: " + initializeIndex);
+
+        Debug.Log(groundMask.activeSelf);
+
+        initMessageListener[initializeIndex].SetActive(true);
+        initMessageListener[initializeIndex].SendMessage("Init");
+        initializeIndex++;
     }
 
     public void FinshModeling()
     {
-        shell.SetTransform(confirmedEventAnchor.GetCorrectedHitPoint(), confirmedEventAnchor.GetHitDirection());
-        shell.InitShell();
+        //shell.InitShell();
     }
 
-    public void PlayAmbientSound()
+    public void ShowGroundMask()
     {
-        env_Wind.Play();
-        env_Wind.volume = 0;
-        UpdateAmbientSoundVolume(0);
+        groundMask.SetActive(true);
+    }
+
+    public void HideGroundMask()
+    {
+        groundMask.SetActive(false);
+    }
+
+    public void StartAmbientSound()
+    {
+        audioSource_ambientWind.Play();
     }
 
     public void StopAmbientSound()
     {
-        env_Wind.Stop();
-        env_Wind.volume = 0;
-        UpdateAmbientSoundVolume(0);
+        audioSource_ambientWind.Stop();
     }
 
-    public void UpdateAmbientSoundVolume(float volume)
+    public void SetAmbientVolume(float volume)
     {
-        ambientSoundVolume = volume + ambientSoundBasicVolume;
+        audioSource_ambientWind.SetVolume(volume);
     }
 
-    private void UpdateAmbientSoundVolume()
+    public void SetAmbientVolumeInSeconds(float volume, float duration)
     {
-        float delta = ambientSoundVolume - env_Wind.volume;
-        delta *= Time.deltaTime;
-        env_Wind.volume += delta;
+        if (ambientCoroutine != null)
+        {
+            StopCoroutine(ambientCoroutine);
+        }
+
+        ambientCoroutine = StartCoroutine(duration.Tweeng((vol) =>
+        {
+            audioSource_ambientWind.SetVolume(vol);
+        }, audioSource_ambientWind.GetVolume(), volume));
+
+        //await Task.Delay(System.TimeSpan.FromSeconds(duration));
+
+        Debug.Log("[GameController] Change ambient volume to: " + volume);
     }
 
     public HandState GetDomainHandState()
@@ -117,14 +161,6 @@ public class GameController_S2 : MonoBehaviour
         foreach (Transform plane in planeDetector.transform)
         {
             plane.GetComponent<Animation>().Stop();
-        }
-    }
-
-    void Update()
-    {
-        if(env_Wind.isPlaying)
-        {
-            UpdateAmbientSoundVolume();
         }
     }
 }

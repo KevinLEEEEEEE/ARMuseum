@@ -68,12 +68,6 @@ public class ShellController : MonoBehaviour
         }, 0, 1f));
     }
 
-    public void SetTransform(Vector3 point, Vector3 direction)
-    {
-        transform.position = point;
-        transform.forward = direction;
-    }
-
     public void InitShell()
     {
         StartCoroutine("StartScene");
