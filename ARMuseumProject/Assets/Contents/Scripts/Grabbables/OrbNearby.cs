@@ -6,7 +6,7 @@ using NRKernal;
 public class OrbNearby : MonoBehaviour
 {
     private Material _material;
-    private Material currentMaterial
+    private Material CurrentMaterial
     {
         get
         {
@@ -34,7 +34,7 @@ public class OrbNearby : MonoBehaviour
 
     public void ResetAll()
     {
-        currentMaterial.SetFloat("_RimLight", MaxRimPower);
+        CurrentMaterial.SetFloat("_RimLight", MaxRimPower);
     }
 
     void Update()
@@ -54,7 +54,7 @@ public class OrbNearby : MonoBehaviour
             float x = nearestDistance - MinDistance;
             float a = (MaxRimPower - MinRimPower) / (MaxDistance - MinDistance);
 
-            currentMaterial.SetFloat("_RimPower", a * x + MinRimPower);
+            CurrentMaterial.SetFloat("_RimPower", a * x + MinRimPower);
         }
     }
 }

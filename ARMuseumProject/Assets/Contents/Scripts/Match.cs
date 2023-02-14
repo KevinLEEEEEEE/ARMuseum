@@ -8,7 +8,7 @@ public class Match : MonoBehaviour
 {
     public AdvancedDissolveGeometricCutoutController cutout_front;
     public AdvancedDissolveGeometricCutoutController cutout_back;
-    public GameController_S2 gameController;
+    public GameController_Historical gameController;
     public float burningDuration;
     public float burningBeginRadius;
     public float burningEndRadius;
@@ -93,7 +93,7 @@ public class Match : MonoBehaviour
     {
         if(state == MatchState.active)
         {
-            transform.position = gameController.getHandJointPose(HandJointID.IndexTip).position;
+            transform.position = gameController.GetDomainHandState().GetJointPose(HandJointID.IndexTip).position;
         }
     }
 }

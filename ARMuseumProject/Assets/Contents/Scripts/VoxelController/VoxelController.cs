@@ -7,28 +7,32 @@ using System;
 
 public class VoxelController : MonoBehaviour
 {
-    public GameController_S2 gameController;
+    public GameController_Historical gameController;
+    public DialogGenerator dialogGenerator;
     public InstructionGenerator instructionGenerator;
     public HandModifier handModifier;
+    public OrbButton orbButton;
     public GameObject interactionHint_L;
     public GameObject interactionHint_R;
     public GameObject voxelBlock;
     public GameObject controllerOrb;
-    public AudioClip audioClip_voxelActivate;
+    public AudioClip audioClip_voxelAppear;
+    public AudioClip audioClip_voxelScale;
 
     private CameraShakeInstance shake;
     private Action instructionFadeOut;
-    private AudioGenerator audioSource_voxelActivate;
+    private AudioGenerator audioSource_voxelAppear;
+    private AudioGenerator audioSource_voxelScale;
     private Animation voxelAnimation;
 
     void Start()
     {
         voxelAnimation = transform.GetComponent<Animation>();
-        audioSource_voxelActivate = new AudioGenerator(gameObject, audioClip_voxelActivate);
+        audioSource_voxelAppear = new AudioGenerator(gameObject, audioClip_voxelAppear);
+        audioSource_voxelScale = new AudioGenerator(gameObject, audioClip_voxelScale);
+        orbButton.orbButtonFinishEvent += () => { StartCoroutine(nameof(EndingScene)); };
         voxelBlock.SetActive(false);
         controllerOrb.SetActive(false);
-
-        // 重新设定显隐藏逻辑
     }
 
     public void Init()
@@ -39,7 +43,9 @@ public class VoxelController : MonoBehaviour
     private IEnumerator OpeningScene()
     {
         gameController.ShowGroundMask();
-        audioSource_voxelActivate.Play();
+        gameController.StartAmbientSound();
+        gameController.SetAmbientVolumeInSeconds(0.5f, 2);
+        audioSource_voxelAppear.Play();
         voxelAnimation.Play("VoxelMoveIn");
         voxelBlock.SetActive(true);
 
@@ -55,21 +61,32 @@ public class VoxelController : MonoBehaviour
 
         gameController.HideGroundMask();
         gameController.SetAmbientVolumeInSeconds(0.5f, 2);
-        controllerOrb.SetActive(true);
-        handModifier.EnableModify();
-        
         StartCoroutine(nameof(StartInstruction));
+
+        yield return new WaitForSeconds(1f);
+
+        handModifier.EnableModify();
+        controllerOrb.SetActive(true);     
     }
 
     private IEnumerator EndingScene()
     {
+        if(instructionFadeOut != null) StopInstruction();
         controllerOrb.SetActive(false);
         handModifier.DisableModify();
-        voxelAnimation.Play("VoxelScale");
 
         // send message to server
 
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(1f);
+
+        dialogGenerator.GenerateDialog("内模已完成...外范塑形中...");
+
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
+
+        audioSource_voxelScale.Play();
+        voxelAnimation.Play("VoxelScale");
+
+        yield return new WaitForSeconds(4f);
 
         gameController.NextScene();
     }
@@ -91,20 +108,4 @@ public class VoxelController : MonoBehaviour
         interactionHint_R.GetComponent<InteractionHint>().StopHintLoop();
         interactionHint_L.GetComponent<InteractionHint>().StopHintLoop();
     }
-
-    private void DeleteStop()
-    {
-
-    }
-
-    private void DeleteStart()
-    {
-
-    }
-
-    private void DeleteComplete()
-    {
-        StartCoroutine(nameof(EndingScene));
-    }
-
 }

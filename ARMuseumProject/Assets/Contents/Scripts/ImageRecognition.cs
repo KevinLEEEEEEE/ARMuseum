@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using RestSharp;
 using Newtonsoft.Json;
 using NRKernal;
+using System.Diagnostics;
 #if UNITY_ANDROID && !UNITY_EDITOR
     using GalleryDataProvider = NRKernal.NRExamples.NativeGalleryDataProvider;
 #else
@@ -15,58 +16,56 @@ using GalleryDataProvider = NRKernal.NRExamples.MockGalleryDataProvider;
 
 public class ImageRecogResult
 {
-    private readonly bool _isValid;
-    private readonly bool _hasMatch;
-    private readonly float _timestamp;
+    private readonly bool _isSuccessful;
+    ObjectDetectionResponse _response;
 
-    public ImageRecogResult(bool isValid, bool hasMatch, float timestamp)
+    public ImageRecogResult(bool isSuccessful, ObjectDetectionResponse response)
     {
-        _isValid = isValid;
-        _hasMatch = hasMatch;
-        _timestamp = timestamp;
+        _isSuccessful = isSuccessful;
+        _response = response;
     }
 
-    public bool GetValidation()
+    public float GetCostTime()
     {
-        return _isValid;
+        return _response.cost_ms;
     }
 
-    public bool GetResult()
+    public bool ContainLabel(string label)
     {
-        return _hasMatch;
-    }
+        if(_isSuccessful)
+        {
+            foreach (ObjectArray item in _response.results)
+            {
+                if (item.label == label)
+                {
+                    return true;
+                }
+            }
+        }
 
-    public float GetTimestamp()
-    {
-        return _timestamp;
+        return false;
     }
 }
-public class AccessTokenResponse
-{
-    public string refresh_token { get; set; }
-    public int expires_in { get; set; }
-    public string scope { get; set; }
-    public string session_key { get; set; }
-    public string access_token { get; set; }
-    public string session_secret { get; set; }
-}
+
 public class ObjectDetectionResponse
 {
-    public double log_id { get; set; }
-    public ObjectArray[] results { get; set; }
+    public int cost_ms;
+    public int error_code;
+    public ObjectArray[] results;
 }
 public class ObjectArray
 {
-    public string name { get; set; }
-    public double score { get; set; }
-    public ObjectLocation location { get; set; }
+    public float confidence;
+    public string label;
+    public int index;
+    public ObjectLocation location;
 }
 public class ObjectLocation
 {
-    public int left { get; set; }
-    public int top { get; set; }
-    public int width { get; set; }
-    public int height { get; set; }
+    public float x1;
+    public float y1;
+    public float x2;
+    public float y2;
 }
 
 public class ImageRecognition : MonoBehaviour
@@ -76,21 +75,22 @@ public class ImageRecognition : MonoBehaviour
 #else
     private static bool isInUnityEditor = false;
 #endif
+    public string easydl_ip;
+    public string port;
+    public float threshold;
     public bool alwaysDetected;
     public bool savePhotoToGallery;
     public bool displayPhotoOnScreen;
     public RawImage captureImage;
     public Texture2D[] mockImages;
-    private NRRGBCamTexture camTexture { get; set; }
+
+    private NRRGBCamTexture CamTexture { get; set; }
     private GalleryDataProvider galleryDataTool;
     private RestClient client;
-    private string accessToken;
-    private bool isInitialized
+    private bool IsInitialized
     {
-        get { return client != null && accessToken != null && camTexture != null; }
+        get { return client != null && CamTexture != null; }
     }
-    const string API_KEY = "hVi4vsUIRrzMcRSw5rvl1ecf";
-    const string SECRET_KEY = "6lSGZAMnntKMsW9YLGdiW571cbsEB0Gq";
 
     void Start()
     {
@@ -99,75 +99,75 @@ public class ImageRecognition : MonoBehaviour
             captureImage.gameObject.SetActive(true);
         }
 
+        StartImageRecogService();
+
+        InvokeRepeating(nameof(Test), 1f, 1f);
+
+        Test();
+    }
+
+    public async void Test()
+    {
+        //int index = UnityEngine.Random.Range(0, alwaysDetected ? 4 : 7);
+        //Texture2D tex = mockImages[index];
+        //byte[] _bytes = tex.EncodeToPNG();
+
+        Stopwatch sw = new();
+        sw.Start();
+
+        ImageRecogResult result = await TakePhotoAndAnalysis();
+
+        sw.Stop();
+        UnityEngine.Debug.Log(string.Format("total: {0} ms", sw.ElapsedMilliseconds));
+
+        UnityEngine.Debug.Log(result.GetCostTime());
+    }
+
+    public void StartImageRecogService()
+    {
+        client = new(easydl_ip + ":" + port + "?threshold=" + threshold);
+        client.Timeout = 1000;
         StartCam();
-        InitClientService();
     }
 
-    public void StartCam()
+    public void StopImageRecogService()
     {
-        if (camTexture == null)
-        {
-            camTexture = new NRRGBCamTexture();
-        }
-        camTexture?.Play();
+        client = null;
+        StopCam();
     }
 
-    public void PauseCam()
+    private void StartCam()
     {
-        camTexture?.Pause();
+        if (CamTexture == null) CamTexture = new NRRGBCamTexture();
+        CamTexture?.Play();
     }
 
-    public void StopCam()
+    private void StopCam()
     {
-        camTexture?.Stop();
-        camTexture = null;
-    }
-
-    private async void InitClientService()
-    {
-        client = InitClient();
-        accessToken = await GetAccessToken();
-    }
-
-    private RestClient InitClient()
-    {
-        RestClient _client = new("https://aip.baidubce.com/");
-        _client.Timeout = 1500;
-        return _client;
-    }
-
-    public async Task<string> GetAccessToken()
-    {
-        IRestRequest request = new RestRequest("oauth/2.0/token")
-            .AddParameter("grant_type", "client_credentials")
-            .AddParameter("client_id", API_KEY)
-
-            .AddParameter("client_secret", SECRET_KEY);
-
-        AccessTokenResponse response = await client.PostAsync<AccessTokenResponse>(request);
-        return response.access_token;
+        CamTexture?.Stop();
+        CamTexture = null;
     }
 
     public async Task<ImageRecogResult> TakePhotoAndAnalysis()
     {
-        if (!isInitialized)
+        if (!IsInitialized)
         {
-            Debug.LogError("[Player] Image recognition servive failed to initialize.");
-            return new ImageRecogResult(false, false, 0);
+            UnityEngine.Debug.LogError("[ImageRecognition] Initialize image recognition servive first.");
+            return new ImageRecogResult(false, null);
         }
 
         Texture2D tex;
 
         if (isInUnityEditor)
         {
-            int random = UnityEngine.Random.Range(0, alwaysDetected ? 4 : 7);
-            int index = random > 5 ? 5 : random;
-            Debug.Log("[Player] Use mock image NO." + (index + 1));
+            int index = UnityEngine.Random.Range(0, alwaysDetected ? 4 : 7);
             tex = mockImages[index];
+
+            UnityEngine.Debug.Log("[ImageRecognition] Use mock image NO." + (index + 1));
         }
         else
         {
-            Texture2D texture = camTexture.GetTexture();
+            Texture2D texture = CamTexture.GetTexture();
             tex = FlipTexture(texture);
         }
 
@@ -176,12 +176,14 @@ public class ImageRecognition : MonoBehaviour
             captureImage.texture = FlipTexture(tex);
         }
 
+        byte[] _bytes = tex.EncodeToPNG();
+
         if (savePhotoToGallery)
         {
-            SaveTextureToGallery(tex);
+            SaveTextureToGallery(_bytes);
         }
 
-        return await AnalysisTexture2D(tex);
+        return await AnalysisTexture2D(_bytes);
     }
 
     private Texture2D FlipTexture(Texture2D tex)
@@ -194,40 +196,36 @@ public class ImageRecognition : MonoBehaviour
         return flipTexture;
     }
 
-    private async Task<ImageRecogResult> AnalysisTexture2D(Texture2D tex)
+    private async Task<ImageRecogResult> AnalysisTexture2D(byte[] bytes)
     {
-        float timestamp = Time.time;
-        string base64 = Convert.ToBase64String(tex.EncodeToPNG());
-
-        var request = new RestRequest("rpc/2.0/ai_custom/v1/detection/matchrecog?access_token=" + accessToken)
-            .AddJsonBody(new { image = base64 });
+        var request = new RestRequest()
+            .AddHeader("Content-Type", "image/png")
+            .AddParameter("application/octet-stream", bytes, ParameterType.RequestBody);
 
         IRestResponse response = await client.ExecuteAsync(request, Method.POST);
 
-        if(response.IsSuccessful)
+        if (response.IsSuccessful)
         {
             ObjectDetectionResponse result = JsonConvert.DeserializeObject<ObjectDetectionResponse>(response.Content);
-            bool hasMatch = result.results.Length > 0;
-            return new ImageRecogResult(true, hasMatch, timestamp);
+            return new ImageRecogResult(true, result);
         }else
         {
-            return new ImageRecogResult(false, false, timestamp);
+            return new ImageRecogResult(false, null);
         }
     }
 
-    public void SaveTextureToGallery(Texture2D _texture)
+    public void SaveTextureToGallery(byte[] bytes)
     {
         try
         {
             string filename = string.Format("Nreal_Shot_{0}.png", NRTools.GetTimeStamp().ToString());
-            byte[] _bytes = _texture.EncodeToPNG();
-            NRDebugger.Info(_bytes.Length / 1024 + "Kb was saved as: " + filename);
+            NRDebugger.Info(bytes.Length / 1024 + "Kb was saved as: " + filename);
             if (galleryDataTool == null)
             {
                 galleryDataTool = new GalleryDataProvider();
             }
 
-            galleryDataTool.InsertImage(_bytes, filename, "Screenshots");
+            galleryDataTool.InsertImage(bytes, filename, "Screenshots");
         }
         catch (Exception e)
         {
@@ -236,3 +234,25 @@ public class ImageRecognition : MonoBehaviour
         }
     }
 }
+
+//public class AccessTokenResponse
+//{
+//    public string refresh_token { get; set; }
+//    public int expires_in { get; set; }
+//    public string scope { get; set; }
+//    public string session_key { get; set; }
+//    public string access_token { get; set; }
+//    public string session_secret { get; set; }
+//}
+
+//public async Task<string> GetAccessToken()
+//{
+//    IRestRequest request = new RestRequest("oauth/2.0/token")
+//        .AddParameter("grant_type", "client_credentials")
+//        .AddParameter("client_id", API_KEY)
+
+//        .AddParameter("client_secret", SECRET_KEY);
+
+//    AccessTokenResponse response = await client.PostAsync<AccessTokenResponse>(request);
+//    return response.access_token;
+//}

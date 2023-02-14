@@ -1,6 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 public class AudioGenerator
@@ -20,12 +19,18 @@ public class AudioGenerator
 
     public void Play()
     {
-        source.Play();
+        if(!source.isPlaying)
+        {
+            source.Play();
+        }
     }
 
     public void Stop()
     {
-        source.Stop();
+        if (source.isPlaying)
+        {
+            source.Stop();
+        } 
     }
 
     public float GetVolume()
@@ -37,16 +42,6 @@ public class AudioGenerator
     {
         source.volume = GetTargetVolume(volume);
     }
-
-    //public void SetVolumeInSeconds(float volume, float duration)
-    //{
-
-    //}
-
-    //private void AdjustVolume()
-    //{
-
-    //}
          
     private float GetTargetVolume(float volume)
     {

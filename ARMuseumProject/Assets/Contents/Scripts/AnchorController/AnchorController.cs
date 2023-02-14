@@ -50,7 +50,7 @@ public class AnchorController : MonoBehaviour
 {
     public DialogGenerator dialogGenerator;
     public InstructionGenerator instructionGenerator;
-    public GameController_S2 gameController;
+    public GameController_Historical gameController;
     public GlowingOrb glowingOrb;
     public Progress progressUI;
     public ParticleSystem[] groundEffect_orbHit;
@@ -186,7 +186,7 @@ public class AnchorController : MonoBehaviour
 
     private void MotionDetection()
     {
-        Vector3 motionAnchor = gameController.getHandJointPose(HandJointID.Palm).position;
+        Vector3 motionAnchor = gameController.GetDomainHandState().GetJointPose(HandJointID.Palm).position;
 
         if (motionCount == -1)
         {
@@ -232,14 +232,14 @@ public class AnchorController : MonoBehaviour
             return;
         }
 
-        if (!gameController.GetHandTrackingState())
+        if (!gameController.GetDomainHandState().isTracked)
         {
             StopActivationTiming();
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
             return;
         }
 
-        Pose jointPose = gameController.getHandJointPose(HandJointID.MiddleTip);
+        Pose jointPose = gameController.GetDomainHandState().GetJointPose(HandJointID.MiddleTip);
         Vector3 laserPosition = jointPose.position;
         Vector3 laserDirection = jointPose.up;
         Ray laser = new(laserPosition, Vector3.down);

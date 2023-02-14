@@ -22,10 +22,12 @@ public class HandModifier : MonoBehaviour
     public ColliderEvent leftHandColliderEvent;
     public ColliderEvent rightHandColliderEvent;
     public VoxelController voxelController;
+    public VoxelBoundary voxelBoundary;
     public GameObject fingerTorchPrefab;
     public GameObject fingerHitVisualizerPrefab;
     public float maxVisualDistance;
     public float minVisualDistance;
+    public AudioClip audioClip_voxelOperation;
 
     private readonly HandEnum addVoxelHand = HandEnum.RightHand;
     private readonly HandGesture addVoxelHandGesture = HandGesture.Point;
@@ -37,6 +39,7 @@ public class HandModifier : MonoBehaviour
     private GameObject addVisualizer;
     private GameObject subVisualizer;
     private VoxelModifier modifier;
+    private AudioGenerator audioSource_voxelOperation;
     private bool isFirstModify;
     private bool canAddVoxel;
     private bool canSubVoxel;
@@ -45,9 +48,12 @@ public class HandModifier : MonoBehaviour
     private void Start()
     {
         modifier = GetComponent<VoxelModifier>();
+        audioSource_voxelOperation = new AudioGenerator(gameObject, audioClip_voxelOperation, true);
 
         leftHandColliderEvent.triggerEnterListener += LeftIndexTipTrigger;
         rightHandColliderEvent.triggerEnterListener += RightIndexTipTrigger;
+        voxelBoundary.leftHandExitBoundaryListener += LeftIndexTipExitBoundary;
+        voxelBoundary.rightHandExitBoundaryListener += RightIndexTipExitBoundary;
 
         addFingerTorch = Instantiate(fingerTorchPrefab, transform);
         subFingerTorch = Instantiate(fingerTorchPrefab, transform);
@@ -79,10 +85,21 @@ public class HandModifier : MonoBehaviour
         canSubVoxel = true;
     }
 
+    private void LeftIndexTipExitBoundary()
+    {
+        canSubVoxel = false;
+    }
+
     private void RightIndexTipTrigger()
     {
         canAddVoxel = true;
     }
+
+    private void RightIndexTipExitBoundary()
+    {
+        canAddVoxel = false;
+    }
+
 
     private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos)
     {
@@ -200,13 +217,23 @@ public class HandModifier : MonoBehaviour
 
             if (canSubVoxel)
             {
-                ModifyAtPosition(VoxelModifyMode.Additive, subPosition);
+                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition);
             }
         } else
         {
             canSubVoxel = false;
             subVisualizer.SetActive(false);
             subFingerTorch.SetActive(false);
+        }
+
+        // Play audio if operating
+
+        if(canAddVoxel || canSubVoxel)
+        {
+            audioSource_voxelOperation.Play();
+        } else
+        {
+            audioSource_voxelOperation.Stop();
         }
     }
 }

@@ -8,48 +8,75 @@ using NRKernal;
 
 public class ShellController : MonoBehaviour
 {
-    public GameController_S2 gameController;
-    public ImageRecognition imageRecog;
-    public TextMeshProUGUI receivedState;
-    public TextMeshProUGUI currentState;
-    public GameObject blocks_standard;
-    public GameObject blocks_geometric;
-    public DialogGenerator dialog;
+    public GameController_Historical gameController;
+    public DialogGenerator dialogGenerator;
+    public InstructionGenerator instructionGenerator;
     public Match match;
     public AdvancedDissolvePropertiesController property_clay_standard;
     public AdvancedDissolvePropertiesController property_gold_standard;
+    public GameObject blocks_standard;
+    public GameObject blocks_geometric;
+    public TextMeshProUGUI receivedState;
+    public TextMeshProUGUI currentState;
+    public AudioClip audioClip_shellFadeIn;
+    public ParticleSystem basicEffect_smoke;
+
+    private AudioGenerator audioSource_shellFadeIn;
+    private ImageRecognition imageRecog;
     private ImageRecogResult currentResult;
+    private readonly float shellFadeInDuration = 5.5f;
     private bool isTracking;
 
     void Start()
     {
-        ResetAll();
+        imageRecog = transform.GetComponent<ImageRecognition>();
+        audioSource_shellFadeIn = new AudioGenerator(gameObject, audioClip_shellFadeIn);
 
-        StartCoroutine(nameof(ShellFadeIn));
+        ResetAll();  
     }
 
     private void ResetAll()
     {
+        currentResult = new ImageRecogResult(false, null);
+        isTracking = false;
         blocks_standard.SetActive(false);
         blocks_geometric.SetActive(false);
-        currentResult = new ImageRecogResult(true, true, 0);
-        isTracking = false;  
+        match.gameObject.SetActive(false);
+    }
+
+    public void Init()
+    {
+        StartCoroutine(nameof(ShellFadeIn));
     }
 
     private IEnumerator ShellFadeIn()
     {
-        blocks_standard.SetActive(true);
+        basicEffect_smoke.Play();
 
         yield return new WaitForSeconds(2f);
 
-        float shellFadeInDuration = 6f;
-
+        audioSource_shellFadeIn.Play();
+        blocks_standard.SetActive(true);
         PropertyFadeIn(property_clay_standard, shellFadeInDuration);
 
-        yield return new WaitForSeconds(shellFadeInDuration);
+        yield return new WaitForSeconds(shellFadeInDuration + 2f);
 
-        blocks_geometric.SetActive(true);
+        dialogGenerator.GenerateDialog("外范已经聚合");
+
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
+
+        dialogGenerator.GenerateDialog("现在，点燃熔融之火...");
+
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
+
+        instructionGenerator.GenerateInstruction("任务:引燃火焰", "划开火柴并靠近外范，以热量融化青铜");
+
+        yield return new WaitForSeconds(2f);
+
         blocks_standard.SetActive(false);
+        blocks_geometric.SetActive(true);
+        
+        //isTracking = true;
     }
 
     private void PropertyFadeIn(AdvancedDissolvePropertiesController controller, float duration)
@@ -68,29 +95,12 @@ public class ShellController : MonoBehaviour
         }, 0, 1f));
     }
 
-    public void InitShell()
-    {
-        StartCoroutine("StartScene");
-    }
-
     private void BurnOutMessage()
     {
         //blocks_geometric.SetActive(false);
         //blocks_standard.SetActive(true);
 
         Debug.Log("Burnout");
-    }
-
-    private IEnumerator StartScene()
-    {
-        
-        //dialog.GenerateDialog("引燃火种");
-
-        yield return new WaitForSeconds(1f);
-
-        //StartMatchTracking();
-        //matchLight.SetActive(true);
-        isTracking = true;
     }
 
     private IEnumerator MiddleScene()
@@ -128,35 +138,35 @@ public class ShellController : MonoBehaviour
 
     private void UpdateRecogState(ImageRecogResult result)
     {
-        receivedState.text = "Received: " + result.GetResult() + ", Time use: " + (Time.time - result.GetTimestamp());
+        //receivedState.text = "Received: " + result.GetResult() + ", Time use: " + (Time.time - result.GetTimestamp());
 
-        if (result.GetValidation())
-        {
-            if (currentResult == null)
-            {
-                currentResult = result;
-            }
+        //if (result.GetValidation())
+        //{
+        //    if (currentResult == null)
+        //    {
+        //        currentResult = result;
+        //    }
 
-            if (result.GetTimestamp() >= currentResult.GetTimestamp())
-            {
-                currentResult = result;
-                currentState.text = "Current: " + result.GetResult() + ", Time use: " + (Time.time - result.GetTimestamp());
-            }
-        }
+        //    if (result.GetTimestamp() >= currentResult.GetTimestamp())
+        //    {
+        //        currentResult = result;
+        //        currentState.text = "Current: " + result.GetResult() + ", Time use: " + (Time.time - result.GetTimestamp());
+        //    }
+        //}
     }
 
     void Update()
     {
-        if(isTracking && currentResult.GetResult())
-        {
-            // update position
-            //matchLight.SetActive(true);
-            //matchLight.transform.position = gameController.getHandJointPose(HandJointID.IndexTip).position;
-            match.ShowMatch();
-        } else
-        {
-            //matchLight.SetActive(false);
-            match.HideMatch();
-        }
+        //if(isTracking && currentResult.GetResult())
+        //{
+        //    // update position
+        //    //matchLight.SetActive(true);
+        //    //matchLight.transform.position = gameController.getHandJointPose(HandJointID.IndexTip).position;
+        //    match.ShowMatch();
+        //} else
+        //{
+        //    //matchLight.SetActive(false);
+        //    match.HideMatch();
+        //}
     }
 }

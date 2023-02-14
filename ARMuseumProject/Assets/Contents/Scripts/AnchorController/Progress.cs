@@ -6,7 +6,7 @@ using NRKernal;
 
 public class Progress : MonoBehaviour
 {
-    public GameController_S2 gameController;
+    public GameController_Historical gameController;
     public HandJointID followJoint;
     public float forwardDistance;
     public float upwardDistance;
@@ -64,7 +64,7 @@ public class Progress : MonoBehaviour
     {
         if(isActive)
         {
-            Pose jointPose = gameController.getHandJointPose(followJoint);
+            Pose jointPose = gameController.GetDomainHandState().GetJointPose(followJoint);
             transform.position = jointPose.position + Vector3.up * upwardDistance + jointPose.up * forwardDistance;
         }
     }

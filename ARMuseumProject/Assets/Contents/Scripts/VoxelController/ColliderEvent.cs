@@ -9,6 +9,9 @@ public class ColliderEvent : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        triggerEnterListener?.Invoke();
+        if(other.name == "__VOXELPIECE(Clone)")
+        {
+            triggerEnterListener?.Invoke();
+        }
     }
 }
