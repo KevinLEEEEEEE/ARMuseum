@@ -193,7 +193,7 @@ Material:
     - _AdvancedDissolveCutoutBaseInvert: 0
     - _AdvancedDissolveCutoutClip: 0
     - _AdvancedDissolveCutoutGeometric1Height: 1
-    - _AdvancedDissolveCutoutGeometric1Radius: 0.4
+    - _AdvancedDissolveCutoutGeometric1Radius: 0.1
     - _AdvancedDissolveCutoutGeometric2Height: 1
     - _AdvancedDissolveCutoutGeometric2Radius: 0
     - _AdvancedDissolveCutoutGeometric3Height: 1
@@ -442,7 +442,7 @@ Material:
     m_Colors:
     - _AdvancedDissolveBakedKeywords: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric1Normal: {r: -0.9656543, g: -0.00000008381903, b: -0.25983065, a: 0}
-    - _AdvancedDissolveCutoutGeometric1Position: {r: -0.0921, g: 0.4366, b: -0.67, a: 0}
+    - _AdvancedDissolveCutoutGeometric1Position: {r: 0, g: 5, b: -0.2, a: 0}
     - _AdvancedDissolveCutoutGeometric2Normal: {r: 1, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric2Position: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric3Normal: {r: 1, g: 0, b: 0, a: 0}

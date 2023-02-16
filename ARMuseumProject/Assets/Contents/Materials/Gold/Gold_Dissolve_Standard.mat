@@ -283,7 +283,7 @@ Material:
     - _AdvancedDissolveEdgeAdditionalColorPhaseOffset: 0
     - _AdvancedDissolveEdgeAdditionalColorTransparency: 1
     - _AdvancedDissolveEdgeAlphaOffset: 0
-    - _AdvancedDissolveEdgeBaseColorTransparency: 0.95
+    - _AdvancedDissolveEdgeBaseColorTransparency: 1
     - _AdvancedDissolveEdgeBaseShape: 1
     - _AdvancedDissolveEdgeBaseWidthGeometric: 0.06
     - _AdvancedDissolveEdgeBaseWidthParametric: 0.1
@@ -499,7 +499,7 @@ Material:
     - _AdvancedDissolveEdgeAdditionalColorMapOffset: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeAdditionalColorMapScroll: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveEdgeAdditionalColorMapTiling: {r: 1, g: 1, b: 0, a: 0}
-    - _AdvancedDissolveEdgeBaseColor: {r: 0.7835379, g: 0.27467737, b: 0.025186857, a: 1}
+    - _AdvancedDissolveEdgeBaseColor: {r: 1, g: 0.43243438, b: 0.10217498, a: 1}
     - _AdvancedDissolveEdgeBaseColorIntensity: {r: 1.5, g: 3.481689, b: 0, a: 0}
     - _AdvancedDissolveEdgeColor: {r: 0.006119758, g: 0.2152672, b: 0.87603444, a: 1}
     - _AdvancedDissolveEdgeColor2: {r: 1, g: 0, b: 0, a: 1}

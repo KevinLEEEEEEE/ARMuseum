@@ -6,11 +6,13 @@ using NRKernal;
 public class PlaneDetector : MonoBehaviour
 {
     public GameObject DetectedPlanePrefab;
-    private List<NRTrackablePlane> m_NewPlanes = new List<NRTrackablePlane>();
+    private List<NRTrackablePlane> m_NewPlanes = new();
     private bool canAddNewPlane = true;
 
     public void LockTargetPlane(GameObject targetPlane)
     {
+        Debug.Log("[PlaneDetector] Target plane locked.");
+
         canAddNewPlane = false;
 
         foreach(Transform plane in transform)
@@ -24,6 +26,8 @@ public class PlaneDetector : MonoBehaviour
 
     public void ReleaseTargetPlane()
     {
+        Debug.Log("[PlaneDetector] Target plane released.");
+
         canAddNewPlane = true;
 
         foreach (Transform plane in transform)

@@ -114,7 +114,7 @@ public class AnchorController : MonoBehaviour
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration / 2 + 1f);
 
-        planeActivateInstruction = instructionGenerator.GenerateInstruction("任务: 激活遗迹", "触碰平面手印处两秒以开启遗迹");
+        planeActivateInstruction = instructionGenerator.GenerateInstruction("任务: 激活遗迹", "将手掌贴在手印痕迹处，并保持两秒");
         gameController.StartPlaneHint();
         currentState = SceneState.Ready;
     }
@@ -127,7 +127,7 @@ public class AnchorController : MonoBehaviour
 
         yield return new WaitForSeconds(3f);
 
-        dialogGenerator.GenerateDialog("遗迹已被激活......");
+        dialogGenerator.GenerateDialog("遗迹已激活...请收回手掌");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
 

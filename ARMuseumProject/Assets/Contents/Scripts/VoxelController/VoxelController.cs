@@ -79,7 +79,7 @@ public class VoxelController : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        dialogGenerator.GenerateDialog("内模已完成...外范塑形中...");
+        dialogGenerator.GenerateDialog("内模已成型...外范聚合中...");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
 
@@ -93,7 +93,7 @@ public class VoxelController : MonoBehaviour
 
     private IEnumerator StartInstruction()
     {
-        instructionFadeOut = instructionGenerator.GenerateInstruction("任务:制作内模", "使用左右手食指触碰模具为青铜器塑形");
+        instructionFadeOut = instructionGenerator.GenerateInstruction("任务:制作内模", "使用左右手食指触碰模具为青铜器模具塑形");
         interactionHint_R.GetComponent<InteractionHint>().StartHintLoop();
 
         yield return new WaitForSeconds(4f);

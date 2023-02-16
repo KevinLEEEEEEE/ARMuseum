@@ -1,8 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
-using NRKernal.NRExamples;
 using NRKernal;
 
 public class GameController_Historical : MonoBehaviour
@@ -18,28 +16,25 @@ public class GameController_Historical : MonoBehaviour
     private int initializeIndex = 0;
     private Coroutine ambientCoroutine;
     private AudioGenerator audioSource_ambientWind;
-    private HandEnum domainHand = HandEnum.RightHand;
+    private readonly HandEnum domainHand = HandEnum.RightHand;
 
     void Start()
     {
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
         NRInput.RaycastersActive = false;
 
-        SetStartPoint(new Vector3(0, 0, 0.7f));
+        //SetStartPoint(new Vector3(0, 0, 0.7f));
         //NextScene();
 
         // Skip to voxel
 
         foreach (Transform trans in eventAnchorListener)
         {
-            trans.position = new Vector3(0, 0, 0);
+            trans.position = new Vector3(0, -0.5f, 0.7f);
             trans.forward = new Vector3(0, 0, 10);
         }
 
-        //initMessageListener[2].SendMessage("Init");
-        //initializeIndex++;
-
-        // Skip to shel
+        initMessageListener[2].SendMessage("Init");
     }
 
     private void SetStartPoint(Vector3 point)
@@ -49,8 +44,7 @@ public class GameController_Historical : MonoBehaviour
             if(trans)
             {
                 trans.position = point;
-            }
-            
+            }  
         }
     }
 
@@ -73,7 +67,7 @@ public class GameController_Historical : MonoBehaviour
 
     public void NextScene()
     {
-        Debug.Log("[GameController] Init scene: " + initializeIndex);
+        Debug.Log("[GameController] Init scene NO." + (initializeIndex + 1));
 
         initMessageListener[initializeIndex].SendMessage("Init");
         initializeIndex++;

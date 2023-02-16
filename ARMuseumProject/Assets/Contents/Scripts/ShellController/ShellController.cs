@@ -1,10 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using AmazingAssets.AdvancedDissolve;
 using UnityEngine;
-using TMPro;
 using NRKernal;
+using System;
 
 public class ShellController : MonoBehaviour
 {
@@ -14,54 +13,56 @@ public class ShellController : MonoBehaviour
     public Match match;
     public AdvancedDissolvePropertiesController property_clay_standard;
     public AdvancedDissolvePropertiesController property_gold_standard;
-    public GameObject blocks_standard;
+    public GameObject block_standard_clay;
+    public GameObject block_standard_gold;
     public GameObject blocks_geometric;
-    public TextMeshProUGUI receivedState;
-    public TextMeshProUGUI currentState;
     public AudioClip audioClip_shellFadeIn;
-    public ParticleSystem basicEffect_smoke;
+    public ParticleSystem[] basicEffect;
+    public ParticleSystem[] burningEffect;
+    public ParticleSystem[] fadeoutEffect;
+    public readonly float objectDetectionFrequency = 1f;
+    public readonly float shellFadeInDuration = 5.6f;
 
     private AudioGenerator audioSource_shellFadeIn;
-    private ImageRecognition imageRecog;
-    private ImageRecogResult currentResult;
-    private readonly float shellFadeInDuration = 5.5f;
-    private bool isTracking;
+    private ImageRecognition imageRecognition;
+    private ImageRecogResult latestRecogResult;
+    private Action hideMatchInstruction;
 
     void Start()
     {
-        imageRecog = transform.GetComponent<ImageRecognition>();
         audioSource_shellFadeIn = new AudioGenerator(gameObject, audioClip_shellFadeIn);
-
+        imageRecognition = transform.GetComponent<ImageRecognition>();
+        imageRecognition.InitClient((int)(objectDetectionFrequency * 1000));
+        match.BurningEventListener += StartBurning;
+        match.BurnoutEventListener += () => { StartCoroutine(nameof(EndingScene)); };
         ResetAll();  
     }
 
     private void ResetAll()
     {
-        currentResult = new ImageRecogResult(false, null);
-        isTracking = false;
-        blocks_standard.SetActive(false);
+        block_standard_clay.SetActive(false);
+        block_standard_gold.SetActive(false);
         blocks_geometric.SetActive(false);
-        match.gameObject.SetActive(false);
     }
 
     public void Init()
     {
-        StartCoroutine(nameof(ShellFadeIn));
+        StartCoroutine(nameof(OpeningScene));
     }
 
-    private IEnumerator ShellFadeIn()
+    private IEnumerator OpeningScene()
     {
-        basicEffect_smoke.Play();
+        StartParticles(basicEffect);
 
         yield return new WaitForSeconds(2f);
 
         audioSource_shellFadeIn.Play();
-        blocks_standard.SetActive(true);
+        block_standard_clay.SetActive(true);
         PropertyFadeIn(property_clay_standard, shellFadeInDuration);
 
-        yield return new WaitForSeconds(shellFadeInDuration + 2f);
+        yield return new WaitForSeconds(shellFadeInDuration + 2.5f);
 
-        dialogGenerator.GenerateDialog("外范已经聚合");
+        dialogGenerator.GenerateDialog("模具容器已经形成...");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
 
@@ -69,14 +70,106 @@ public class ShellController : MonoBehaviour
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
 
-        instructionGenerator.GenerateInstruction("任务:引燃火焰", "划开火柴并靠近外范，以热量融化青铜");
+        hideMatchInstruction = instructionGenerator.GenerateInstruction("任务:引燃火种", "划开火柴并用火苗触碰模型，点燃青铜之火");
 
         yield return new WaitForSeconds(2f);
 
-        blocks_standard.SetActive(false);
         blocks_geometric.SetActive(true);
+        block_standard_clay.SetActive(false);
+        StartCoroutine(nameof(ObjectDetection));
+    }
+
+    private void StartBurning()
+    {
+        Debug.Log("[ShellController] Shell start burning.");
+
+        StopCoroutine(nameof(ObjectDetection));
+
+        StartParticles(burningEffect);
+        StopParticles(basicEffect);
+
+        hideMatchInstruction();
+        hideMatchInstruction = null;
+    }
+
+    private IEnumerator EndingScene()
+    {
+        Debug.Log("[ShellController] Shell burnout");
+
+        block_standard_gold.SetActive(true);
+        blocks_geometric.SetActive(false);
+
+        yield return new WaitForSeconds(1.5f);
+
+        dialogGenerator.GenerateDialog("青铜器已完成铸造");
+
+        yield return new WaitForSeconds(DialogGenerator.dialogDuration);
+
+        StopParticles(burningEffect);
+        StartParticles(fadeoutEffect);
+        PropertyFadeOut(property_gold_standard, 5f);
         
-        //isTracking = true;
+        yield return new WaitForSeconds(5f);
+
+        block_standard_gold.SetActive(false);
+    }
+
+    private IEnumerator ObjectDetection()
+    {
+        while(true)
+        {
+            CapturePhotoAndAnalysis();
+
+            yield return new WaitForSeconds(objectDetectionFrequency);
+        }
+    }
+
+    private void CapturePhotoAndAnalysis()
+    {
+        bool rightHandPinchState = NRInput.Hands.GetHandState(HandEnum.RightHand).isPinching;
+        bool leftHandPinchState = NRInput.Hands.GetHandState(HandEnum.LeftHand).isPinching;
+        
+        if(rightHandPinchState || leftHandPinchState)
+        {
+            Debug.Log("[ShellController] Start taking photo.");
+
+            imageRecognition.TakePhotoAndAnalysis(UpdateImageRecogResult);
+
+        } else
+        {
+            Debug.Log("[ShellController] Skip taking photo due to invalid gesture.");
+        }
+    }
+
+    public void UpdateImageRecogResult(ImageRecogResult res)
+    {
+        if(latestRecogResult != null && res.GetStartTime() < latestRecogResult.GetStartTime())
+        {
+            Debug.Log("[ShellController] Earlier recog result received, skip it.");
+            return;
+        }
+
+        if (res.IsSuccessful())
+        {
+            if (res.ContainMatch())
+            {
+                Debug.Log(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
+                match.EnableMatch();
+                return;
+            }
+            else
+            {
+                Debug.Log(string.Format("[ShellController] Match undetected, Receive result in {0} ms.", res.GetCostTime()));
+            }
+
+            latestRecogResult = res;
+        }
+        else
+        {
+            Debug.Log("[ShellController] Image detection request failed.");
+        }
+
+        match.DisableMatch();
     }
 
     private void PropertyFadeIn(AdvancedDissolvePropertiesController controller, float duration)
@@ -95,78 +188,19 @@ public class ShellController : MonoBehaviour
         }, 0, 1f));
     }
 
-    private void BurnOutMessage()
+    private void StartParticles(ParticleSystem[] particles)
     {
-        //blocks_geometric.SetActive(false);
-        //blocks_standard.SetActive(true);
-
-        Debug.Log("Burnout");
+        foreach (ParticleSystem sys in particles)
+        {
+            sys.Play();
+        }
     }
 
-    private IEnumerator MiddleScene()
+    private void StopParticles(ParticleSystem[] particles)
     {
-        StopMatchTracking();
-        isTracking = false;
-
-        yield return new WaitForSeconds(3f);
-    }
-
-    private IEnumerator EndingScene()
-    {
-        yield return new WaitForSeconds(3f);
-    }
-
-    private void StartMatchTracking()
-    {
-        InvokeRepeating(nameof(CapturePhotoAndAnalysis), 0f, 1.5f);
-    }
-
-    private void StopMatchTracking()
-    {
-        CancelInvoke(nameof(CapturePhotoAndAnalysis));
-    }
-
-    private async void CapturePhotoAndAnalysis()
-    {
-        //if(gameController.GetHandPinchState())
-        //{
-            ImageRecogResult res = await imageRecog.TakePhotoAndAnalysis();
-
-            UpdateRecogState(res);
-        //}
-    }
-
-    private void UpdateRecogState(ImageRecogResult result)
-    {
-        //receivedState.text = "Received: " + result.GetResult() + ", Time use: " + (Time.time - result.GetTimestamp());
-
-        //if (result.GetValidation())
-        //{
-        //    if (currentResult == null)
-        //    {
-        //        currentResult = result;
-        //    }
-
-        //    if (result.GetTimestamp() >= currentResult.GetTimestamp())
-        //    {
-        //        currentResult = result;
-        //        currentState.text = "Current: " + result.GetResult() + ", Time use: " + (Time.time - result.GetTimestamp());
-        //    }
-        //}
-    }
-
-    void Update()
-    {
-        //if(isTracking && currentResult.GetResult())
-        //{
-        //    // update position
-        //    //matchLight.SetActive(true);
-        //    //matchLight.transform.position = gameController.getHandJointPose(HandJointID.IndexTip).position;
-        //    match.ShowMatch();
-        //} else
-        //{
-        //    //matchLight.SetActive(false);
-        //    match.HideMatch();
-        //}
+        foreach (ParticleSystem sys in particles)
+        {
+            sys.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+        }
     }
 }
