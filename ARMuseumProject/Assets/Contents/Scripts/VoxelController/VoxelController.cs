@@ -60,7 +60,6 @@ public class VoxelController : MonoBehaviour
         yield return new WaitForSeconds(5.5f);
 
         gameController.HideGroundMask();
-        gameController.SetAmbientVolumeInSeconds(0.5f, 2);
         StartCoroutine(nameof(StartInstruction));
 
         yield return new WaitForSeconds(1f);
@@ -79,7 +78,7 @@ public class VoxelController : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        dialogGenerator.GenerateDialog("内模已成型...外范聚合中...");
+        dialogGenerator.GenerateDialog("器形已固定，容器形成中...");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
 

@@ -42,15 +42,6 @@ public class ImageRecogResult
         return _startTime;
     }
 
-    public bool ContainMatch()
-    {
-        if(_isSuccessful)
-        {
-            return _response.results.Length > 0;
-        }
-        return false;
-    }
-
     public bool ContainLabel(string label)
     {
         if(_isSuccessful)
@@ -150,18 +141,18 @@ public class ImageRecognition : MonoBehaviour
         {
             ObjectDetectionResponse result = JsonConvert.DeserializeObject<ObjectDetectionResponse>(response.Content);
             recogResult = new ImageRecogResult(true, result, startTime);
-            UnityEngine.Debug.Log("[ImageRecognition] Post successfully");
+            UnityEngine.Debug.Log("[ImageRecognition] Receive result successfully.");
         }
         else
         {
             recogResult = new ImageRecogResult(false, null, startTime);
-            UnityEngine.Debug.Log("[ImageRecognition] Post failed: " + response.ErrorMessage);
+            UnityEngine.Debug.LogError("[ImageRecognition] Receive result failed: " + response.ErrorMessage);
         }
 
         if(displayReceivedInfo)
         {
-            receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nContainMatch: {3}.", 
-                recogResult.IsSuccessful(), recogResult.GetStartTime(), recogResult.GetCostTime(), recogResult.ContainMatch());
+            receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nIsBurning: {3}.", 
+                recogResult.IsSuccessful(), recogResult.GetStartTime().ToString("f3"), recogResult.GetCostTime(), recogResult.ContainLabel("burning"));
         }
 
         return recogResult;

@@ -13,11 +13,13 @@ public class Match : MonoBehaviour
     public Action BurningEventListener;
     public Action BurnoutEventListener;
     public GameObject lightBulb;
+    public GameObject flameMask;
     public AudioClip audioClip_shellMatchTrigger;
     public AudioClip audioClip_shellBurning;
     public float burningDuration;
     public float burningBeginRadius;
     public float burningEndRadius;
+    public float matchPositionOffset;
 
     private AudioGenerator audioSource_shellMatchTrigger;
     private AudioGenerator audioSource_shellBurning;
@@ -41,6 +43,7 @@ public class Match : MonoBehaviour
     public void ResetAll()
     {
         lightBulb.SetActive(false);
+        flameMask.SetActive(false);
         transform.position = new Vector3(0, 5, 0);
 
         cutout_front.target1Radius = burningBeginRadius;
@@ -56,6 +59,7 @@ public class Match : MonoBehaviour
         {
             state = MatchState.suspend;
             lightBulb.SetActive(false);
+            flameMask.SetActive(false);
         }
     }
 
@@ -65,6 +69,7 @@ public class Match : MonoBehaviour
         {
             state = MatchState.active;
             lightBulb.SetActive(true);
+            flameMask.SetActive(true);
         }
     }
 
@@ -86,6 +91,8 @@ public class Match : MonoBehaviour
 
     private IEnumerator Burning()
     {
+        flameMask.SetActive(false);
+
         BurningEventListener?.Invoke();
         SetADControllerUpdateMode(AdvancedDissolveGeometricCutoutController.UpdateMode.EveryFrame);
 
@@ -128,11 +135,24 @@ public class Match : MonoBehaviour
         BurnoutEventListener?.Invoke();
     }
 
+    private HandEnum GetHandHoldingMatch()
+    {
+        if (NRInput.Hands.GetHandState(HandEnum.RightHand).isPinching)
+        {
+            return HandEnum.RightHand;
+        } else
+        {
+            return HandEnum.LeftHand;
+        }
+    }
+
     private void Update()
     {
         if(state == MatchState.active)
         {
-            transform.position = gameController.GetDomainHandState().GetJointPose(HandJointID.IndexTip).position;
+            Pose indexTipPose = NRInput.Hands.GetHandState(GetHandHoldingMatch()).GetJointPose(HandJointID.IndexTip);
+
+            transform.position = indexTipPose.position + indexTipPose.up * matchPositionOffset;
         }
     }
 }

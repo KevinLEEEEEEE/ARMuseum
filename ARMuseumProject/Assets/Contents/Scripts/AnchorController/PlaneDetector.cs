@@ -11,7 +11,7 @@ public class PlaneDetector : MonoBehaviour
 
     public void LockTargetPlane(GameObject targetPlane)
     {
-        Debug.Log("[PlaneDetector] Target plane locked.");
+        NRDebugger.Info("[PlaneDetector] Target plane locked.");
 
         canAddNewPlane = false;
 
@@ -26,7 +26,7 @@ public class PlaneDetector : MonoBehaviour
 
     public void ReleaseTargetPlane()
     {
-        Debug.Log("[PlaneDetector] Target plane released.");
+        NRDebugger.Info("[PlaneDetector] Target plane released.");
 
         canAddNewPlane = true;
 

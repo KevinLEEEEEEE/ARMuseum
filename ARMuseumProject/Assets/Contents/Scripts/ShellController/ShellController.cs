@@ -35,7 +35,7 @@ public class ShellController : MonoBehaviour
         imageRecognition.InitClient((int)(objectDetectionFrequency * 1000));
         match.BurningEventListener += StartBurning;
         match.BurnoutEventListener += () => { StartCoroutine(nameof(EndingScene)); };
-        ResetAll();  
+        ResetAll();
     }
 
     private void ResetAll()
@@ -62,17 +62,17 @@ public class ShellController : MonoBehaviour
 
         yield return new WaitForSeconds(shellFadeInDuration + 2.5f);
 
-        dialogGenerator.GenerateDialog("模具容器已经形成...");
+        dialogGenerator.GenerateDialog("容器已形成......");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
 
-        dialogGenerator.GenerateDialog("现在，点燃熔融之火...");
+        dialogGenerator.GenerateDialog("现在，点燃熔融之火");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
 
         hideMatchInstruction = instructionGenerator.GenerateInstruction("任务:引燃火种", "划开火柴并用火苗触碰模型，点燃青铜之火");
 
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(3f);
 
         blocks_geometric.SetActive(true);
         block_standard_clay.SetActive(false);
@@ -151,7 +151,7 @@ public class ShellController : MonoBehaviour
 
         if (res.IsSuccessful())
         {
-            if (res.ContainMatch())
+            if (res.ContainLabel("burning"))
             {
                 Debug.Log(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
                 match.EnableMatch();
