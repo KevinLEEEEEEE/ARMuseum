@@ -23,14 +23,14 @@ public class CameraManager : MonoBehaviour
 
     private NRPhotoCapture m_PhotoCaptureObject;
     private Resolution m_CameraResolution;
-    private bool isOnPhotoProcess = false;
+    //private bool isOnPhotoProcess = false;
     private GalleryDataProvider galleryDataTool;
+    private byte[] imageBytes;
 
     private void Start()
     {
-        if(displayCapturedImage) {
-            capturedImageUI.gameObject.SetActive(true);
-        }
+        capturedImageUI.gameObject.SetActive(displayCapturedImage);
+        imageBytes = mockImages_Burning[0].EncodeToPNG();
     }
 
     void Create(Action<NRPhotoCapture> onCreated)
@@ -71,7 +71,7 @@ public class CameraManager : MonoBehaviour
                 }
                 else
                 {
-                    isOnPhotoProcess = false;
+                    //isOnPhotoProcess = false;
                     this.Close();
                     NRDebugger.Error("Start PhotoMode faild." + result.resultType);
                 }
@@ -91,24 +91,26 @@ public class CameraManager : MonoBehaviour
         }
 
         // Run mock method in unity editor
-        if (Application.isEditor)
+        if (!Application.isEditor)
         {
-            int index = UnityEngine.Random.Range(0, alwaysDetectedInEditor ? (mockImages_Burning.Length - 1) : (mockImages_Burning.Length + mockImages_Others.Length - 1));
-            Texture2D tex = index <= (mockImages_Burning.Length - 1) ? mockImages_Burning[index] : mockImages_Others[index - mockImages_Burning.Length];
+            //int index = UnityEngine.Random.Range(0, alwaysDetectedInEditor ? (mockImages_Burning.Length - 1) : (mockImages_Burning.Length + mockImages_Others.Length - 1));
+            //Texture2D tex = index <= (mockImages_Burning.Length - 1) ? mockImages_Burning[index] : mockImages_Others[index - mockImages_Burning.Length];
 
-            UnityEngine.Debug.Log("[ImageRecognition] Use mock image NO." + (index + 1));
+            //UnityEngine.Debug.Log("[ImageRecognition] Use mock image NO." + (index + 1));
 
-            capturedCallback(tex.EncodeToPNG());
+            //capturedCallback(tex.EncodeToPNG());
+
+            capturedCallback(imageBytes);
             return;
         }
 
-        if (isOnPhotoProcess)
-        {
-            NRDebugger.Warning("Currently in the process of taking pictures, Can not take photo .");
-            return;
-        }
+        //if (isOnPhotoProcess)
+        //{
+        //    NRDebugger.Warning("Currently in the process of taking pictures, Can not take photo .");
+        //    return;
+        //}
 
-        isOnPhotoProcess = true;
+        //isOnPhotoProcess = true;
 
         if (m_PhotoCaptureObject == null)
         {
@@ -126,11 +128,7 @@ public class CameraManager : MonoBehaviour
     private void OnCapturedProcessCallback(byte[] bytes, OnPhotoCapturedCallback callback, float startTime)
     {
         callback(bytes, startTime);
-
-        if(!Application.isEditor)
-        {
-            this.Close();
-        }
+        //this.Close();
 
         if(savePhotoToGallery)
         {
@@ -146,11 +144,11 @@ public class CameraManager : MonoBehaviour
         }
     }
 
-    void Close()
+    public void Close()
     {
         if (m_PhotoCaptureObject == null)
         {
-            NRDebugger.Error("The NRPhotoCapture has not been created.");
+            if(!Application.isEditor) NRDebugger.Error("The NRPhotoCapture has not been created.");
             return;
         }
 
@@ -161,7 +159,7 @@ public class CameraManager : MonoBehaviour
     {
         m_PhotoCaptureObject?.Dispose();
         m_PhotoCaptureObject = null;
-        isOnPhotoProcess = false;
+        //isOnPhotoProcess = false;
     }
 
     void OnDestroy()

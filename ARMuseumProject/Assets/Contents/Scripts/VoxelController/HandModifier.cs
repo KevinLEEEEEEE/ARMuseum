@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Fraktalia.VoxelGen.Modify;
 using UnityEngine;
+using UnityEngine.Serialization;
 using NRKernal;
 
 public class NearestHitResult
@@ -28,6 +29,8 @@ public class HandModifier : MonoBehaviour
     public float maxVisualDistance;
     public float minVisualDistance;
     public AudioClip audioClip_voxelOperation;
+    [FormerlySerializedAs("Distance_IDCurve")]
+    public AnimationCurve Distance_RadiusCurve;
 
     private readonly HandEnum addVoxelHand = HandEnum.RightHand;
     private readonly HandGesture addVoxelHandGesture = HandGesture.Point;
@@ -44,6 +47,8 @@ public class HandModifier : MonoBehaviour
     private bool canAddVoxel;
     private bool canSubVoxel;
     private bool canModify;
+    private Vector3 addPrePosition = new(0, 0, 0);
+    private Vector3 subPrePosition = new(0, 0, 0);
 
     private void Start()
     {
@@ -101,7 +106,7 @@ public class HandModifier : MonoBehaviour
     }
 
 
-    private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos)
+    private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos, float radius = 0.2f)
     {
         if(isFirstModify)
         {
@@ -110,9 +115,11 @@ public class HandModifier : MonoBehaviour
         }
 
         if (modifier.Mode != mode)
-        {
+        { 
             modifier.SetModificationMode(mode);
         }
+
+        modifier.SetRadius(radius);
         modifier.ModifyAtPos(pos);
     }
 
@@ -200,11 +207,16 @@ public class HandModifier : MonoBehaviour
 
             if (canAddVoxel)
             {
-                ModifyAtPosition(VoxelModifyMode.Additive, addPosition);
+                float distance = Vector3.Distance(addPrePosition, addPosition);
+                float radius = Distance_RadiusCurve.Evaluate(distance);
+                ModifyAtPosition(VoxelModifyMode.Additive, addPosition, radius);
             }
+
+            addPrePosition = addPosition;
         } else
         {
             canAddVoxel = false;
+            addPrePosition = Vector3.zero;
             addVisualizer.SetActive(false);
             addFingerTorch.SetActive(false);
         }
@@ -217,8 +229,14 @@ public class HandModifier : MonoBehaviour
 
             if (canSubVoxel)
             {
-                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition);
+                float distance = Vector3.Distance(subPrePosition, subPosition);
+                float radius = Distance_RadiusCurve.Evaluate(distance);
+
+                // 删除的尺寸比添加的稍大一些，能够将原有轨迹擦得更干净，符合预期
+                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition, radius * 1.1f);
             }
+
+            subPrePosition = subPosition;
         } else
         {
             canSubVoxel = false;

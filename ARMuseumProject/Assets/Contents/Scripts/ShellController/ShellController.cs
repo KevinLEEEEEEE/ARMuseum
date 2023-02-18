@@ -4,6 +4,7 @@ using AmazingAssets.AdvancedDissolve;
 using UnityEngine;
 using NRKernal;
 using System;
+using TMPro;
 
 public class ShellController : MonoBehaviour
 {
@@ -17,13 +18,16 @@ public class ShellController : MonoBehaviour
     public GameObject block_standard_gold;
     public GameObject blocks_geometric;
     public AudioClip audioClip_shellFadeIn;
+    public float objectDetectionFrequency = 1f;
+    public float shellFadeInDuration = 5.6f;
+    public bool displayReceivedInfo;
+    public TextMeshProUGUI receivedInfoUI;
     public ParticleSystem[] basicEffect;
     public ParticleSystem[] burningEffect;
     public ParticleSystem[] fadeoutEffect;
-    public readonly float objectDetectionFrequency = 1f;
-    public readonly float shellFadeInDuration = 5.6f;
 
     private AudioGenerator audioSource_shellFadeIn;
+    private CameraManager cameraManager;
     private ImageRecognition imageRecognition;
     private ImageRecogResult latestRecogResult;
     private Action hideMatchInstruction;
@@ -32,9 +36,10 @@ public class ShellController : MonoBehaviour
     {
         audioSource_shellFadeIn = new AudioGenerator(gameObject, audioClip_shellFadeIn);
         imageRecognition = transform.GetComponent<ImageRecognition>();
-        imageRecognition.InitClient((int)(objectDetectionFrequency * 1000));
+        cameraManager = transform.GetComponent<CameraManager>();
         match.BurningEventListener += StartBurning;
         match.BurnoutEventListener += () => { StartCoroutine(nameof(EndingScene)); };
+        receivedInfoUI.gameObject.SetActive(displayReceivedInfo);
         ResetAll();
     }
 
@@ -81,8 +86,9 @@ public class ShellController : MonoBehaviour
 
     private void StartBurning()
     {
-        Debug.Log("[ShellController] Shell start burning.");
+        NRDebugger.Info("[ShellController] Shell start burning.");
 
+        cameraManager.Close();
         StopCoroutine(nameof(ObjectDetection));
 
         StartParticles(burningEffect);
@@ -94,7 +100,7 @@ public class ShellController : MonoBehaviour
 
     private IEnumerator EndingScene()
     {
-        Debug.Log("[ShellController] Shell burnout");
+        NRDebugger.Info("[ShellController] Shell burnout");
 
         block_standard_gold.SetActive(true);
         blocks_geometric.SetActive(false);
@@ -131,21 +137,27 @@ public class ShellController : MonoBehaviour
         
         if(rightHandPinchState || leftHandPinchState)
         {
-            Debug.Log("[ShellController] Start taking photo.");
+            NRDebugger.Info("[ShellController] Start taking photo.");
 
             imageRecognition.TakePhotoAndAnalysis(UpdateImageRecogResult);
 
         } else
         {
-            Debug.Log("[ShellController] Skip taking photo due to invalid gesture.");
+            NRDebugger.Info("[ShellController] Skip taking photo due to invalid gesture.");
         }
     }
 
     public void UpdateImageRecogResult(ImageRecogResult res)
     {
-        if(latestRecogResult != null && res.GetStartTime() < latestRecogResult.GetStartTime())
+        if (displayReceivedInfo)
         {
-            Debug.Log("[ShellController] Earlier recog result received, skip it.");
+            receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nIsBurning: {3}.",
+                res.IsSuccessful(), res.GetStartTime().ToString("f3"), res.GetCostTime(), res.ContainLabel("burning"));
+        }
+
+        if (latestRecogResult != null && res.GetStartTime() < latestRecogResult.GetStartTime())
+        {
+            NRDebugger.Info("[ShellController] Earlier recog result received, skip it.");
             return;
         }
 
@@ -153,20 +165,20 @@ public class ShellController : MonoBehaviour
         {
             if (res.ContainLabel("burning"))
             {
-                Debug.Log(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
+                NRDebugger.Info(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
                 match.EnableMatch();
                 return;
             }
             else
             {
-                Debug.Log(string.Format("[ShellController] Match undetected, Receive result in {0} ms.", res.GetCostTime()));
+                NRDebugger.Info(string.Format("[ShellController] Match undetected, Receive result in {0} ms.", res.GetCostTime()));
             }
 
             latestRecogResult = res;
         }
         else
         {
-            Debug.Log("[ShellController] Image detection request failed.");
+            NRDebugger.Info("[ShellController] Image detection request failed.");
         }
 
         match.DisableMatch();

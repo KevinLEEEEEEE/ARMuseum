@@ -8,6 +8,7 @@ public class Dialog : MonoBehaviour
 {
     public AudioClip audioClip_templeBell;
     public AudioClip[] audioClip_chant;
+    public TextMeshProUGUI textMesh;
     private AudioGenerator audioSource_templeBell;
     private AudioGenerator audioSource_chant;
     private Animation dialogAnimation;
@@ -21,7 +22,7 @@ public class Dialog : MonoBehaviour
 
     public void SetContent(string content)
     {
-        transform.GetChild(0).GetComponent<Text>().text = content;
+        textMesh.text = content;
     }
 
     public void StartDialog()

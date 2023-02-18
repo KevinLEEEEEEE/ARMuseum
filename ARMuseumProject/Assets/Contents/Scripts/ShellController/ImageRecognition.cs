@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
-using RestSharp;
 using Newtonsoft.Json;
 using NRKernal;
-using TMPro;
+using System.Net;
+using System.IO;
 #if UNITY_ANDROID && !UNITY_EDITOR
     using GalleryDataProvider = NRKernal.NRExamples.NativeGalleryDataProvider;
 #else
-    using GalleryDataProvider = NRKernal.NRExamples.MockGalleryDataProvider;
+using GalleryDataProvider = NRKernal.NRExamples.MockGalleryDataProvider;
 #endif
 
 public class ImageRecogResult
@@ -86,33 +85,18 @@ public class ImageRecognition : MonoBehaviour
     public string easydl_ip;
     public string port;
     public float threshold;
-    public bool displayReceivedInfo;
-    public TextMeshProUGUI receivedInfoUI;
+    public int timeout;
 
     private GalleryDataProvider galleryDataTool;
-    private RestClient client;
+    private Uri uri;
 
     void Start()
     {
-        if (displayReceivedInfo)
-        {
-            receivedInfoUI.gameObject.SetActive(true);
-        }
-    }
-
-    public void InitClient(int timeout = 1000)
-    {
-        client = new(easydl_ip + ":" + port + "?threshold=" + threshold);
-        client.Timeout = timeout;
+        uri = new(easydl_ip + ":" + port + "?threshold=" + threshold);
     }
 
     public void TakePhotoAndAnalysis(OnPhotoAnalysisedCallback callback)
     {
-        if (client == null)
-        {
-            Debug.LogError("[ImageRecognition] Initialize image recognition client first.");
-        }
-
         cameraManager.TakeAPhoto((byte[] bytes, float startTime) =>
         {
             OnPhotoCapturedCallback(bytes, callback, startTime);
@@ -130,32 +114,36 @@ public class ImageRecognition : MonoBehaviour
 
     private async Task<ImageRecogResult> AnalysisImage(byte[] bytes, float startTime)
     {
-        var request = new RestRequest()
-            .AddHeader("Content-Type", "image/png")
-            .AddParameter("application/octet-stream", bytes, ParameterType.RequestBody);
-
-        IRestResponse response = await client.ExecuteAsync(request, Method.POST);
-        ImageRecogResult recogResult;
-
-        if (response.IsSuccessful)
+        try
         {
-            ObjectDetectionResponse result = JsonConvert.DeserializeObject<ObjectDetectionResponse>(response.Content);
-            recogResult = new ImageRecogResult(true, result, startTime);
-            UnityEngine.Debug.Log("[ImageRecognition] Receive result successfully.");
-        }
-        else
-        {
-            recogResult = new ImageRecogResult(false, null, startTime);
-            UnityEngine.Debug.LogError("[ImageRecognition] Receive result failed: " + response.ErrorMessage);
-        }
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(uri);
+            request.Method = "POST";
+            request.Timeout = timeout;
 
-        if(displayReceivedInfo)
-        {
-            receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nIsBurning: {3}.", 
-                recogResult.IsSuccessful(), recogResult.GetStartTime().ToString("f3"), recogResult.GetCostTime(), recogResult.ContainLabel("burning"));
-        }
+            Stream stream = request.GetRequestStream();
+            stream.Write(bytes, 0, bytes.Length);
+            stream.Close();
 
-        return recogResult;
+            WebResponse response = await request.GetResponseAsync();
+            StreamReader sr = new(response.GetResponseStream());
+            JsonReader reader = new JsonTextReader(sr);
+            JsonSerializer serializer = new();
+            ObjectDetectionResponse result = serializer.Deserialize<ObjectDetectionResponse>(reader);
+            sr.Close();
+            response.Close();
+            NRDebugger.Info("[ImageRecognition] Receive result successfully.");
+            return new ImageRecogResult(true, result, startTime);
+        }
+        catch (WebException e)
+        {
+            NRDebugger.Error("[ImageRecognition] Web exception raised: " + e.Message);
+            return new ImageRecogResult(false, null, startTime);
+        }
+        catch (Exception e)
+        {
+            NRDebugger.Error("[ImageRecognition] Exception raised: " + e.Message);
+            return new ImageRecogResult(false, null, startTime);
+        }
     }
 
     public void SaveImageToGallery(byte[] bytes)
@@ -178,3 +166,33 @@ public class ImageRecognition : MonoBehaviour
         }
     }
 }
+
+//private async Task<ImageRecogResult> AnalysisImage(byte[] bytes, float startTime)
+//{
+//    var request = new RestRequest()
+//        .AddHeader("Content-Type", "image/png")
+//        .AddParameter("application/octet-stream", bytes, ParameterType.RequestBody);
+
+//    IRestResponse response = await client.ExecuteAsync(request, Method.POST);
+//    ImageRecogResult recogResult;
+
+//    if (response.IsSuccessful)
+//    {
+//        ObjectDetectionResponse result = JsonConvert.DeserializeObject<ObjectDetectionResponse>(response.Content);
+//        recogResult = new ImageRecogResult(true, result, startTime);
+//        UnityEngine.Debug.Log("[ImageRecognition] Receive result successfully.");
+//    }
+//    else
+//    {
+//        recogResult = new ImageRecogResult(false, null, startTime);
+//        UnityEngine.Debug.LogError("[ImageRecognition] Receive result failed: " + response.ErrorMessage);
+//    }
+
+//    if(displayReceivedInfo)
+//    {
+//        receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nIsBurning: {3}.", 
+//            recogResult.IsSuccessful(), recogResult.GetStartTime().ToString("f3"), recogResult.GetCostTime(), recogResult.ContainLabel("burning"));
+//    }
+
+//    return recogResult;
+//}

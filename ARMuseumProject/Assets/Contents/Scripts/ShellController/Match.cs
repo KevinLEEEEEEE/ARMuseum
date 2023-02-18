@@ -83,7 +83,7 @@ public class Match : MonoBehaviour
     {
         if(state == MatchState.active)
         {
-            Debug.Log("[Match] Trigger detected, start burning.");
+            NRDebugger.Info("[Match] Trigger detected, start burning.");
             state = MatchState.burning;
             StartCoroutine(nameof(Burning));
         }

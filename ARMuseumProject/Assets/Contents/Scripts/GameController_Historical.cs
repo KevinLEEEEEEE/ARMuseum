@@ -9,7 +9,6 @@ public class GameController_Historical : MonoBehaviour
     public GameObject groundMask;
     public AudioClip audioClip_ambientWind;
     public float ambientBasicVolume;
-    public LogLevel buildLogLevel;
     public Transform[] eventAnchorListener;
     public GameObject[] initMessageListener;
     public Transform[] startPointListener;
@@ -23,12 +22,9 @@ public class GameController_Historical : MonoBehaviour
     {
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
         NRInput.RaycastersActive = false;
-        NRDebugger.logLevel = buildLogLevel;
 
         SetStartPoint(new Vector3(0, 0, 0.7f));
         NextScene();
-
-        // Skip to voxel
 
         //foreach (Transform trans in eventAnchorListener)
         //{
@@ -36,7 +32,7 @@ public class GameController_Historical : MonoBehaviour
         //    trans.forward = new Vector3(0, 0, 10);
         //}
 
-        //initMessageListener[2].SendMessage("Init");
+        //initMessageListener[1].SendMessage("Init");
     }
 
     private void SetStartPoint(Vector3 point)
