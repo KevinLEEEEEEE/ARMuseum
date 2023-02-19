@@ -11,6 +11,8 @@ public class ShellController : MonoBehaviour
     public GameController_Historical gameController;
     public DialogGenerator dialogGenerator;
     public InstructionGenerator instructionGenerator;
+    public VoxelController voxelController;
+    public PostCardController postCardController;
     public Match match;
     public AdvancedDissolvePropertiesController property_clay_standard;
     public AdvancedDissolvePropertiesController property_gold_standard;
@@ -67,6 +69,9 @@ public class ShellController : MonoBehaviour
 
         yield return new WaitForSeconds(shellFadeInDuration + 2.5f);
 
+        // 此时可以隐藏voxel全部内容
+        voxelController.HideVoxel();
+
         dialogGenerator.GenerateDialog("容器已形成......");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
@@ -110,6 +115,9 @@ public class ShellController : MonoBehaviour
         dialogGenerator.GenerateDialog("青铜器已完成铸造");
 
         yield return new WaitForSeconds(DialogGenerator.dialogDuration);
+
+        postCardController.SetUserID(gameController.UserID);
+        postCardController.ShowPostCard();
 
         StopParticles(burningEffect);
         StartParticles(fadeoutEffect);

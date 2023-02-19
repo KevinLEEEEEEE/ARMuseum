@@ -25,12 +25,12 @@ public class CameraManager : MonoBehaviour
     private Resolution m_CameraResolution;
     //private bool isOnPhotoProcess = false;
     private GalleryDataProvider galleryDataTool;
-    private byte[] imageBytes;
+    //private byte[] imageBytes;
 
     private void Start()
     {
         capturedImageUI.gameObject.SetActive(displayCapturedImage);
-        imageBytes = mockImages_Burning[0].EncodeToPNG();
+        //imageBytes = mockImages_Burning[0].EncodeToPNG();
     }
 
     void Create(Action<NRPhotoCapture> onCreated)
@@ -91,16 +91,16 @@ public class CameraManager : MonoBehaviour
         }
 
         // Run mock method in unity editor
-        if (!Application.isEditor)
+        if (Application.isEditor)
         {
-            //int index = UnityEngine.Random.Range(0, alwaysDetectedInEditor ? (mockImages_Burning.Length - 1) : (mockImages_Burning.Length + mockImages_Others.Length - 1));
-            //Texture2D tex = index <= (mockImages_Burning.Length - 1) ? mockImages_Burning[index] : mockImages_Others[index - mockImages_Burning.Length];
+            int index = UnityEngine.Random.Range(0, alwaysDetectedInEditor ? (mockImages_Burning.Length - 1) : (mockImages_Burning.Length + mockImages_Others.Length - 1));
+            Texture2D tex = index <= (mockImages_Burning.Length - 1) ? mockImages_Burning[index] : mockImages_Others[index - mockImages_Burning.Length];
 
-            //UnityEngine.Debug.Log("[ImageRecognition] Use mock image NO." + (index + 1));
+            UnityEngine.Debug.Log("[ImageRecognition] Use mock image NO." + (index + 1));
 
-            //capturedCallback(tex.EncodeToPNG());
+            capturedCallback(tex.EncodeToPNG());
 
-            capturedCallback(imageBytes);
+            //capturedCallback(imageBytes);
             return;
         }
 

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.adrenak.restsharp.unity": "1.1.0",
+    "com.cysharp.unitask": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask",
     "com.unity.burst": "1.4.7",
     "com.unity.collab-proxy": "1.17.2",
     "com.unity.collections": "1.4.0",

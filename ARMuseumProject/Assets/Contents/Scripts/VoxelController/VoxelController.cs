@@ -4,6 +4,7 @@ using UnityEngine;
 using EZCameraShake;
 using NRKernal;
 using System;
+using Fraktalia.VoxelGen;
 
 public class VoxelController : MonoBehaviour
 {
@@ -18,7 +19,9 @@ public class VoxelController : MonoBehaviour
     public GameObject controllerOrb;
     public AudioClip audioClip_voxelAppear;
     public AudioClip audioClip_voxelScale;
+    public VoxelSaveSystem voxelSaveSystem;
 
+    private LeanServer leanServer;
     private CameraShakeInstance shake;
     private Action instructionFadeOut;
     private AudioGenerator audioSource_voxelAppear;
@@ -28,16 +31,27 @@ public class VoxelController : MonoBehaviour
     void Start()
     {
         voxelAnimation = transform.GetComponent<Animation>();
+        leanServer = transform.GetComponent<LeanServer>();
+
+        Fraktalia.VoxelGen.SaveSystem.Modules.SaveModule_ByteBuffer_V2.OnDataBufferSaved += VoxelByteBufferSaved;
+        orbButton.orbButtonFinishEvent += () => { StartCoroutine(nameof(EndingScene)); };
+
         audioSource_voxelAppear = new AudioGenerator(gameObject, audioClip_voxelAppear);
         audioSource_voxelScale = new AudioGenerator(gameObject, audioClip_voxelScale);
-        orbButton.orbButtonFinishEvent += () => { StartCoroutine(nameof(EndingScene)); };
+
         voxelBlock.SetActive(false);
-        controllerOrb.SetActive(false);
+        controllerOrb.SetActive(false);  
     }
 
     public void Init()
     {
         StartCoroutine(nameof(OpeningScene));
+    }
+
+    public void HideVoxel()
+    {
+        voxelBlock.SetActive(false);
+        handModifier.gameObject.SetActive(false);
     }
 
     private IEnumerator OpeningScene()
@@ -74,7 +88,8 @@ public class VoxelController : MonoBehaviour
         controllerOrb.SetActive(false);
         handModifier.DisableModify();
 
-        // send message to server
+        // 将Voxel数据传送至服务器
+        SaveUserVoxel();
 
         yield return new WaitForSeconds(1f);
 
@@ -88,6 +103,20 @@ public class VoxelController : MonoBehaviour
         yield return new WaitForSeconds(4f);
 
         gameController.NextScene();
+    }
+
+    private void SaveUserVoxel()
+    {
+        voxelSaveSystem.EditorSaveMode = EditorVoxelSaveMode.ByteBuffer_V2;
+        voxelSaveSystem.ModuleByteBuffer_V2.Key = gameController.UserID;
+        voxelSaveSystem.Save();
+    }
+
+    private void VoxelByteBufferSaved(string id, byte[] bytes)
+    {
+        NRDebugger.Info(string.Format("[VoxelController] Voxel saved, key: {0}, byte length: {1}.", id, bytes.Length));
+
+        leanServer.SaveVoxel(id, bytes);
     }
 
     private IEnumerator StartInstruction()

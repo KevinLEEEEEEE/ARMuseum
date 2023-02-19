@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
+using System;
 
 public class GameController_Historical : MonoBehaviour
 {
@@ -12,7 +13,15 @@ public class GameController_Historical : MonoBehaviour
     public Transform[] eventAnchorListener;
     public GameObject[] initMessageListener;
     public Transform[] startPointListener;
+    public string UserID
+    {
+        get
+        {
+            return _userID;
+        }
+    }
 
+    private string _userID;
     private int initializeIndex = 0;
     private Coroutine ambientCoroutine;
     private AudioGenerator audioSource_ambientWind;
@@ -22,6 +31,7 @@ public class GameController_Historical : MonoBehaviour
     {
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
         NRInput.RaycastersActive = false;
+        _userID = GetUniqueUserID();
 
         SetStartPoint(new Vector3(0, 0, 0.7f));
         NextScene();
@@ -32,7 +42,14 @@ public class GameController_Historical : MonoBehaviour
         //    trans.forward = new Vector3(0, 0, 10);
         //}
 
-        //initMessageListener[1].SendMessage("Init");
+        //initMessageListener[2].SendMessage("Init");
+    }
+
+    private string GetUniqueUserID()
+    {
+        DateTime dt = DateTime.Now;
+
+        return string.Format("{0}{1}{2}", dt.Day, dt.Hour, dt.Minute);
     }
 
     private void SetStartPoint(Vector3 point)
