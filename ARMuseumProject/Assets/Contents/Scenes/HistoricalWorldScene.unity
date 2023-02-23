@@ -11099,7 +11099,7 @@ MonoBehaviour:
   UseInitPoint: 0
   Initpoint: {x: 0, y: 0, z: 0}
   DebugMode: 0
-  instanceID: 27038
+  instanceID: 27362
   IsExtension: 0
   __export_foldout: 0
   __export_savePath: Assets/
@@ -27815,8 +27815,8 @@ GameObject:
   m_Component:
   - component: {fileID: 695721035}
   - component: {fileID: 695721036}
-  - component: {fileID: 695721038}
   - component: {fileID: 695721039}
+  - component: {fileID: 695721038}
   m_Layer: 0
   m_Name: VoxelController
   m_TagString: Untagged
@@ -38793,7 +38793,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraManager: {fileID: 886738554}
-  easydl_ip: http://192.168.3.29
+  easydl_ip: http://192.168.31.99
   port: 24402
   threshold: 0.3
   timeout: 600
@@ -64632,7 +64632,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  instanceID: 27948
+  instanceID: 28292
   width: 8
   Cell_Subdivision: 8
   NumCores: 8

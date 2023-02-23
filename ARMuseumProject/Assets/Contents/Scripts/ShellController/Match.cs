@@ -20,10 +20,8 @@ public class Match : MonoBehaviour
     public float burningBeginRadius;
     public float burningEndRadius;
     public float matchPositionOffset;
-
     private AudioGenerator audioSource_shellMatchTrigger;
     private AudioGenerator audioSource_shellBurning;
-
     private enum MatchState
     {
         suspend,
