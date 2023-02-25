@@ -33,8 +33,8 @@ public class GameController_Historical : MonoBehaviour
         NRInput.RaycastersActive = false;
         _userID = GetUniqueUserID();
 
-        SetStartPoint(new Vector3(0, 0, 0.7f));
-        NextScene();
+        //SetStartPoint(new Vector3(0, 0, 0.7f));
+        //NextScene();
 
         //foreach (Transform trans in eventAnchorListener)
         //{
