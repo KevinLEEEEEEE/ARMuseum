@@ -25,6 +25,7 @@ public class BlockTimer : MonoBehaviour
 
     [SerializeField] private float dirtIntensityMin;
     [SerializeField] private float dirtIntensityMax;
+    [SerializeField] private AnimationCurve dirtIntensityCurve;
 
     [SerializeField] private int rotationAngle;
     [SerializeField] private AnimationCurve rotationCurve;
@@ -32,13 +33,13 @@ public class BlockTimer : MonoBehaviour
 
     void Start()
     {
-        _clockController.clockListener += UpdateBlockState;
+        _clockController.clockListener += UpdateBlock;
 
         rendererComp = rustBlock.GetComponent<Renderer>();
         propertyBlock = new MaterialPropertyBlock();
     }
 
-    private void UpdateBlockState(float time, float percentage)
+    private void UpdateBlock(int date, float percentage)
     {
         UpdateMaterial(percentage);
 
@@ -59,7 +60,7 @@ public class BlockTimer : MonoBehaviour
         propertyBlock.SetFloat(rustIntensity, CalcValue(rustIntensityMin, rustIntensityMax, percentage));
         propertyBlock.SetFloat(rustMaskWeight, CalcValue(rustMaskWeightMin, rustMaskWeightMax, percentage));
         propertyBlock.SetFloat(rustSecondPattern, CalcValue(rustSecondPatternMin, rustSecondPatternMax, percentage));
-        propertyBlock.SetFloat(dirtIntensity, CalcValue(dirtIntensityMin, dirtIntensityMax, percentage));
+        propertyBlock.SetFloat(dirtIntensity, CalcValue(dirtIntensityMin, dirtIntensityMax, dirtIntensityCurve.Evaluate(percentage)));
 
         rendererComp.SetPropertyBlock(propertyBlock);
     }

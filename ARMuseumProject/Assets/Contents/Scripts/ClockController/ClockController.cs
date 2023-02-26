@@ -18,14 +18,16 @@ public class ClockController : MonoBehaviour
     public StopEventListener stopEventListener;
     public ClockListener clockListener;
     public SpeedModeListener speedModeListener;
+    [SerializeField] private int startDate;
+    [SerializeField] private int endDate;
 
     private HandState rightHandState;
     private HandState leftHandState;
-    private const int targetTime = 6523;
+    private int dateDuration;
     private float currentTime;
     private int currentTimeSpan;
-    private const int normalTimeSpan= 240; // 常规速度下走完全程消耗200s
-    private const int acceleratedTimeSpan = 12; // 加速状态下走完全程消耗10s
+    private const int normalTimeSpan= 300; // 常规速度下走完全程所需时间(秒)
+    private const int acceleratedTimeSpan = 15; // 加速状态下走完全程所需时间(秒)
     private bool canRunClock;
 
     void Start()
@@ -41,6 +43,7 @@ public class ClockController : MonoBehaviour
     public void Reset()
     {
         canRunClock = true;
+        dateDuration = endDate - startDate;
         currentTime = 0;
         currentTimeSpan = normalTimeSpan;
     }
@@ -63,14 +66,17 @@ public class ClockController : MonoBehaviour
 
     private void UpdateTime()
     {
-        currentTime += Time.deltaTime * (targetTime / currentTimeSpan);
+        currentTime += Time.deltaTime * (dateDuration / currentTimeSpan);
 
-        if (currentTime >= targetTime)
+        if (currentTime >= dateDuration)
         {
             canRunClock = false;
         }
 
-        clockListener?.Invoke(currentTime, currentTime / targetTime);
+        int date = Mathf.FloorToInt(currentTime + startDate);
+        float progress = currentTime / dateDuration;
+
+        clockListener?.Invoke(Mathf.Min(date, endDate), Mathf.Min(progress, 1));
     }
 
     private void UpdateSpeed()
@@ -94,7 +100,7 @@ public class ClockController : MonoBehaviour
         }
     }
 
-    public delegate void ClockListener(float time, float percentage);
+    public delegate void ClockListener(int date, float progress);
     public delegate void SpeedModeListener(SpeedMode mode);
     public delegate void StartEventListener();
     public delegate void StopEventListener();

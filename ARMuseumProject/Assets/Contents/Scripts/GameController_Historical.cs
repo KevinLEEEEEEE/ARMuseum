@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
 using System;
+using DG.Tweening;
 
 public class GameController_Historical : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class GameController_Historical : MonoBehaviour
     public GameObject groundMask;
     public AudioClip audioClip_ambientWind;
     public float ambientBasicVolume;
+    public Light ambientLightComp;
     public Transform[] eventAnchorListener;
     public GameObject[] initMessageListener;
     public Transform[] startPointListener;
@@ -111,6 +113,11 @@ public class GameController_Historical : MonoBehaviour
     public void SetAmbientVolume(float volume)
     {
         audioSource_ambientWind.SetVolume(volume);
+    }
+
+    public void SetAmbientLightInSeconds(float intensity, float duration)
+    {
+        ambientLightComp.DOIntensity(intensity, duration);
     }
 
     public void SetAmbientVolumeInSeconds(float volume, float duration)

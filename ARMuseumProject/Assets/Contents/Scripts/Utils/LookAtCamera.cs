@@ -5,7 +5,8 @@ using NRKernal;
 
 public class LookAtCamera : MonoBehaviour
 {
-    private Transform centerAnchor
+    [SerializeField] private bool lockY;
+    private Transform CenterAnchor
     {
         get
         {
@@ -15,6 +16,14 @@ public class LookAtCamera : MonoBehaviour
 
     void Update()
     {
-        transform.LookAt(2 * transform.position - centerAnchor.transform.position);
+        if(lockY)
+        {
+            Vector3 point = CenterAnchor.transform.position;
+            point.y = transform.position.y;
+            transform.LookAt(2 * transform.position - point);
+        } else
+        {
+            transform.LookAt(2 * transform.position - CenterAnchor.transform.position);
+        }  
     }
 }
