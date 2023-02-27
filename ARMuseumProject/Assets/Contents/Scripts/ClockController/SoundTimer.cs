@@ -4,6 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 
+public enum TimeNode
+{
+    Start,
+    Stop,
+    Load,
+    Unload,
+    none,
+}
+
 [Serializable]
 public class ClockAudio
 {
@@ -14,26 +23,64 @@ public class ClockAudio
     [SerializeField] private float acceleratedVolume;
     [SerializeField] private float normalPinch;
     [SerializeField] private float acceleratedPinch;
-    [SerializeField] private bool loop;
-    [SerializeField] private bool once;
+    [SerializeField] private TimeNode playAt;
+    [SerializeField] private TimeNode stopAt;
+    [SerializeField] private bool isLoop;
     private AudioSource _audioSource;
 
-    public void Play()
+    public void Trigger(TimeNode node)
     {
-        _audioSource.Play();
-        _audioSource.DOFade(normalVolume, fadeInDuration);
+        if(node == playAt)
+        {
+            _audioSource.Play();
+            _audioSource.DOFade(normalVolume, fadeInDuration);
+        } else if(node == stopAt)
+        {
+            _audioSource.DOFade(0, fadeOutDuration).OnComplete(_audioSource.Stop);
+        }
     }
 
-    public void Stop()
-    {
-        if (once) return;
+    //public void Play()
+    //{
+    //    if(playMode == PlayMode.playAtStart)
+    //    {
+    //        _audioSource.Play();
+    //        _audioSource.DOFade(normalVolume, fadeInDuration);
+    //    }
+    //}
 
-        _audioSource.DOFade(0, fadeOutDuration).OnComplete(_audioSource.Stop);
-    }
+    //public void Stop()
+    //{
+    //    if(playMode == PlayMode.playAtStop)
+    //    {
+    //        _audioSource.Play();
+    //        _audioSource.DOFade(normalVolume, fadeInDuration);
+    //    } else
+    //    {
+    //        _audioSource.DOFade(0, fadeOutDuration).OnComplete(_audioSource.Stop);
+    //    }
+    //}
+
+    //public void LoadAudio()
+    //{
+    //    _audioSource.enabled = true;
+    //}
+
+    //public void UnloadAudio()
+    //{
+    //    if(playMode == PlayMode.playAtUnload)
+    //    {
+    //        _audioSource.Play();
+    //        _audioSource.DOFade(normalVolume, fadeInDuration);
+    //    } else
+    //    {
+    //        _audioSource.enabled = false;
+    //    }
+    //}
 
     public void SetSpeedMode(SpeedMode mode)
     {
-        if (once) return;
+        if (!_audioSource.isPlaying) return;
 
         if(mode == SpeedMode.Normal)
         {
@@ -49,10 +96,11 @@ public class ClockAudio
     public void BindAudioSource(AudioSource source)
     {
         _audioSource = source;
+
         _audioSource.clip = clip;
         _audioSource.volume = 0;
         _audioSource.pitch = normalPinch;
-        _audioSource.loop = loop;
+        _audioSource.loop = isLoop;  
     }
 }
 
@@ -63,9 +111,11 @@ public class SoundTimer : MonoBehaviour
 
     void Start()
     {
-        _clockController.speedModeListener += UpdateSpeedMode;
-        _clockController.startEventListener += StartTimer;
-        _clockController.stopEventListener += StopTimer;
+        _clockController.speedModeListener += SpeedModeHandler;
+        _clockController.startEventListener += StartEventHandler;
+        _clockController.stopEventListener += StopEventHandler;
+        _clockController.loadEventListener += LoadEventHandler;
+        _clockController.unloadEventListener += UnloadEventHandler;
 
         GenerateAudio();
     }
@@ -78,27 +128,43 @@ public class SoundTimer : MonoBehaviour
         }
     }
 
-    private void StartTimer()
+    private void LoadEventHandler()
     {
-        foreach (ClockAudio audio in clockAudios)
+        //for(int i = 0; i < clockAudios.Length; i++)
+        //{
+        //    clockAudios[i].Trigger()
+        //}
+    }
+
+    private void UnloadEventHandler()
+    {
+        for (int i = 0; i < clockAudios.Length; i++)
         {
-            audio.Play();
+            clockAudios[i].Trigger(TimeNode.Unload);
         }
     }
 
-    private void StopTimer()
+    private void StartEventHandler()
     {
-        foreach (ClockAudio audio in clockAudios)
+        for (int i = 0; i < clockAudios.Length; i++)
         {
-            audio.Stop();
+            clockAudios[i].Trigger(TimeNode.Start);
         }
     }
 
-    private void UpdateSpeedMode(SpeedMode mode)
+    private void StopEventHandler()
     {
-        foreach (ClockAudio audio in clockAudios)
+        for (int i = 0; i < clockAudios.Length; i++)
         {
-            audio.SetSpeedMode(mode);
+            clockAudios[i].Trigger(TimeNode.Stop);
+        }
+    }
+
+    private void SpeedModeHandler(SpeedMode mode)
+    {
+        for (int i = 0; i < clockAudios.Length; i++)
+        {
+            clockAudios[i].SetSpeedMode(mode);
         }
     }
 }

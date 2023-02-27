@@ -14,21 +14,34 @@ public enum SpeedMode
 
 public class ClockController : MonoBehaviour
 {
+    public DateMessageListener dateMessageListener;
+    public SpeedModeListener speedModeListener;
+    public LoadEventListener loadEventListener;
+    public UnloadEventListener unloadEventListener;
     public StartEventListener startEventListener;
     public StopEventListener stopEventListener;
-    public ClockListener clockListener;
-    public SpeedModeListener speedModeListener;
+
+    [SerializeField] private GameController_Historical _gameController;
+    [SerializeField] private DialogGenerator _dialogGenerator;
+    [SerializeField] private InstructionGenerator _instructionGenerator;
     [SerializeField] private int startDate;
     [SerializeField] private int endDate;
+    [SerializeField] private int normalTimeSpan; // 常规速度下走完全程所需时间(秒)
+    [SerializeField] private int acceleratedTimeSpan; // 加速状态下走完全程所需时间(秒)
 
     private HandState rightHandState;
     private HandState leftHandState;
-    private int dateDuration;
+    private int DateDuration
+    {
+        get
+        {
+            return endDate - startDate;
+        }
+    }
     private float currentTime;
     private int currentTimeSpan;
-    private const int normalTimeSpan= 300; // 常规速度下走完全程所需时间(秒)
-    private const int acceleratedTimeSpan = 15; // 加速状态下走完全程所需时间(秒)
     private bool canRunClock;
+    private Action instructionHandler;
 
     void Start()
     {
@@ -37,46 +50,72 @@ public class ClockController : MonoBehaviour
 
         Reset();
 
-        RunClock();
+        Init();
     }
 
     public void Reset()
     {
         canRunClock = true;
-        dateDuration = endDate - startDate;
+        
         currentTime = 0;
         currentTimeSpan = normalTimeSpan;
     }
 
-    private async void RunClock()
+    public async void Init()
+    {
+        loadEventListener?.Invoke();
+
+        await UniTask.NextFrame();
+
+        _dialogGenerator.GenerateDialog("它将历经时光的洗礼");
+
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1f), ignoreTimeScale: false);
+
+        BeginScene();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
+
+        instructionHandler = _instructionGenerator.GenerateInstruction("握拳加速", "手掌握拳可以加速时间流逝");
+
+        await UniTask.Delay(TimeSpan.FromSeconds(5.5f), ignoreTimeScale: false);
+
+        HideSpeedUpInstruction();
+    }
+
+    private async void BeginScene()
     {
         startEventListener?.Invoke();
 
         while(canRunClock)
         {
-            UpdateTime();
-            UpdateSpeed();
-
             await UniTask.NextFrame();
+
+            UpdateTime();
+            UpdateSpeed();  
         }
 
         speedModeListener?.Invoke(SpeedMode.Normal);
         stopEventListener?.Invoke();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(5), ignoreTimeScale: false);
+
+        unloadEventListener?.Invoke();
+        //_gameController.NextScene();
     }
 
     private void UpdateTime()
     {
-        currentTime += Time.deltaTime * (dateDuration / currentTimeSpan);
+        currentTime += Time.deltaTime * (DateDuration / currentTimeSpan);
 
-        if (currentTime >= dateDuration)
+        if (currentTime >= DateDuration)
         {
             canRunClock = false;
         }
 
         int date = Mathf.FloorToInt(currentTime + startDate);
-        float progress = currentTime / dateDuration;
+        float progress = currentTime / DateDuration;
 
-        clockListener?.Invoke(Mathf.Min(date, endDate), Mathf.Min(progress, 1));
+        dateMessageListener?.Invoke(Mathf.Min(date, endDate), Mathf.Min(progress, 1));
     }
 
     private void UpdateSpeed()
@@ -89,6 +128,7 @@ public class ClockController : MonoBehaviour
             {
                 currentTimeSpan = acceleratedTimeSpan;
                 speedModeListener?.Invoke(SpeedMode.Accelerated);
+                HideSpeedUpInstruction();
             }  
         } else
         {
@@ -100,8 +140,19 @@ public class ClockController : MonoBehaviour
         }
     }
 
-    public delegate void ClockListener(int date, float progress);
+    private void HideSpeedUpInstruction()
+    {
+        if(instructionHandler != null)
+        {
+            instructionHandler();
+            instructionHandler = null;
+        }
+    }
+
+    public delegate void DateMessageListener(int date, float progress);
     public delegate void SpeedModeListener(SpeedMode mode);
     public delegate void StartEventListener();
     public delegate void StopEventListener();
+    public delegate void LoadEventListener();
+    public delegate void UnloadEventListener();
 }

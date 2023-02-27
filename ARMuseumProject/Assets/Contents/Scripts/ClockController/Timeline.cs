@@ -3,60 +3,84 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System.Linq;
+using System;
+using Cysharp.Threading.Tasks;
+
+[Serializable]
+public class Dynasty
+{
+    public int founded;
+    public string name;
+}
 
 public class Timeline : MonoBehaviour
 {
     [SerializeField] private ClockController _clockController;
+    [SerializeField] private GameObject timeline;
     [SerializeField] private TextMeshProUGUI dynastyComp;
     [SerializeField] private TextMeshProUGUI dateComp;
+    [SerializeField] private ParticleSystem ringParticleComp;
     [SerializeField] private float fadeInDuration;
-    private static readonly Dictionary<int, string> dynastyChronology = new()
-    {
-        { -2500, "上古" },
-        { -2070, "夏" },
-        { -1600, "商" },
-        { -770, "春秋" },
-        { -475, "战国" },
-        { -221, "秦" },
-        { -202, "汉" },
-        { 220, "三国" },
-        { 265, "晋" },
-        { 304, "十六国" },
-        { 420, "南北朝" },
-        { 581, "隋" },
-        { 618, "唐" },
-        { 907, "五代十国-辽" },
-        { 960, "宋" },
-        { 1038, "西夏" },
-        { 1115, "金" },
-        { 1271, "元" },
-        { 1279, "元" },
-        { 1368, "明" },
-        { 1644, "清" },
-        { 1912, "中华民国" },
-        { 1949, "中华人民共和国" },
-    };
+    [SerializeField] private float fadeOutDuration;
+    [SerializeField] private Dynasty[] dynastyChronology;
+    private int currentDynastyIndex;
 
     void Start()
     {
-        _clockController.clockListener += UpdateTimeline;
-        _clockController.startEventListener += StartTimer;
-        _clockController.stopEventListener += StopTimer;
+        _clockController.dateMessageListener += DateMessageHandler;
+        _clockController.startEventListener += StartEventHandler;
+        _clockController.stopEventListener += StopEventHandler;
+        _clockController.loadEventListener += LoadEventHandler;
+        _clockController.unloadEventListener += UnloadEventHandler;
+
+        Reset();
     }
-    private void StartTimer()
+
+    private void Reset()
+    {
+        timeline.SetActive(false);
+        DateMessageHandler(-2500, 0);
+        SetTextColor(new Color(1, 1, 1, 0));
+        currentDynastyIndex = 0;
+    }
+
+    private void LoadEventHandler()
+    {
+        timeline.SetActive(true);
+    }
+
+    private async void UnloadEventHandler()
+    {
+        StartCoroutine(fadeOutDuration.Tweeng((t) =>
+        {
+            SetTextColor(new Color(1, 1, 1, t));
+        }, 1f, 0f));
+
+        await UniTask.Delay(TimeSpan.FromSeconds(fadeOutDuration), ignoreTimeScale: false);
+
+        Reset();
+    }
+
+    private void StartEventHandler()
     {
         StartCoroutine(fadeInDuration.Tweeng((t) =>
         {
-            dynastyComp.color = new Color(1, 1, 1, t);
-            dateComp.color = new Color(1, 1, 1, t);
+            SetTextColor(new Color(1, 1, 1, t));
         }, 0f, 1f));
     }
 
-    private void StopTimer()
+    private void SetTextColor(Color color)
     {
+        dynastyComp.color = color;
+        dateComp.color = color;
     }
 
-    private void UpdateTimeline(int date, float percentage)
+    private void StopEventHandler()
+    {
+        ringParticleComp.Play();
+    }
+
+    private void DateMessageHandler(int date, float percentage)
     {
         UpdateDate(date);
         UpdateDynasty(date);
@@ -64,25 +88,20 @@ public class Timeline : MonoBehaviour
 
     private void UpdateDate(int date)
     {
-        dateComp.text = string.Format("{0}{1}年", date < 0 ? "公元前" : "公元", Mathf.Abs(date));
+        dateComp.text = string.Format("公元{0}{1}年", date < 0 ? "前" : "", Mathf.Abs(date));
     }
 
     private void UpdateDynasty(int date)
     {
-        if(dynastyChronology.Count > 0)
+        if(currentDynastyIndex >= dynastyChronology.Length)
         {
-            int key = dynastyChronology.First().Key;
+            return;
+        }
 
-            if (key <= date)
-            {
-                dynastyComp.text = dynastyChronology[key];
-                dynastyChronology.Remove(key);
-
-                if(key == 1949)
-                {
-
-                }
-            }
+        if(dynastyChronology[currentDynastyIndex].founded <= date)
+        {
+            dynastyComp.text = dynastyChronology[currentDynastyIndex].name;
+            currentDynastyIndex++;
         }
     }
 }

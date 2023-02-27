@@ -33,7 +33,7 @@ public class Instruction : MonoBehaviour
     public void StartInstruction()
     {
         audioSource_instructionActive.Play();
-        particle.Play();
+        //particle.Play();
         instructionAnimation.Play("InstructionFadeIn");
     }
 

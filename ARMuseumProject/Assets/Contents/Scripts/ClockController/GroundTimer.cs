@@ -42,32 +42,32 @@ public class GroundTimer : MonoBehaviour
 
     void Start()
     {
-        _clockController.speedModeListener += UpdateState;
-        _clockController.startEventListener += StartTimer;
-        _clockController.stopEventListener += StopTimer;
+        _clockController.speedModeListener += SpeedModeHandler;
+        _clockController.startEventListener += StartEventHandler;
+        _clockController.stopEventListener += StopEventHandler;
     }
 
-    private void StartTimer()
+    private void StartEventHandler()
     {
-        foreach (Particle effect in groundEffects)
+        for (int i = 0; i < groundEffects.Length; i++)
         {
-            effect.Play();
+            groundEffects[i].Play();
         }
     }
 
-    private void StopTimer()
+    private void StopEventHandler()
     {
-        foreach (Particle effect in groundEffects)
+        for (int i = 0; i < groundEffects.Length; i++)
         {
-            effect.Stop();
+            groundEffects[i].Stop();
         }
     }
 
-    private void UpdateState(SpeedMode mode)
+    private void SpeedModeHandler(SpeedMode mode)
     {
-        foreach (Particle effect in groundEffects)
+        for (int i = 0; i < groundEffects.Length; i++)
         {
-            effect.SetSpeedMode(mode);
+            groundEffects[i].SetSpeedMode(mode);
         }
     }
 }

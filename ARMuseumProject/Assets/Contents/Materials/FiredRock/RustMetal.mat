@@ -188,11 +188,11 @@ Material:
     - _Parallax: 0.02
     - _RustContrast: 1
     - _RustIntensity: 0.87
-    - _RustMaskTiling: 3.13
+    - _RustMaskTiling: 3
     - _RustMaskWeight: 0.29
     - _RustSecondPattern: 0.5
     - _RustTiling: 2
-    - _Smoothness: 0.8
+    - _Smoothness: 0.85
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

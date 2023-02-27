@@ -14,57 +14,66 @@ public class LightTimer : MonoBehaviour
     [SerializeField] private float lightFadeDuration;
     private Animator lightAnimatorComp;
     private Light lightComp;
-    private bool canMultiply;
+    private bool isLightCompOccupied;
 
     void Start()
     {
         lightComp = GetComponent<Light>();
         lightAnimatorComp = GetComponent<Animator>();
 
-        _clockController.speedModeListener += UpdateState;
-        _clockController.clockListener += UpdateIntensity;
-        _clockController.startEventListener += StartTimer;
-        _clockController.stopEventListener += StopTimer;
+        _clockController.speedModeListener += SpeedModeHandler;
+        _clockController.dateMessageListener += DateMessageHandler;
+        _clockController.startEventListener += StartEventHandler;
+        _clockController.stopEventListener += StopEventHandler;
+        _clockController.loadEventListener += LoadEventHandler;
+        _clockController.unloadEventListener += UnloadEventHandler;
 
         Reset();
     }
 
     private void Reset()
     {
-        canMultiply = false;
+        lightComp.gameObject.SetActive(false);
+        lightComp.intensity = 0;
+        isLightCompOccupied = true;
     }
 
-    private void StartTimer()
+    private void LoadEventHandler()
     {
-        _gameController.SetAmbientLightInSeconds(0, lightFadeDuration);
-        lightComp.DOIntensity(lightIntensityDefault, lightFadeDuration).OnComplete(() => { canMultiply = true; });
+        lightComp.gameObject.SetActive(true);
+    }
+
+    private void UnloadEventHandler()
+    {
+        Reset();
+    }
+
+    private void StartEventHandler()
+    {
+        _gameController.SetAmbientLightInSeconds(0.1f, lightFadeDuration);
+        lightComp.DOIntensity(lightIntensityDefault, lightFadeDuration).OnComplete(() => { isLightCompOccupied = false; });
         lightAnimatorComp.SetTrigger("Enter");
     }
 
-    private void StopTimer()
+    private void StopEventHandler()
     {
+        isLightCompOccupied = true;
         _gameController.SetAmbientLightInSeconds(1.2f, lightFadeDuration);
+        lightComp.DOIntensity(0, lightFadeDuration / 2);
         lightAnimatorComp.SetFloat("CycleSpeed", 50);
-        lightComp.DOIntensity(0, lightFadeDuration);
         lightAnimatorComp.SetTrigger("Exit");
     }
 
-    private void UpdateIntensity(int date, float progress)
+    private void DateMessageHandler(int date, float progress)
     {
-        if(canMultiply)
+        if(!isLightCompOccupied)
         {
             lightComp.intensity = lightIntensityDefault * lightIntensityMultiplier.Evaluate(progress);
         }
     }
 
-    private void UpdateState(SpeedMode mode)
+    private void SpeedModeHandler(SpeedMode mode)
     {
-        if (mode == SpeedMode.Normal)
-        {
-            lightAnimatorComp.SetFloat("CycleSpeed", cycleSpeedNormal);
-        } else
-        {
-            lightAnimatorComp.SetFloat("CycleSpeed", cycleSpeedAccelerated);
-        }
+        lightAnimatorComp.SetFloat("CycleSpeed", mode == SpeedMode.Normal ? cycleSpeedNormal : cycleSpeedAccelerated);
     }
 }
