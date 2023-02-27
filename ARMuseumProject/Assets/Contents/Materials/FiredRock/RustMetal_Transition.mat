@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: RustMetal
+  m_Name: RustMetal_Transition
   m_Shader: {fileID: 4800000, guid: 116bb39ade638cc45b43193fe708c56a, type: 3}
   m_ValidKeywords:
   - _EMISSION

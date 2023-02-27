@@ -648,8 +648,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1523466585}
-  - {fileID: 243989755}
   - {fileID: 640283417}
   - {fileID: 585800455}
   - {fileID: 870835197}
@@ -11055,7 +11053,7 @@ GameObject:
   - component: {fileID: 243989755}
   - component: {fileID: 243989756}
   m_Layer: 0
-  m_Name: AD Keywords Controller_Geometric
+  m_Name: ADKeywordsController_Geometric
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -11073,7 +11071,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 108998625}
+  m_Father: {fileID: 1737747255}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &243989756
@@ -22609,7 +22607,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 108998625}
-  m_RootOrder: 3
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &585800456
 MonoBehaviour:
@@ -32909,7 +32907,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 108998625}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &640283418
 MonoBehaviour:
@@ -39031,7 +39029,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 108998625}
-  m_RootOrder: 5
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &829362547
 MonoBehaviour:
@@ -44130,39 +44128,6 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!1 &864744171
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 864744172}
-  m_Layer: 0
-  m_Name: ADController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &864744172
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 864744171}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1000206818}
-  - {fileID: 936345834}
-  m_Father: {fileID: 898480424}
-  m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &864836454
 GameObject:
   m_ObjectHideFlags: 0
@@ -44269,7 +44234,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 108998625}
-  m_RootOrder: 4
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &870835198
 MonoBehaviour:
@@ -44330,89 +44295,6 @@ MonoBehaviour:
   target4Size: {x: 1, y: 1, z: 1}
   invert: 0
   noise: 0.08
---- !u!1 &873675441
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 873675442}
-  - component: {fileID: 873675444}
-  - component: {fileID: 873675443}
-  m_Layer: 0
-  m_Name: RustMetal_Dissolve
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 0
---- !u!4 &873675442
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873675441}
-  m_LocalRotation: {x: 0, y: -1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 898480424}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: -180, z: 0}
---- !u!23 &873675443
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873675441}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 6ca752882371da74f880651e9ff24692, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
---- !u!33 &873675444
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 873675441}
-  m_Mesh: {fileID: 4300000, guid: 1e1e36ba80ba46c4db2004982332d52b, type: 2}
 --- !u!1 &876492693
 GameObject:
   m_ObjectHideFlags: 0
@@ -44444,7 +44326,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 898480424}
-  m_RootOrder: 2
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!199 &876492695
 ParticleSystemRenderer:
@@ -49541,9 +49423,8 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1802675146}
-  - {fileID: 873675442}
   - {fileID: 876492694}
-  - {fileID: 864744172}
+  - {fileID: 936345834}
   m_Father: {fileID: 1569047388}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -49561,8 +49442,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _clockController: {fileID: 1569047389}
   dissolveController: {fileID: 936345835}
-  rustBlock_Transition: {fileID: 1802675145}
-  rustBlock_Dissolve: {fileID: 873675441}
+  rustBlock: {fileID: 1802675145}
+  transitionMaterial: {fileID: 2100000, guid: fec48b94bb0026b47adecd5818146be1, type: 2}
+  dissolveMaterial: {fileID: 2100000, guid: 6ca752882371da74f880651e9ff24692, type: 2}
   dissolveParticleComp: {fileID: 876492696}
   rustIntensityMin: 0
   rustIntensityMax: 4
@@ -49731,7 +49613,7 @@ GameObject:
   - component: {fileID: 936345834}
   - component: {fileID: 936345835}
   m_Layer: 0
-  m_Name: AD Properties Controller
+  m_Name: ADPropertiesController
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -49749,8 +49631,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 864744172}
-  m_RootOrder: 1
+  m_Father: {fileID: 898480424}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &936345835
 MonoBehaviour:
@@ -54854,61 +54736,6 @@ MonoBehaviour:
   Mode: 0
   colliders:
   - {fileID: 3676923904530172873}
---- !u!1 &1000206817
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1000206818}
-  - component: {fileID: 1000206819}
-  m_Layer: 0
-  m_Name: AD Keywords Controller
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1000206818
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000206817}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 864744172}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1000206819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000206817}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d88748cc2e21bc7478c891e55173be45, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  globalControlID: 0
-  materials:
-  - {fileID: 2100000, guid: 6ca752882371da74f880651e9ff24692, type: 2}
-  state: 1
-  cutoutStandardSource: 2
-  cutoutStandardSourceMapsMappingType: 0
-  cutoutGeometricType: 0
-  cutoutGeometricCount: 0
-  edgeBaseSource: 1
-  edgeAdditionalColorSource: 0
-  edgeUVDistortionSource: 0
 --- !u!1 &1005380687
 GameObject:
   m_ObjectHideFlags: 0
@@ -79112,6 +78939,7 @@ Transform:
   m_Children:
   - {fileID: 1362111712}
   - {fileID: 455605802}
+  - {fileID: 1737747255}
   m_Father: {fileID: 0}
   m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -79586,7 +79414,7 @@ GameObject:
   - component: {fileID: 1523466585}
   - component: {fileID: 1523466586}
   m_Layer: 0
-  m_Name: AD Keywords Controller_Standard
+  m_Name: ADKeywordsController_Dissolve
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -79604,7 +79432,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 108998625}
+  m_Father: {fileID: 1737747255}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1523466586
@@ -79622,6 +79450,7 @@ MonoBehaviour:
   globalControlID: 0
   materials:
   - {fileID: 2100000, guid: 8a0466a539056a24692bd427cdb5fc53, type: 2}
+  - {fileID: 2100000, guid: 6ca752882371da74f880651e9ff24692, type: 2}
   state: 1
   cutoutStandardSource: 2
   cutoutStandardSourceMapsMappingType: 0
@@ -90403,6 +90232,39 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
+--- !u!1 &1737747254
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1737747255}
+  m_Layer: 0
+  m_Name: ADKeywordsController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1737747255
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1737747254}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1523466585}
+  - {fileID: 243989755}
+  m_Father: {fileID: 1457940029}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1790724606
 GameObject:
   m_ObjectHideFlags: 0
@@ -95297,7 +95159,7 @@ GameObject:
   - component: {fileID: 1802675148}
   - component: {fileID: 1802675147}
   m_Layer: 0
-  m_Name: RustMetal_Transition
+  m_Name: RustMetalBlock
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

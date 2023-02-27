@@ -9,8 +9,9 @@ public class BlockManager : MonoBehaviour
 {
     [SerializeField] private ClockController _clockController;
     [SerializeField] private AdvancedDissolvePropertiesController dissolveController;
-    [SerializeField] private GameObject rustBlock_Transition;
-    [SerializeField] private GameObject rustBlock_Dissolve;
+    [SerializeField] private GameObject rustBlock;
+    [SerializeField] private Material transitionMaterial;
+    [SerializeField] private Material dissolveMaterial;
     [SerializeField] private ParticleSystem dissolveParticleComp;
 
     private Renderer rendererComp;
@@ -47,7 +48,7 @@ public class BlockManager : MonoBehaviour
         _clockController.loadEventListener += LoadEventHandler;
         _clockController.unloadEventListener += UnloadEventHandler;
 
-        rendererComp = rustBlock_Transition.GetComponent<Renderer>();
+        rendererComp = rustBlock.GetComponent<Renderer>();
         propertyBlock = new MaterialPropertyBlock();
 
         Reset();
@@ -55,8 +56,8 @@ public class BlockManager : MonoBehaviour
 
     public void Reset()
     {
-        rustBlock_Transition.SetActive(false);
-        rustBlock_Dissolve.SetActive(false);
+        rustBlock.SetActive(false);
+        rustBlock.GetComponent<MeshRenderer>().material = transitionMaterial;
         dissolveController.cutoutStandard.clip = clipStart;
         UpdateMaterial(0);
         UpdateRotation(0);
@@ -64,14 +65,12 @@ public class BlockManager : MonoBehaviour
 
     private void LoadEventHandler()
     {
-        rustBlock_Transition.SetActive(true);
+        rustBlock.SetActive(true);
     }
 
     private async void UnloadEventHandler()
     {
-        rustBlock_Transition.SetActive(false);
-        rustBlock_Dissolve.SetActive(true);
-
+        rendererComp.material = dissolveMaterial;
         dissolveParticleComp.Play();
 
         StartCoroutine(clipDuration.Tweeng((r) =>
@@ -93,8 +92,7 @@ public class BlockManager : MonoBehaviour
     private void UpdateRotation(float percentage)
     {
         float angleY = rotationAngle * rotationCurve.Evaluate(percentage);
-
-        rustBlock_Transition.transform.rotation = Quaternion.Euler(0, angleY, 0);
+        rustBlock.transform.rotation = Quaternion.Euler(0, angleY, 0);
     }
 
     private void UpdateMaterial(float percentage)
