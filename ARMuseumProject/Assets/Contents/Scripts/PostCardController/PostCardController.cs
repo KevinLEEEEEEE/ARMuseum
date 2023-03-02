@@ -5,12 +5,19 @@ using TMPro;
 
 public class PostCardController : MonoBehaviour
 {
-    public GameObject PostCard;
-    public TextMeshProUGUI textMesh;
+    [SerializeField] private GameController_Historical _gameController;
+    [SerializeField] private GameObject PostCard;
+    [SerializeField] private TextMeshProUGUI textMesh;
 
     private void Start()
     {
         HidePostCard();
+    }
+
+    public void Init()
+    {
+        SetUserID(_gameController.UserID);
+        ShowPostCard();
     }
 
     public void SetUserID(string id)

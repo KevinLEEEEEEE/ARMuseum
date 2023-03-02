@@ -12,6 +12,7 @@ public class GameController_Historical : MonoBehaviour
     public AudioClip audioClip_ambientWind;
     public float ambientBasicVolume;
     public Light ambientLightComp;
+    [SerializeField] private int initializeIndex;
     public Transform[] eventAnchorListener;
     public GameObject[] initMessageListener;
     public Transform[] startPointListener;
@@ -24,7 +25,6 @@ public class GameController_Historical : MonoBehaviour
     }
 
     private string _userID;
-    private int initializeIndex = 0;
     private Coroutine ambientCoroutine;
     private AudioGenerator audioSource_ambientWind;
     private readonly HandEnum domainHand = HandEnum.RightHand;
@@ -35,16 +35,10 @@ public class GameController_Historical : MonoBehaviour
         NRInput.RaycastersActive = false;
         _userID = GetUniqueUserID();
 
-        //SetStartPoint(new Vector3(0, 0, 0.7f));
-        //NextScene();
+        SetStartPoint(new Vector3(0, 0.5f, 0.5f));
 
-        //foreach (Transform trans in eventAnchorListener)
-        //{
-        //    trans.position = new Vector3(0, -0.5f, 0.7f);
-        //    trans.forward = new Vector3(0, 0, 10);
-        //}
-
-        //initMessageListener[2].SendMessage("Init");
+        //SetAnchoredPosition(new Vector3(0, -0.5f, 1), new Vector3(0, 0, 10));
+        NextScene();
     }
 
     private string GetUniqueUserID()
@@ -65,21 +59,22 @@ public class GameController_Historical : MonoBehaviour
         }
     }
 
-    public void SetEventAnchor(EventAnchor anchor)
+    private void SetAnchoredPosition(Vector3 position, Vector3 forward)
     {
-        planeDetector.GetComponent<PlaneDetector>().LockTargetPlane(anchor.GetHitObject());
-
-        Vector3 position = anchor.GetCorrectedHitPoint();
-        Vector3 forward = anchor.GetHitDirection();
-
         foreach (Transform trans in eventAnchorListener)
         {
-            if(trans)
+            if (trans)
             {
                 trans.position = position;
                 trans.forward = forward;
             }
         }
+    }
+
+    public void SetEventAnchor(EventAnchor anchor)
+    {
+        planeDetector.GetComponent<PlaneDetector>().LockTargetPlane(anchor.GetHitObject());
+        SetAnchoredPosition(anchor.GetCorrectedHitPoint(), anchor.GetHitDirection());
     }
 
     public void NextScene()
@@ -90,15 +85,15 @@ public class GameController_Historical : MonoBehaviour
         initializeIndex++;
     }
 
-    public void ShowGroundMask()
-    {
-        groundMask.SetActive(true);
-    }
+    //public void ShowGroundMask()
+    //{
+    //    groundMask.SetActive(true);
+    //}
 
-    public void HideGroundMask()
-    {
-        groundMask.SetActive(false);
-    }
+    //public void HideGroundMask()
+    //{
+    //    groundMask.SetActive(false);
+    //}
 
     public void StartAmbientSound()
     {

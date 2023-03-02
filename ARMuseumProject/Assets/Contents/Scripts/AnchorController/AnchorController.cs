@@ -135,7 +135,7 @@ public class AnchorController : MonoBehaviour
         glowingOrb.FadeOut();
         gameController.StopPlaneHint();
         gameController.SetEventAnchor(confirmedEventAnchor);
-        gameController.ShowGroundMask();
+        //gameController.ShowGroundMask();
 
         yield return new WaitForSeconds(4.47f); // µÈ´ý×²»÷
 
@@ -145,7 +145,7 @@ public class AnchorController : MonoBehaviour
 
         currentState = SceneState.Suspend;
         glowingOrb.gameObject.SetActive(false);
-        gameController.HideGroundMask();
+        //gameController.HideGroundMask();
         gameController.NextScene();
     }
 

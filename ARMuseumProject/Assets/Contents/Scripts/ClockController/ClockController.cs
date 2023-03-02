@@ -1,9 +1,6 @@
 using Cysharp.Threading.Tasks;
 using NRKernal;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public enum SpeedMode
@@ -49,8 +46,6 @@ public class ClockController : MonoBehaviour
         leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
 
         Reset();
-
-        Init();
     }
 
     public void Reset()
@@ -65,11 +60,12 @@ public class ClockController : MonoBehaviour
     {
         loadEventListener?.Invoke();
 
-        await UniTask.NextFrame();
+        // 动画等待两秒，舒缓节奏
+        await UniTask.Delay(TimeSpan.FromSeconds(2f), ignoreTimeScale: false);
 
         _dialogGenerator.GenerateDialog("它将历经时光的洗礼");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5f), ignoreTimeScale: false);
 
         BeginScene();
 
@@ -97,10 +93,14 @@ public class ClockController : MonoBehaviour
         speedModeListener?.Invoke(SpeedMode.Normal);
         stopEventListener?.Invoke();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(5), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(6f), ignoreTimeScale: false);
+
+        _dialogGenerator.GenerateDialog("这是跨越时空的相遇");
+
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1f), ignoreTimeScale: false);
 
         unloadEventListener?.Invoke();
-        //_gameController.NextScene();
+        _gameController.NextScene();
     }
 
     private void UpdateTime()

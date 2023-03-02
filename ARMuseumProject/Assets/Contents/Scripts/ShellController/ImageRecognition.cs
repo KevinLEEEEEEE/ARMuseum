@@ -80,12 +80,12 @@ public class ObjectLocation
 
 public class ImageRecognition : MonoBehaviour
 {
-    public OnPhotoAnalysisedCallback onPhotoAnalysisedCallback;
-    public CameraManager cameraManager;
-    public string easydl_ip;
-    public string port;
-    public float threshold;
-    public int timeout;
+    [SerializeField] private OnPhotoAnalysisedCallback onPhotoAnalysisedCallback;
+    [SerializeField] private CameraManager cameraManager;
+    [SerializeField] private string easydl_ip;
+    [SerializeField] private string port;
+    [SerializeField] private float threshold;
+    [SerializeField] private int timeout;
 
     private GalleryDataProvider galleryDataTool;
     private Uri uri;

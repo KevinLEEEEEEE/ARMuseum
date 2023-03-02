@@ -56,7 +56,7 @@ public class VoxelController : MonoBehaviour
 
     private IEnumerator OpeningScene()
     {
-        gameController.ShowGroundMask();
+        //gameController.ShowGroundMask();
         gameController.StartAmbientSound();
         gameController.SetAmbientVolumeInSeconds(0.5f, 2);
         audioSource_voxelAppear.Play();
@@ -73,7 +73,7 @@ public class VoxelController : MonoBehaviour
 
         yield return new WaitForSeconds(5.5f);
 
-        gameController.HideGroundMask();
+        //gameController.HideGroundMask();
         StartCoroutine(nameof(StartInstruction));
 
         yield return new WaitForSeconds(1f);
@@ -103,6 +103,11 @@ public class VoxelController : MonoBehaviour
         yield return new WaitForSeconds(4f);
 
         gameController.NextScene();
+
+        // 等待shell成型后，voxel可以隐藏
+        yield return new WaitForSeconds(12f);
+
+        voxelBlock.SetActive(false);
     }
 
     private void SaveUserVoxel()
