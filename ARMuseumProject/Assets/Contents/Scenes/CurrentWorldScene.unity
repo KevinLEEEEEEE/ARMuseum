@@ -329,6 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f131fc8262e1a54993c6235e2bc78e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockY: 0
 --- !u!114 &36010123
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1672,6 +1673,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f131fc8262e1a54993c6235e2bc78e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockY: 0
 --- !u!114 &194365479
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1865,7 +1867,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handEnum: 0
   handJoint: 9
-  activeByHandGesture: 2
+  activeByHandGesture: 3
 --- !u!54 &201316350
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1995,7 +1997,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   handEnum: 1
   handJoint: 9
-  activeByHandGesture: 2
+  activeByHandGesture: 3
 --- !u!54 &228557632
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -6674,10 +6676,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Why Diamond?
+  m_text: "\u4E09\u661F\u5806\u7684\u8D77\u6E90"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
+  m_sharedMaterial: {fileID: 7596408728917544233, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6766,7 +6768,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: 7596408728917544233, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -7793,6 +7795,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f131fc8262e1a54993c6235e2bc78e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockY: 0
 --- !u!114 &1295722309
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7917,6 +7920,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f131fc8262e1a54993c6235e2bc78e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockY: 0
 --- !u!114 &1300540956
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8196,6 +8200,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1314680046}
     m_Modifications:
+    - target: {fileID: 2984198680494111090, guid: f526b607e73f93e4bb38269850c199a6, type: 3}
+      propertyPath: m_text
+      value: "\u590D\u4F4D"
+      objectReference: {fileID: 0}
+    - target: {fileID: 2984198680494111090, guid: f526b607e73f93e4bb38269850c199a6, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
+    - target: {fileID: 2984198680494111090, guid: f526b607e73f93e4bb38269850c199a6, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 7596408728917544233, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
+    - target: {fileID: 2984198680494111091, guid: f526b607e73f93e4bb38269850c199a6, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 7596408728917544233, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
     - target: {fileID: 2984198682160837528, guid: f526b607e73f93e4bb38269850c199a6, type: 3}
       propertyPath: m_Name
       value: DeleteOrb
@@ -8548,10 +8568,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Why Diamond?
+  m_text: "\u4EC0\u4E48\u662F\u9752\u94DC\u795E\u6811"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
+  m_sharedMaterial: {fileID: 7596408728917544233, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8640,7 +8660,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - {fileID: 7596408728917544233, guid: 45e49ee08e64e374486b32552e3d92a6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -12143,6 +12163,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f131fc8262e1a54993c6235e2bc78e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockY: 0
 --- !u!114 &2070815161
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12381,6 +12402,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5f131fc8262e1a54993c6235e2bc78e4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockY: 0
 --- !u!114 &2111151864
 MonoBehaviour:
   m_ObjectHideFlags: 0

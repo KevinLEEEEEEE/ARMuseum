@@ -2,18 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
+using DG.Tweening;
+
+public enum MatchState
+{
+    Suspend,
+    Default,
+    Burning,
+}
 
 public class ShellMatchManager : MonoBehaviour
 {
     [SerializeField] private ShellController _shellController;
-    [SerializeField] private GameObject lightBulb;
-    [SerializeField] private GameObject flameMask;
-    [SerializeField] private float matchPositionOffset;
+    [SerializeField] private Light lightComp;
+    [SerializeField] private ParticleSystem haloParticleComp;
+    [SerializeField] private ParticleSystem darknessParticleComp;
+    [SerializeField] private float maskOffset;
+    [SerializeField] private float maskMoveSpeed;
 
     private SphereCollider sphereColliderComp;
     private HandState rightHandState;
     private HandState leftHandState;
-    private bool canActiveMatch;
+    private HandState holdingHand;
+    private MatchState currentState;
+    private float defaultLightIntensity;
 
     private void Start()
     {
@@ -21,53 +33,83 @@ public class ShellMatchManager : MonoBehaviour
         rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
         leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
         sphereColliderComp = GetComponent<SphereCollider>();
+        defaultLightIntensity = lightComp.intensity;
 
         Reset();
     }
 
     public void Reset()
-    {
-        DisableMatch();
-        canActiveMatch = false;
+    {  
+        currentState = MatchState.Suspend;
         sphereColliderComp.enabled = false;
-        transform.position = new Vector3(0, 5, 0);
+        lightComp.intensity = 0;
+        lightComp.gameObject.SetActive(false);
+        haloParticleComp.gameObject.SetActive(false);
     }
 
     private void ShellStateHandler(ShellNode node)
     {
         if(node == ShellNode.ToBurn)
         {
-            canActiveMatch = true;
-            sphereColliderComp.enabled = true;
+            currentState = MatchState.Default;
+            lightComp.gameObject.SetActive(true);
+            haloParticleComp.gameObject.SetActive(true);
         } else if(node == ShellNode.Burning)
         {
             Reset();
         }
     }
 
-    public void DisableMatch()
+    public void PutOutMatch()
     {
-        lightBulb.SetActive(false);
-        flameMask.SetActive(false); 
+        if(currentState == MatchState.Burning)
+        {
+            currentState = MatchState.Default;
+            holdingHand = null;
+            sphereColliderComp.enabled = false;
+            lightComp.DOIntensity(0, 1);
+            haloParticleComp.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+            darknessParticleComp.gameObject.transform.DOScale(0, 0.3f);
+        }
     }
 
-    public void EnableMatch()
+    public void LightUpMatch()
     {
-        if(canActiveMatch)
+        if(currentState == MatchState.Default)
         {
-            lightBulb.SetActive(true);
-            flameMask.SetActive(true);
+            currentState = MatchState.Burning;
+            holdingHand = rightHandState.isPinching ? rightHandState : leftHandState;
+            MoveMatchToTarget(false);
+            sphereColliderComp.enabled = true;
+            lightComp.DOIntensity(defaultLightIntensity, 1);
+            haloParticleComp.Play();
+            darknessParticleComp.gameObject.transform.DOScale(1.5f, 0.3f);
+        }
+    }
+
+    private void MoveMatchToTarget(bool smooth)
+    {
+        if (holdingHand == null) return;
+
+        Vector3 direction = (holdingHand.GetJointPose(HandJointID.ThumbDistal).up + holdingHand.GetJointPose(HandJointID.IndexDistal).up) / 2;
+        Vector3 point = holdingHand.GetJointPose(HandJointID.ThumbTip).position;
+        Vector3 target = point + direction * maskOffset;
+
+        if (smooth)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, target, Time.deltaTime * maskMoveSpeed);
+        }
+        else
+        {
+            transform.position = target;
         }
     }
 
     private void Update()
     {
-        if(canActiveMatch)
+        if(currentState == MatchState.Burning)
         {
-            HandState holdingHand = rightHandState.isPinching ? rightHandState : leftHandState;
-            Pose indexTipPose = holdingHand.GetJointPose(HandJointID.IndexTip);
-
-            transform.position = indexTipPose.position + indexTipPose.up * matchPositionOffset;
+            MoveMatchToTarget(true);
         }
     }
 }

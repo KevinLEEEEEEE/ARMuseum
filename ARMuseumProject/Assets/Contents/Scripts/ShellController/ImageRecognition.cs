@@ -166,33 +166,3 @@ public class ImageRecognition : MonoBehaviour
         }
     }
 }
-
-//private async Task<ImageRecogResult> AnalysisImage(byte[] bytes, float startTime)
-//{
-//    var request = new RestRequest()
-//        .AddHeader("Content-Type", "image/png")
-//        .AddParameter("application/octet-stream", bytes, ParameterType.RequestBody);
-
-//    IRestResponse response = await client.ExecuteAsync(request, Method.POST);
-//    ImageRecogResult recogResult;
-
-//    if (response.IsSuccessful)
-//    {
-//        ObjectDetectionResponse result = JsonConvert.DeserializeObject<ObjectDetectionResponse>(response.Content);
-//        recogResult = new ImageRecogResult(true, result, startTime);
-//        UnityEngine.Debug.Log("[ImageRecognition] Receive result successfully.");
-//    }
-//    else
-//    {
-//        recogResult = new ImageRecogResult(false, null, startTime);
-//        UnityEngine.Debug.LogError("[ImageRecognition] Receive result failed: " + response.ErrorMessage);
-//    }
-
-//    if(displayReceivedInfo)
-//    {
-//        receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nIsBurning: {3}.", 
-//            recogResult.IsSuccessful(), recogResult.GetStartTime().ToString("f3"), recogResult.GetCostTime(), recogResult.ContainLabel("burning"));
-//    }
-
-//    return recogResult;
-//}

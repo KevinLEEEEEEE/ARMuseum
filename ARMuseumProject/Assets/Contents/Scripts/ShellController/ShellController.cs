@@ -24,6 +24,7 @@ public class ShellController : MonoBehaviour
     public StartEventListener startEventListener;
     public ShellStateListener shellStateListener;
     public StopEventListener stopEventListener;
+    public ImageRecogResultListener imageRecogResultListener;
 
     [SerializeField] private GameController_Historical _gameController;
     [SerializeField] private DialogGenerator dialogGenerator;
@@ -121,14 +122,14 @@ public class ShellController : MonoBehaviour
 
                 if(lockToBurningState)
                 {
-                    _matchManager.EnableMatch();
+                    _matchManager.LightUpMatch();
                 } else
                 {
                     imageRecognition.TakePhotoAndAnalysis(UpdateImageRecogResult);
                 }
             } else
             {
-                _matchManager.DisableMatch();
+                _matchManager.PutOutMatch();
             }
 
             await UniTask.Delay(TimeSpan.FromSeconds(objectDetectionFrequency), ignoreTimeScale: false);
@@ -194,12 +195,6 @@ public class ShellController : MonoBehaviour
 
     public void UpdateImageRecogResult(ImageRecogResult res)
     {
-        //if (displayReceivedInfo)
-        //{
-        //    receivedInfoUI.text = string.Format("IsSuccessful: {0},\nStartTime: {1}s,\nRecogDuration: {2}ms,\nIsBurning: {3}.",
-        //        res.IsSuccessful(), res.GetStartTime().ToString("f3"), res.GetCostTime(), res.ContainLabel("burning"));
-        //}
-
         if (latestRecogResult != null && res.GetStartTime() < latestRecogResult.GetStartTime())
         {
             NRDebugger.Info("[ShellController] Earlier recog result received, skip it.");
@@ -208,25 +203,28 @@ public class ShellController : MonoBehaviour
 
         if (res.IsSuccessful())
         {
+            // 如果请求成果，则根据结果决定火柴组件是否启用
             if (res.ContainLabel("burning"))
             {
                 NRDebugger.Info(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
-                _matchManager.EnableMatch();
-                return;
+                _matchManager.LightUpMatch();
             }
             else
             {
                 NRDebugger.Info(string.Format("[ShellController] Match undetected, Receive result in {0} ms.", res.GetCostTime()));
+                _matchManager.PutOutMatch();
             }
 
             latestRecogResult = res;
         }
         else
         {
+            // 如果请求失败，则保持先前的火柴状态
             NRDebugger.Info("[ShellController] Image detection request failed.");
         }
 
-        _matchManager.DisableMatch();
+        // 如果debug系统监听了图像识别结果事件，则同步并显示结果
+        imageRecogResultListener?.Invoke(res);
     }
 
     public delegate void StartEventListener();
@@ -234,4 +232,5 @@ public class ShellController : MonoBehaviour
     public delegate void LoadEventListener();
     public delegate void UnloadEventListener();
     public delegate void ShellStateListener(ShellNode state);
+    public delegate void ImageRecogResultListener(ImageRecogResult result);
 }

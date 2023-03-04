@@ -5,7 +5,6 @@ using NRKernal.Record;
 using System;
 using NRKernal;
 using System.Linq;
-using UnityEngine.UI;
 #if UNITY_ANDROID && !UNITY_EDITOR
     using GalleryDataProvider = NRKernal.NRExamples.NativeGalleryDataProvider;
 #else
@@ -14,20 +13,16 @@ using GalleryDataProvider = NRKernal.NRExamples.MockGalleryDataProvider;
 
 public class CameraManager : MonoBehaviour
 {
+    public ImageCapturedEventListener imageCapturedEventListener;
+
     [SerializeField] private bool savePhotoToGallery;
-    //public bool displayCapturedImage;
-    //[SerializeField] private RawImage capturedImageUI;
+    [SerializeField] private bool useMockImagesInEditor;
     [SerializeField] private Texture2D[] mockImages_Burning;
     [SerializeField] private Texture2D[] mockImages_Others;
 
     private NRPhotoCapture m_PhotoCaptureObject;
     private Resolution m_CameraResolution;
     private GalleryDataProvider galleryDataTool;
-
-    private void Start()
-    {
-        //capturedImageUI.gameObject.SetActive(displayCapturedImage);
-    }
 
     void Create(Action<NRPhotoCapture> onCreated)
     {
@@ -67,7 +62,6 @@ public class CameraManager : MonoBehaviour
                 }
                 else
                 {
-                    //isOnPhotoProcess = false;
                     this.Close();
                     NRDebugger.Error("Start PhotoMode faild." + result.resultType);
                 }
@@ -86,8 +80,7 @@ public class CameraManager : MonoBehaviour
             OnCapturedProcessCallback(bytes, callback, startTime);
         }
 
-        // Run mock method in unity editor
-        if (Application.isEditor)
+        if (useMockImagesInEditor && Application.isEditor)
         {
             int index = UnityEngine.Random.Range(0, mockImages_Burning.Length + mockImages_Others.Length - 1);
             Texture2D tex = index <= (mockImages_Burning.Length - 1) ? mockImages_Burning[index] : mockImages_Others[index - mockImages_Burning.Length];
@@ -115,18 +108,12 @@ public class CameraManager : MonoBehaviour
     {
         callback(bytes, startTime);
 
-        if(savePhotoToGallery)
+        imageCapturedEventListener?.Invoke(bytes, m_CameraResolution.width, m_CameraResolution.height);
+
+        if (savePhotoToGallery)
         {
             SaveBytesToGallery(bytes);
-        }
-
-        //if (displayCapturedImage)
-        //{
-        //    Texture2D tex = new(m_CameraResolution.width, m_CameraResolution.height);
-        //    ImageConversion.LoadImage(tex, bytes);
-
-        //    capturedImageUI.texture = tex;
-        //}
+        }    
     }
 
     public void Close()
@@ -171,4 +158,6 @@ public class CameraManager : MonoBehaviour
             throw e;
         }
     }
+
+    public delegate void ImageCapturedEventListener(byte[] bytes, int width, int height);
 }

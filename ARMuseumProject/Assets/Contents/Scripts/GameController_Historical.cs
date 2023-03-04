@@ -13,6 +13,8 @@ public class GameController_Historical : MonoBehaviour
     public float ambientBasicVolume;
     public Light ambientLightComp;
     [SerializeField] private int initializeIndex;
+    [SerializeField] private bool useCustomeAnchorPosition;
+    [SerializeField] private Vector3 customeAnchorPosition;
     public Transform[] eventAnchorListener;
     public GameObject[] initMessageListener;
     public Transform[] startPointListener;
@@ -20,6 +22,11 @@ public class GameController_Historical : MonoBehaviour
     {
         get
         {
+            if(_userID == null)
+            {
+                _userID = GetUniqueUserID();
+            }
+
             return _userID;
         }
     }
@@ -33,19 +40,21 @@ public class GameController_Historical : MonoBehaviour
     {
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
         NRInput.RaycastersActive = false;
-        _userID = GetUniqueUserID();
 
         SetStartPoint(new Vector3(0, 0.5f, 0.5f));
 
-        //SetAnchoredPosition(new Vector3(0, -0.5f, 1), new Vector3(0, 0, 10));
+        if(useCustomeAnchorPosition && initializeIndex != 0)
+        {
+            SetAnchoredPosition(customeAnchorPosition, new Vector3(0, 0, 10));
+        }
+
         NextScene();
     }
 
     private string GetUniqueUserID()
     {
         DateTime dt = DateTime.Now;
-
-        return string.Format("{0}{1}{2}", dt.Day, dt.Hour, dt.Minute);
+        return string.Format("{0}{1}{2}", dt.Day.ToString("00"), dt.Hour.ToString("00"), dt.Minute.ToString("00"));
     }
 
     private void SetStartPoint(Vector3 point)
@@ -84,16 +93,6 @@ public class GameController_Historical : MonoBehaviour
         initMessageListener[initializeIndex].SendMessage("Init");
         initializeIndex++;
     }
-
-    //public void ShowGroundMask()
-    //{
-    //    groundMask.SetActive(true);
-    //}
-
-    //public void HideGroundMask()
-    //{
-    //    groundMask.SetActive(false);
-    //}
 
     public void StartAmbientSound()
     {
