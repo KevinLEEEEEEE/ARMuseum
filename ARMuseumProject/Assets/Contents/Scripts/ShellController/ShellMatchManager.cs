@@ -20,7 +20,7 @@ public class ShellMatchManager : MonoBehaviour
     [SerializeField] private float maskOffset;
     [SerializeField] private float maskMoveSpeed;
 
-    private SphereCollider sphereColliderComp;
+    private Collider colliderComp;
     private HandState rightHandState;
     private HandState leftHandState;
     private HandState holdingHand;
@@ -32,7 +32,7 @@ public class ShellMatchManager : MonoBehaviour
         _shellController.shellStateListener += ShellStateHandler;
         rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
         leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
-        sphereColliderComp = GetComponent<SphereCollider>();
+        colliderComp = GetComponent<Collider>();
         defaultLightIntensity = lightComp.intensity;
 
         Reset();
@@ -41,7 +41,7 @@ public class ShellMatchManager : MonoBehaviour
     public void Reset()
     {  
         currentState = MatchState.Suspend;
-        sphereColliderComp.enabled = false;
+        colliderComp.enabled = false;
         lightComp.intensity = 0;
         lightComp.gameObject.SetActive(false);
         haloParticleComp.gameObject.SetActive(false);
@@ -66,7 +66,7 @@ public class ShellMatchManager : MonoBehaviour
         {
             currentState = MatchState.Default;
             holdingHand = null;
-            sphereColliderComp.enabled = false;
+            colliderComp.enabled = false;
             lightComp.DOIntensity(0, 1);
             haloParticleComp.Stop(false, ParticleSystemStopBehavior.StopEmitting);
             darknessParticleComp.gameObject.transform.DOScale(0, 0.3f);
@@ -80,7 +80,7 @@ public class ShellMatchManager : MonoBehaviour
             currentState = MatchState.Burning;
             holdingHand = rightHandState.isPinching ? rightHandState : leftHandState;
             MoveMatchToTarget(false);
-            sphereColliderComp.enabled = true;
+            colliderComp.enabled = true;
             lightComp.DOIntensity(defaultLightIntensity, 1);
             haloParticleComp.Play();
             darknessParticleComp.gameObject.transform.DOScale(1.5f, 0.3f);
@@ -91,7 +91,7 @@ public class ShellMatchManager : MonoBehaviour
     {
         if (holdingHand == null) return;
 
-        Vector3 direction = (holdingHand.GetJointPose(HandJointID.ThumbDistal).up + holdingHand.GetJointPose(HandJointID.IndexDistal).up) / 2;
+        Vector3 direction = (holdingHand.GetJointPose(HandJointID.ThumbDistal).up + holdingHand.GetJointPose(HandJointID.IndexDistal).up * 1.5f) / 2;
         Vector3 point = holdingHand.GetJointPose(HandJointID.ThumbTip).position;
         Vector3 target = point + direction * maskOffset;
 
@@ -103,6 +103,8 @@ public class ShellMatchManager : MonoBehaviour
         {
             transform.position = target;
         }
+
+        transform.up = direction;
     }
 
     private void Update()

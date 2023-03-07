@@ -61,7 +61,7 @@ public class ClockController : MonoBehaviour
         loadEventListener?.Invoke();
 
         // 动画等待两秒，舒缓节奏
-        await UniTask.Delay(TimeSpan.FromSeconds(2f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
         _dialogGenerator.GenerateDialog("它将历经时光的洗礼");
 
@@ -93,11 +93,11 @@ public class ClockController : MonoBehaviour
         speedModeListener?.Invoke(SpeedMode.Normal);
         stopEventListener?.Invoke();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(6f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
 
         _dialogGenerator.GenerateDialog("这是跨越时空的相遇");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
         unloadEventListener?.Invoke();
         _gameController.NextScene();

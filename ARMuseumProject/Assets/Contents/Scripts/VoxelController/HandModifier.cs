@@ -29,14 +29,15 @@ public class HandModifier : MonoBehaviour
     public float maxVisualDistance;
     public float minVisualDistance;
     public AudioClip audioClip_voxelOperation;
-    [FormerlySerializedAs("Distance_IDCurve")]
-    public AnimationCurve Distance_RadiusCurve;
+    public AnimationCurve Distance_IDCurve;
 
     private readonly HandEnum addVoxelHand = HandEnum.RightHand;
     private readonly HandGesture addVoxelHandGesture = HandGesture.Point;
     private readonly HandEnum subVoxelHand = HandEnum.LeftHand;
     private readonly HandGesture subVoxelHandGesture = HandGesture.Point;
     private readonly int layerMask = 1 << 13;
+    private HandState addVoxelHandState;
+    private HandState subVoxelHandState;
     private GameObject addFingerTorch;
     private GameObject subFingerTorch;
     private GameObject addVisualizer;
@@ -49,6 +50,7 @@ public class HandModifier : MonoBehaviour
     private bool canModify;
     private Vector3 addPrePosition = new(0, 0, 0);
     private Vector3 subPrePosition = new(0, 0, 0);
+    private int defaultIDValue;
 
     private void Start()
     {
@@ -65,10 +67,19 @@ public class HandModifier : MonoBehaviour
         addVisualizer = Instantiate(fingerHitVisualizerPrefab, transform);
         subVisualizer = Instantiate(fingerHitVisualizerPrefab, transform);
 
+        addVoxelHandState = NRInput.Hands.GetHandState(addVoxelHand);
+        subVoxelHandState = NRInput.Hands.GetHandState(subVoxelHand);
+
+        Reset();
+    }
+
+    private void Reset()
+    {
         isFirstModify = true;
         canAddVoxel = false;
         canSubVoxel = false;
         canModify = false;
+        defaultIDValue = modifier.ID;
     }
 
     public void EnableModify()
@@ -106,11 +117,11 @@ public class HandModifier : MonoBehaviour
     }
 
 
-    private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos, float radius = 0.2f)
+    private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos, float id, float radius = 0.2f)
     {
         if(isFirstModify)
         {
-            voxelController.StopInstruction();
+            voxelController.FirstModify();
             isFirstModify = false;
         }
 
@@ -119,6 +130,9 @@ public class HandModifier : MonoBehaviour
             modifier.SetModificationMode(mode);
         }
 
+        Debug.Log(id);
+
+        modifier.SetID(id);
         modifier.SetRadius(radius);
         modifier.ModifyAtPos(pos);
     }
@@ -196,11 +210,9 @@ public class HandModifier : MonoBehaviour
             return;
         }
 
-        Vector3 addPosition = NRInput.Hands.GetHandState(addVoxelHand).GetJointPose(HandJointID.IndexTip).position;
-        Vector3 subPosition = NRInput.Hands.GetHandState(subVoxelHand).GetJointPose(HandJointID.IndexTip).position;
-
-        if (NRInput.Hands.GetHandState(addVoxelHand).currentGesture == addVoxelHandGesture)
+        if (addVoxelHandState.currentGesture == addVoxelHandGesture)
         {
+            Vector3 addPosition = addVoxelHandState.GetJointPose(HandJointID.IndexTip).position;
             NearestHitResult addResult = GenerateSphereRaycast(addPosition, maxVisualDistance, layerMask);
             UpdateHitVisualizer(addVisualizer, addResult, canAddVoxel);
             UpdateFingerTorch(addFingerTorch, addPosition);
@@ -208,8 +220,8 @@ public class HandModifier : MonoBehaviour
             if (canAddVoxel)
             {
                 float distance = Vector3.Distance(addPrePosition, addPosition);
-                float radius = Distance_RadiusCurve.Evaluate(distance);
-                ModifyAtPosition(VoxelModifyMode.Additive, addPosition, radius);
+                float id = Distance_IDCurve.Evaluate(distance) * defaultIDValue;
+                ModifyAtPosition(VoxelModifyMode.Additive, addPosition, id, 0.2f);
             }
 
             addPrePosition = addPosition;
@@ -221,8 +233,9 @@ public class HandModifier : MonoBehaviour
             addFingerTorch.SetActive(false);
         }
 
-        if (NRInput.Hands.GetHandState(subVoxelHand).currentGesture == subVoxelHandGesture)
+        if (subVoxelHandState.currentGesture == subVoxelHandGesture)
         {
+            Vector3 subPosition = subVoxelHandState.GetJointPose(HandJointID.IndexTip).position;
             NearestHitResult subResult = GenerateSphereRaycast(subPosition, maxVisualDistance, layerMask);
             UpdateHitVisualizer(subVisualizer, subResult, canSubVoxel);
             UpdateFingerTorch(subFingerTorch, subPosition);
@@ -230,10 +243,10 @@ public class HandModifier : MonoBehaviour
             if (canSubVoxel)
             {
                 float distance = Vector3.Distance(subPrePosition, subPosition);
-                float radius = Distance_RadiusCurve.Evaluate(distance);
+                float id = Distance_IDCurve.Evaluate(distance) * defaultIDValue;
 
                 // 删除的尺寸比添加的稍大一些，能够将原有轨迹擦得更干净，符合预期
-                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition, radius * 1.1f);
+                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition, id, 0.25f);
             }
 
             subPrePosition = subPosition;

@@ -7,7 +7,7 @@ public class AudioGenerator
     public readonly AudioSource source;
     private readonly float _minVolume;
 
-    public AudioGenerator(GameObject target, AudioClip clip, bool isLoop = false, bool playOnAwake = false, float volume = 1, float minVolume = 0)
+    public AudioGenerator(GameObject target, AudioClip clip = null, bool isLoop = false, bool playOnAwake = false, float volume = 1, float minVolume = 0)
     {
         source = target.AddComponent<AudioSource>();
         source.clip = clip;
@@ -15,6 +15,11 @@ public class AudioGenerator
         source.playOnAwake = playOnAwake;
         source.volume = volume;
         _minVolume = minVolume;
+    }
+
+    public void SetClip(AudioClip clip)
+    {
+        source.clip = clip;
     }
 
     public void Play()

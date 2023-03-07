@@ -230,7 +230,7 @@ namespace NRKernal
         /// </summary>
         public void StartHintLoop()
         {
-            if (!loopRunning && VisualsRoot != null)
+            if (!loopRunning && VisualsRoot != null && gameObject.activeSelf)
             {
                 loopRunning = true;
                 animationHideDuration = GetAnimationDuration(fadeOutAnimationState);

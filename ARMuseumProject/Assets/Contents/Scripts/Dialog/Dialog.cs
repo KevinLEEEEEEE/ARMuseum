@@ -16,17 +16,15 @@ public class Dialog : MonoBehaviour
     private void Awake()
     {
         audioSource_templeBell = new AudioGenerator(gameObject, audioClip_templeBell);
-        audioSource_chant = new AudioGenerator(gameObject, audioClip_chant[Random.Range(0, 3)]);
+        audioSource_chant = new AudioGenerator(gameObject);
         dialogAnimation = transform.GetComponent<Animation>();
     }
 
-    public void SetContent(string content)
+    public void StartDialog(string content)
     {
+        audioSource_chant.SetClip(audioClip_chant[Random.Range(0, 3)]);
         textMesh.text = content;
-    }
 
-    public void StartDialog()
-    {
         audioSource_templeBell.Play();
         audioSource_chant.Play();
         dialogAnimation.Play();

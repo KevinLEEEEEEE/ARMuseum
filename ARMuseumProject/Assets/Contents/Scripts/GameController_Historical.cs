@@ -13,6 +13,7 @@ public class GameController_Historical : MonoBehaviour
     public float ambientBasicVolume;
     public Light ambientLightComp;
     [SerializeField] private int initializeIndex;
+    [SerializeField] private bool indexLoop;
     [SerializeField] private bool useCustomeAnchorPosition;
     [SerializeField] private Vector3 customeAnchorPosition;
     public Transform[] eventAnchorListener;
@@ -41,7 +42,7 @@ public class GameController_Historical : MonoBehaviour
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
         NRInput.RaycastersActive = false;
 
-        SetStartPoint(new Vector3(0, 0.5f, 0.5f));
+        SetStartPoint(new Vector3(0, 0.3f, 0.5f));
 
         if(useCustomeAnchorPosition && initializeIndex != 0)
         {
@@ -91,7 +92,7 @@ public class GameController_Historical : MonoBehaviour
         NRDebugger.Info("[GameController] Init scene NO." + (initializeIndex + 1));
 
         initMessageListener[initializeIndex].SendMessage("Init");
-        initializeIndex++;
+        if(!indexLoop) initializeIndex++;
     }
 
     public void StartAmbientSound()

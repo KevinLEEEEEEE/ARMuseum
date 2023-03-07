@@ -1,26 +1,26 @@
+using Cysharp.Threading.Tasks;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPro;
 
 public class DialogGenerator : MonoBehaviour
 {
-    public GameObject dialogPrefab;
+    public GameObject dialog;
     public const float dialogDuration = 6.5f;
 
-    public void GenerateDialog(string content)
+    private void Start()
     {
-        GameObject dialog = Instantiate(dialogPrefab, transform, false);  
-        dialog.GetComponent<Dialog>().SetContent(content);
-        StartCoroutine(StartDialogAndDestory(dialog));
+        dialog.SetActive(false);
     }
 
-    private IEnumerator StartDialogAndDestory(GameObject dialog)
+    public async void GenerateDialog(string content)
     {
-        dialog.GetComponent<Dialog>().StartDialog();
+        dialog.SetActive(true);
+        dialog.GetComponent<Dialog>().StartDialog(content);
 
-        yield return new WaitForSeconds(dialogDuration);
+        await UniTask.Delay(TimeSpan.FromSeconds(dialogDuration), ignoreTimeScale: false);
 
-        Destroy(dialog);
+        dialog.SetActive(false);
     }
 }

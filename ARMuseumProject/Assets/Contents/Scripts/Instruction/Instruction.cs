@@ -2,52 +2,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 
 public class Instruction : MonoBehaviour
 {
-    public ParticleSystem particle;
-    public TextMeshProUGUI ins_title;
-    public TextMeshProUGUI ins_content;
-    public AudioClip audioClip_instructionActive;
+    public Action AnimationEndEventListener;
+    [SerializeField] private TextMeshProUGUI ins_title;
+    [SerializeField] private TextMeshProUGUI ins_content;
+    [SerializeField] private AudioClip audioClip_instructionActive;
 
     private AudioGenerator audioSource_instructionActive;
-    private Animation instructionAnimation;
-
-    private void Awake()
-    {
-        instructionAnimation = transform.GetComponent<Animation>();
-        audioSource_instructionActive = new AudioGenerator(gameObject, audioClip_instructionActive);
-    }
+    private Animation animatorComp;
 
     private void Start()
     {
-        StartInstruction();
+        animatorComp = transform.GetComponent<Animation>();
+        audioSource_instructionActive = new AudioGenerator(gameObject, audioClip_instructionActive);
     }
 
-    public void SetContent(string title, string content)
+    public void StartInstruction(string title, string content)
     {
         ins_title.text = title;
         ins_content.text = content;
-    }
-
-    public void StartInstruction()
-    {
         audioSource_instructionActive.Play();
-        //particle.Play();
-        instructionAnimation.Play("InstructionFadeIn");
+        animatorComp.Play("InsFadeIn");   
     }
 
     public void EndInstruction()
     {
-        StartCoroutine(nameof(FadeOut));
+        animatorComp.Play("InsFadeOut");
     }
 
-    private IEnumerator FadeOut()
+    private void FadeInComplete()
     {
-        instructionAnimation.Play("InstructionFadeOut");
+        animatorComp.Play("InsInProgress");
+    }
 
-        yield return new WaitForSeconds(2f);
-
-        GameObject.Destroy(gameObject);
+    private void FadeOutComplete()
+    {
+        AnimationEndEventListener?.Invoke();
     }
 }
