@@ -95,6 +95,7 @@ public class VoxelController : MonoBehaviour
         // ²¥·Å½áÊø¶¯»­
         audioSource_voxelScale.Play();
         animationComp.Play("VoxelScale");
+        _gameController.StopAmbientSound();
 
         await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 

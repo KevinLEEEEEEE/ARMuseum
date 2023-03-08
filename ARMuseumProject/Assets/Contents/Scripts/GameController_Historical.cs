@@ -7,18 +7,17 @@ using DG.Tweening;
 
 public class GameController_Historical : MonoBehaviour
 {
-    public GameObject planeDetector;
-    public GameObject groundMask;
-    public AudioClip audioClip_ambientWind;
-    public float ambientBasicVolume;
-    public Light ambientLightComp;
+    [SerializeField] private PlaneDetector _planeDetector;
+    [SerializeField] private AudioClip audioClip_ambientWind;
+    [SerializeField] private GameObject groundMask;
+    [SerializeField] private float ambientBasicVolume;
+    [SerializeField] private Light ambientLightComp;
     [SerializeField] private int initializeIndex;
-    [SerializeField] private bool indexLoop;
     [SerializeField] private bool useCustomeAnchorPosition;
     [SerializeField] private Vector3 customeAnchorPosition;
-    public Transform[] eventAnchorListener;
-    public GameObject[] initMessageListener;
-    public Transform[] startPointListener;
+    [SerializeField] private GameObject[] initMessageListener;
+    [SerializeField] private Transform[] eventAnchorListener;
+    [SerializeField] private Transform[] startPointListener;
     public string UserID
     {
         get
@@ -31,24 +30,21 @@ public class GameController_Historical : MonoBehaviour
             return _userID;
         }
     }
-
     private string _userID;
-    private Coroutine ambientCoroutine;
     private AudioGenerator audioSource_ambientWind;
-    private readonly HandEnum domainHand = HandEnum.RightHand;
 
     void Start()
     {
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
         NRInput.RaycastersActive = false;
-
-        SetStartPoint(new Vector3(0, 0.3f, 0.5f));
+        HideGroundMask();
 
         if(useCustomeAnchorPosition && initializeIndex != 0)
         {
             SetAnchoredPosition(customeAnchorPosition, new Vector3(0, 0, 10));
         }
 
+        SetStartPoint(new Vector3(0, 0.3f, 0.5f));
         NextScene();
     }
 
@@ -62,10 +58,7 @@ public class GameController_Historical : MonoBehaviour
     {
         foreach(Transform trans in startPointListener)
         {
-            if(trans)
-            {
-                trans.position = point;
-            }  
+            trans.position = point;
         }
     }
 
@@ -73,26 +66,22 @@ public class GameController_Historical : MonoBehaviour
     {
         foreach (Transform trans in eventAnchorListener)
         {
-            if (trans)
-            {
-                trans.position = position;
-                trans.forward = forward;
-            }
+            trans.position = position;
+            trans.forward = forward;
         }
     }
 
     public void SetEventAnchor(EventAnchor anchor)
     {
-        planeDetector.GetComponent<PlaneDetector>().LockTargetPlane(anchor.GetHitObject());
         SetAnchoredPosition(anchor.GetCorrectedHitPoint(), anchor.GetHitDirection());
+        _planeDetector.LockTargetPlane(anchor.GetHitObject());
     }
 
     public void NextScene()
     {
-        NRDebugger.Info("[GameController] Init scene NO." + (initializeIndex + 1));
+        NRDebugger.Info(string.Format("[GameController] Init scene NO.{0}", initializeIndex + 1));
 
-        initMessageListener[initializeIndex].SendMessage("Init");
-        if(!indexLoop) initializeIndex++;
+        initMessageListener[initializeIndex++].SendMessage("Init");
     }
 
     public void StartAmbientSound()
@@ -117,37 +106,26 @@ public class GameController_Historical : MonoBehaviour
 
     public void SetAmbientVolumeInSeconds(float volume, float duration)
     {
-        if (ambientCoroutine != null)
-        {
-            StopCoroutine(ambientCoroutine);
-        }
-
-        ambientCoroutine = StartCoroutine(duration.Tweeng((vol) =>
-        {
-            audioSource_ambientWind.SetVolume(vol);
-        }, audioSource_ambientWind.GetVolume(), volume));
-
-        NRDebugger.Info("[GameController] Set ambient sound volume to: " + volume);
-    }
-
-    public HandState GetDomainHandState()
-    {
-        return NRInput.Hands.GetHandState(domainHand);
+        audioSource_ambientWind.SetVolumeInSeconds(volume, duration);
     }
 
     public void StartPlaneHint()
     {
-        foreach (Transform plane in planeDetector.transform)
-        {
-            plane.GetComponent<Animation>().Play();
-        }
+        _planeDetector.StartPlaneHint();
     }
 
     public void StopPlaneHint()
     {
-        foreach (Transform plane in planeDetector.transform)
-        {
-            plane.GetComponent<Animation>().Stop();
-        }
+        _planeDetector.StopPlaneHint();
+    }
+
+    public void ShowGroundMask()
+    {
+        groundMask.SetActive(true);
+    }
+
+    public void HideGroundMask()
+    {
+        groundMask.SetActive(false);
     }
 }

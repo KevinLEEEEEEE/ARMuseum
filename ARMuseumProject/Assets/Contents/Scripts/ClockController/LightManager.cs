@@ -25,7 +25,6 @@ public class LightManager : MonoBehaviour
         _clockController.dateMessageListener += DateMessageHandler;
         _clockController.startEventListener += StartEventHandler;
         _clockController.stopEventListener += StopEventHandler;
-        _clockController.loadEventListener += LoadEventHandler;
         _clockController.unloadEventListener += UnloadEventHandler;
 
         Reset();
@@ -38,11 +37,6 @@ public class LightManager : MonoBehaviour
         isLightCompOccupied = true;
     }
 
-    private void LoadEventHandler()
-    {
-        lightComp.gameObject.SetActive(true);
-    }
-
     private void UnloadEventHandler()
     {
         Reset();
@@ -51,8 +45,9 @@ public class LightManager : MonoBehaviour
     private void StartEventHandler()
     {
         _gameController.SetAmbientLightInSeconds(0.1f, lightFadeDuration);
+        lightComp.gameObject.SetActive(true);
         lightComp.DOIntensity(lightIntensityDefault, lightFadeDuration).OnComplete(() => { isLightCompOccupied = false; });
-        lightAnimatorComp.SetTrigger("Enter");
+        lightAnimatorComp.SetTrigger("Enter"); 
     }
 
     private void StopEventHandler()

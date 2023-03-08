@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
 using System;
+using Cysharp.Threading.Tasks;
 
 public class EventAnchor
 {
@@ -53,14 +54,16 @@ public class AnchorController : MonoBehaviour
     public GameController_Historical gameController;
     public GlowingOrb glowingOrb;
     public Progress progressUI;
-    public ParticleSystem[] groundEffect_orbHit;
-    public ParticleSystem[] groundEffect_planeActive;
+    public ParticleSystem groundEffect_orbHit;
+    public ParticleSystem groundEffect_planeActive;
     public GameObject effectLayer_planeActive;
     public float distanceFromCenter;
     public float handModelOffset;
     public float activationRange;
     public float motionThreshold;
     public AudioClip audioClip_planeActive;
+
+    private HandState rightHandState;
     private AudioGenerator audioSource_planeActive;
     private EventAnchor eventAnchor;
     private EventAnchor confirmedEventAnchor;
@@ -80,6 +83,8 @@ public class AnchorController : MonoBehaviour
     void Start()
     {
         audioSource_planeActive = new AudioGenerator(gameObject, audioClip_planeActive);
+        rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+
         ResetAll();
     }
 
@@ -92,77 +97,62 @@ public class AnchorController : MonoBehaviour
 
     public void Init()
     {
-        StartCoroutine(nameof(OpeningScene));
+        OpeningScene();
     }
 
-    private IEnumerator OpeningScene()
+    private async void OpeningScene()
     {
         glowingOrb.ShowBody();
         glowingOrb.ShowTrail();
 
-        yield return new WaitForSeconds(2f);
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
         dialogGenerator.GenerateDialog("你集齐了历史碎片");
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1.5f);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5), ignoreTimeScale: false);
 
         dialogGenerator.GenerateDialog("现在，激活遗迹......\n唤醒久远的回忆......");
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration / 2);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2), ignoreTimeScale: false);
 
         gameController.StartAmbientSound();
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration / 2 + 1f);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2 + 1), ignoreTimeScale: false);
 
         planeActivateInstruction = instructionGenerator.GenerateInstruction("任务: 激活遗迹", "将手掌贴在手印痕迹处，并保持两秒");
         gameController.StartPlaneHint();
         currentState = SceneState.Ready;
     }
 
-    private IEnumerator EndingScene()
+    private async void EndingScene()
     {
         currentState = SceneState.Anchored;
         planeActivateInstruction();
+
+        gameController.StopPlaneHint();
+        gameController.ShowGroundMask();
+        gameController.SetEventAnchor(confirmedEventAnchor);
+
         audioSource_planeActive.Play();
 
-        yield return new WaitForSeconds(3f);
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
         dialogGenerator.GenerateDialog("遗迹已激活...请收回手掌");
 
-        yield return new WaitForSeconds(DialogGenerator.dialogDuration + 1f);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
         glowingOrb.HideTrail();
         glowingOrb.FadeOut();
-        gameController.StopPlaneHint();
-        gameController.SetEventAnchor(confirmedEventAnchor);
-        //gameController.ShowGroundMask();
 
-        yield return new WaitForSeconds(4.47f); // 等待撞击
+        await UniTask.Delay(TimeSpan.FromSeconds(4.47f), ignoreTimeScale: false);
 
-        StartParticles(groundEffect_orbHit);
+        groundEffect_orbHit.Play();
 
-        yield return new WaitForSeconds(4f); // 等待动画结束
+        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
         currentState = SceneState.Suspend;
         glowingOrb.gameObject.SetActive(false);
-        //gameController.HideGroundMask();
         gameController.NextScene();
-    }
-
-    private void StartParticles(ParticleSystem[] particles)
-    {
-        foreach (ParticleSystem sys in particles)
-        {
-            sys.Play();
-        }
-    }
-
-    private void StopParticles(ParticleSystem[] particles)
-    {
-        foreach (ParticleSystem sys in particles)
-        {
-            sys.Stop();
-        }
     }
 
     private void StartActivationTiming()
@@ -186,7 +176,7 @@ public class AnchorController : MonoBehaviour
 
     private void MotionDetection()
     {
-        Vector3 motionAnchor = gameController.GetDomainHandState().GetJointPose(HandJointID.Palm).position;
+        Vector3 motionAnchor = rightHandState.GetJointPose(HandJointID.Palm).position;
 
         if (motionCount == -1)
         {
@@ -194,8 +184,8 @@ public class AnchorController : MonoBehaviour
         } else if (motionCount == 1)
         {
             progressUI.StartRadialProgress();
-            StartParticles(groundEffect_planeActive);
-            effectLayer_planeActive.transform.position = eventAnchor.GetCorrectedHitPoint();
+            groundEffect_planeActive.transform.position = eventAnchor.GetCorrectedHitPoint();
+            groundEffect_planeActive.Play();
             gameController.SetAmbientVolumeInSeconds(1, 2);
             motionCount++;
         } else if (motionCount == 4) {
@@ -204,7 +194,7 @@ public class AnchorController : MonoBehaviour
         } else if (motionCount == 5)
         {
             StopActivationTiming();
-            StartCoroutine(nameof(EndingScene));
+            EndingScene();
         } else
         {
             if (Vector3.Distance(motionAnchor, prePosition) <= motionThreshold)
@@ -216,12 +206,12 @@ public class AnchorController : MonoBehaviour
                 motionCount = -1;
                 confirmedEventAnchor = null;
                 progressUI.ResetRadialProgress();
-                StopParticles(groundEffect_planeActive);
+                groundEffect_planeActive.Stop();
                 gameController.SetAmbientVolumeInSeconds(0, 1);
             }
         }
 
-        Debug.Log("[AnchorController] Motion counting: " + motionCount);
+        NRDebugger.Info("[AnchorController] Motion counting: " + motionCount);
         prePosition = motionAnchor;
     }
 
@@ -232,20 +222,20 @@ public class AnchorController : MonoBehaviour
             return;
         }
 
-        if (!gameController.GetDomainHandState().isTracked)
+        if (!rightHandState.isTracked)
         {
             StopActivationTiming();
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
             return;
         }
 
-        Pose jointPose = gameController.GetDomainHandState().GetJointPose(HandJointID.MiddleTip);
-        Vector3 laserPosition = jointPose.position;
+        Pose jointPose = rightHandState.GetJointPose(HandJointID.MiddleTip);
+        Vector3 laserPoint = jointPose.position;
         Vector3 laserDirection = jointPose.up;
-        Ray laser = new(laserPosition, Vector3.down);
 
-        if (Physics.Raycast(laser, out var hitResult, activationRange, planeMask))
+        if (Physics.Raycast(new Ray(laserPoint, Vector3.down), out var hitResult, activationRange, planeMask))
         {
+            // 如果右手MiddleTip与目标平面的距离在激活范围内
             StartActivationTiming();
             eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset);
             glowingOrb.SetEventAnchor(confirmedEventAnchor ?? eventAnchor);

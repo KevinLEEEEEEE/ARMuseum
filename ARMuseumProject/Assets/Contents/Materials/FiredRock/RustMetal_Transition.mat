@@ -181,7 +181,7 @@ Material:
     - _L2Smoothness: 0.569
     - _MaterialMaskContrast: 1
     - _MaterialMaskIntensity: 1
-    - _Metallic: 0.72
+    - _Metallic: 0.65
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Opacity: 1
@@ -192,7 +192,7 @@ Material:
     - _RustMaskWeight: 0.29
     - _RustSecondPattern: 0.5
     - _RustTiling: 2
-    - _Smoothness: 0.75
+    - _Smoothness: 0.8
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using System.Linq;
 using System;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 
 [Serializable]
 public class Dynasty
@@ -49,24 +49,30 @@ public class TimelineManager : MonoBehaviour
         timeline.SetActive(true);
     }
 
-    private async void UnloadEventHandler()
+    private void UnloadEventHandler()
     {
-        StartCoroutine(fadeOutDuration.Tweeng((t) =>
-        {
-            SetTextColor(new Color(1, 1, 1, t));
-        }, 1f, 0f));
+        //StartCoroutine(fadeOutDuration.Tweeng((t) =>
+        //{
+        //    SetTextColor(new Color(1, 1, 1, t));
+        //}, 1f, 0f));
 
-        await UniTask.Delay(TimeSpan.FromSeconds(fadeOutDuration), ignoreTimeScale: false);
+        dynastyComp.DOColor(new Color(1, 1, 1, 0), fadeOutDuration).OnComplete(Reset);
+        dateComp.DOColor(new Color(1, 1, 1, 0), fadeOutDuration);
 
-        Reset();
+        //await UniTask.Delay(TimeSpan.FromSeconds(fadeOutDuration), ignoreTimeScale: false);
+
+        //Reset();
     }
 
     private void StartEventHandler()
     {
-        StartCoroutine(fadeInDuration.Tweeng((t) =>
-        {
-            SetTextColor(new Color(1, 1, 1, t));
-        }, 0f, 1f));
+        //StartCoroutine(fadeInDuration.Tweeng((t) =>
+        //{
+        //    SetTextColor(new Color(1, 1, 1, t));
+        //}, 0f, 1f));
+
+        dynastyComp.DOColor(new Color(1, 1, 1, 1), fadeInDuration);
+        dateComp.DOColor(new Color(1, 1, 1, 1), fadeInDuration);
     }
 
     private void SetTextColor(Color color)

@@ -6,23 +6,22 @@ using NRKernal;
 
 public class Progress : MonoBehaviour
 {
-    public GameController_Historical gameController;
-    public HandJointID followJoint;
-    public float forwardDistance;
-    public float upwardDistance;
+    [SerializeField] private HandEnum followHand;
+    [SerializeField] private HandJointID followJoint;
+    [SerializeField] private float forwardDistance;
+    [SerializeField] private float upwardDistance;
 
+    private HandState targetHandState;
     private Image progressUI;
     private Animation animePlayer;
     private bool isActive = false;
-    //private float timer = 0.0f;
 
     private void Start()
     {
+        targetHandState = NRInput.Hands.GetHandState(followHand);
         animePlayer = transform.GetComponent<Animation>();
         progressUI = transform.GetChild(0).GetComponent<Image>();
         ResetRadialProgress();
-
-        //StartCoroutine(RunInSeconds(2));
     }
 
     public void StartRadialProgress()
@@ -36,35 +35,14 @@ public class Progress : MonoBehaviour
     {
         progressUI.gameObject.SetActive(false);
         animePlayer.Stop();
-        //SetValue(0);
         isActive = false;
     }
-
-    //public void SetValue(float percentage)
-    //{
-    //    progressUI.fillAmount = percentage;
-    //}
-
-    //private IEnumerator RunInSeconds(float duration)
-    //{
-    //    float t = 0;
-
-    //    while(t < duration)
-    //    {
-    //        t += Time.deltaTime;
-            
-
-    //        Debug.Log(t / duration);
-
-    //        yield return null;
-    //    }
-    //}
 
     private void Update()
     {
         if(isActive)
         {
-            Pose jointPose = gameController.GetDomainHandState().GetJointPose(followJoint);
+            Pose jointPose = targetHandState.GetJointPose(followJoint);
             transform.position = jointPose.position + Vector3.up * upwardDistance + jointPose.up * forwardDistance;
         }
     }

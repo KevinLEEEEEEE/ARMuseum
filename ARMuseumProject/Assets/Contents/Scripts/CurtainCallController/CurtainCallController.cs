@@ -67,7 +67,7 @@ public class CurtainCallController : MonoBehaviour
     private async void BeginScene()
     {
         Root.SetActive(true);
-        _gameController.SetAmbientVolumeInSeconds(0, 4f);
+        _gameController.StopAmbientSound();
 
         for (int i = 0; i < curtainCalls.Length; i++)
         {

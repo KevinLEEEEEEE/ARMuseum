@@ -1,11 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class AudioGenerator
 {
     public readonly AudioSource source;
     private readonly float _minVolume;
+    private Tween tween;
 
     public AudioGenerator(GameObject target, AudioClip clip = null, bool isLoop = false, bool playOnAwake = false, float volume = 1, float minVolume = 0)
     {
@@ -24,7 +26,7 @@ public class AudioGenerator
 
     public void Play()
     {
-        if(!source.isPlaying)
+        if (!source.isPlaying)
         {
             source.Play();
         }
@@ -35,7 +37,7 @@ public class AudioGenerator
         if (source.isPlaying)
         {
             source.Stop();
-        } 
+        }
     }
 
     public float GetVolume()
@@ -47,7 +49,16 @@ public class AudioGenerator
     {
         source.volume = GetTargetVolume(volume);
     }
-         
+
+    public void SetVolumeInSeconds(float volume, float duration)
+    {
+        if (tween != null) tween.Kill();
+
+        tween = source.DOFade(GetTargetVolume(volume), duration).OnComplete(() => {
+            tween = null;
+        });
+    }
+
     private float GetTargetVolume(float volume)
     {
         return volume < _minVolume ? _minVolume : volume;

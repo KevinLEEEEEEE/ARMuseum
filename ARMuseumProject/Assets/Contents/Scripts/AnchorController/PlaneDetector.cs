@@ -5,7 +5,7 @@ using NRKernal;
 
 public class PlaneDetector : MonoBehaviour
 {
-    public GameObject DetectedPlanePrefab;
+    [SerializeField] private GameObject DetectedPlanePrefab;
     private List<NRTrackablePlane> m_NewPlanes = new();
     private bool canAddNewPlane = true;
 
@@ -33,6 +33,22 @@ public class PlaneDetector : MonoBehaviour
         foreach (Transform plane in transform)
         {
             plane.gameObject.SetActive(true);
+        }
+    }
+
+    public void StartPlaneHint()
+    {
+        foreach (Transform plane in transform)
+        {
+            plane.GetComponent<Animator>().SetTrigger("Breath");
+        }
+    }
+
+    public void StopPlaneHint()
+    {
+        foreach (Transform plane in transform)
+        {
+            plane.GetComponent<Animator>().SetTrigger("FadeOut");
         }
     }
 

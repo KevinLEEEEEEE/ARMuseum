@@ -130,8 +130,6 @@ public class HandModifier : MonoBehaviour
             modifier.SetModificationMode(mode);
         }
 
-        Debug.Log(id);
-
         modifier.SetID(id);
         modifier.SetRadius(radius);
         modifier.ModifyAtPos(pos);
