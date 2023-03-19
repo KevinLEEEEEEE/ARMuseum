@@ -10,6 +10,7 @@ public class LeanServer : MonoBehaviour
     [SerializeField] private string APP_ID;
     [SerializeField] private string APP_KEY;
     [SerializeField] private string Server;
+    [SerializeField] private string Class;
     [SerializeField] private bool debugMode;
     [SerializeField] private bool saveUserVoxelData;
 
@@ -42,20 +43,22 @@ public class LeanServer : MonoBehaviour
         };
     }
 
-    public async void SaveVoxel(string key, byte[] bytes)
+    public async UniTask<bool> SaveVoxel(string key, byte[] bytes)
     {
-        if (!saveUserVoxelData) return;
+        if (!saveUserVoxelData) return false;
 
         await UniTask.NextFrame();
 
         NRDebugger.Info("[LeanServer] Start saving voxel data.");
 
-        LCObject userModel = new("UserModelTest2");
+        LCObject userModel = new(Class);
         userModel["ID"] = key;
         userModel["Model"] = Convert.ToBase64String(bytes);
 
         await userModel.Save();
 
         NRDebugger.Info("[LeanServer] Voxel data has been saved.");
+
+        return true;
     }
 }

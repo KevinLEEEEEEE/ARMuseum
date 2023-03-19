@@ -14,7 +14,7 @@ public class Instruction : MonoBehaviour
     private AudioGenerator audioSource_instructionActive;
     private Animation animatorComp;
 
-    private void Start()
+    private void Awake()
     {
         animatorComp = transform.GetComponent<Animation>();
         audioSource_instructionActive = new AudioGenerator(gameObject, audioClip_instructionActive);

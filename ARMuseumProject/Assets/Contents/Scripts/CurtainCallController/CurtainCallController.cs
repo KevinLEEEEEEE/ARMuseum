@@ -21,8 +21,6 @@ public class CurtainCallObject
 
     public async UniTask<bool> Active()
     {
-        Debug.Log("run");
-
         await UniTask.Delay(TimeSpan.FromSeconds(delayBefore), ignoreTimeScale: false);
 
         text.DOColor(new Color(1, 1, 1, 1), textFadeInDuration);
@@ -42,6 +40,9 @@ public class CurtainCallController : MonoBehaviour
 {
     [SerializeField] private GameController_Historical _gameController;
     [SerializeField] private GameObject Root;
+    [SerializeField] private TextMeshProUGUI countdownTextComp;
+    [SerializeField] private string countdownTextFormat;
+    [SerializeField] private int countdownDuration;
     [SerializeField] private CurtainCallObject[] curtainCalls;
 
     private void Start()
@@ -73,5 +74,23 @@ public class CurtainCallController : MonoBehaviour
         {
             await curtainCalls[i].Active();
         }
+
+        await CountingDown();
+
+        _gameController.NextScene();
+    }
+
+    private async UniTask<bool> CountingDown()
+    {
+        int count = countdownDuration;
+
+        while(count >= 0)
+        {
+            countdownTextComp.text = string.Format(countdownTextFormat, count--);
+
+            await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
+        }
+
+        return true;
     }
 }

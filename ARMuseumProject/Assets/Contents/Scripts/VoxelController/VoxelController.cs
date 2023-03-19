@@ -18,6 +18,7 @@ public class VoxelController : MonoBehaviour
     [SerializeField] private InteractionHint interactionHint_L;
     [SerializeField] private InteractionHint interactionHint_R;
     [SerializeField] private GameObject voxelBlock;
+    [SerializeField] private GameObject orbButtonInstruction;
     [SerializeField] private AudioClip audioClip_voxelAppear;
     [SerializeField] private AudioClip audioClip_voxelScale;
 
@@ -28,6 +29,7 @@ public class VoxelController : MonoBehaviour
     private Animation animationComp;
     private Action modifyInstructionHandler;
     private bool hasModified;
+    private bool byteBufferSaved;
 
     void Start()
     {
@@ -46,7 +48,9 @@ public class VoxelController : MonoBehaviour
     private void Reset()
     {
         hasModified = false;
+        byteBufferSaved = false;
         voxelBlock.SetActive(false);
+        orbButtonInstruction.SetActive(false);
     }
 
     public void Init()
@@ -58,6 +62,7 @@ public class VoxelController : MonoBehaviour
     {
         // 设置背景音量并播放入场动画声音
         _gameController.SetAmbientVolumeInSeconds(0.4f, 2);
+        _gameController.ShowGroundMask();
         audioSource_voxelAppear.Play();
 
         // 启动入场动画
@@ -72,9 +77,10 @@ public class VoxelController : MonoBehaviour
 
         shake.StartFadeOut(2f);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(5.5), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
-        modifyInstructionHandler = _instructionGenerator.GenerateInstruction("任务:制作内模", "使用左右手食指触碰模具为青铜器模具塑形");
+        _gameController.HideGroundMask();
+        modifyInstructionHandler = _instructionGenerator.GenerateInstruction("设计你的胚模", "左手食指触碰「删除」\n右手食指触碰「增加」");
         handModifier.EnableModify();
         ModifyInstructionLoop();
     }
@@ -82,13 +88,21 @@ public class VoxelController : MonoBehaviour
     private async void EndingScene()
     {
         handModifier.DisableModify();
+        orbButtonInstruction.SetActive(false);
+
+        // 防卡顿等待
+        await UniTask.NextFrame();
 
         // 将Voxel数据传送至服务器
         SaveUserVoxel();
 
+        // 等待数据传输完成
+        await UniTask.WaitUntil(() => byteBufferSaved == true);
+
+        // 防卡顿等待
         await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
 
-        _dialogGenerator.GenerateDialog("器形已固定，容器形成中...");
+        _dialogGenerator.GenerateDialog("器形已固定，铸模形成中...");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
@@ -109,7 +123,7 @@ public class VoxelController : MonoBehaviour
 
     private async void ModifyInstructionLoop()
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
 
         while (!hasModified)
         {
@@ -138,20 +152,23 @@ public class VoxelController : MonoBehaviour
         interactionHint_L.gameObject.SetActive(false);
     }
 
-    public async void FirstModify()
+    public void FirstModify()
     {
         hasModified = true;
         HideModifyInstruction();
-        
-        // 等待一段时间后再给出下一步任务提示
-        await UniTask.Delay(TimeSpan.FromSeconds(8), ignoreTimeScale: false);
 
         orbButton.EnableButton();
-        _instructionGenerator.GenerateInstruction("看向按钮", "完成编辑后需要长按「下一步」按钮", 12f);
+        orbButtonInstruction.SetActive(true);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
+        // 等待一段时间后再给出下一步任务提示
+        //await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
 
-        _instructionGenerator.GenerateTrail(orbButton.transform.position, 6f, 3f);
+
+        //_instructionGenerator.GenerateInstruction("按钮位置提示", "完成后点击右侧「下一步」按钮", 12f);
+
+        //await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+
+        //_instructionGenerator.GenerateTrail(orbButton.transform.position, 4f, 4f);
     }
 
     private void SaveUserVoxel()
@@ -161,10 +178,12 @@ public class VoxelController : MonoBehaviour
         voxelSaveSystem.Save();
     }
 
-    private void VoxelByteBufferSaved(string id, byte[] bytes)
+    private async void VoxelByteBufferSaved(string id, byte[] bytes)
     {
         NRDebugger.Info(string.Format("[VoxelController] Voxel saved, key: {0}, byte length: {1}.", id, bytes.Length));
 
-        leanServer.SaveVoxel(id, bytes);
+        await leanServer.SaveVoxel(id, bytes);
+
+        byteBufferSaved = true;
     }
 }

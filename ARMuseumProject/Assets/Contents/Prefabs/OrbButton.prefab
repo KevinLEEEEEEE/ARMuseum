@@ -71,7 +71,7 @@ MonoBehaviour:
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
-  m_FillAmount: 1
+  m_FillAmount: 0
   m_FillClockwise: 0
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
@@ -134,6 +134,7 @@ MonoBehaviour:
   audioClip_stopActivation: {fileID: 8300000, guid: 7d913d7473ecee949b87ef0f5d701164, type: 3}
   scaleRatio: 1.2
   scaleDuration: 0.2
+  enableAtStart: 0
   disableAfterActivated: 0
 --- !u!114 &4767030073053205446
 MonoBehaviour:
@@ -156,7 +157,7 @@ SphereCollider:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4767030073053205432}
   m_Material: {fileID: 0}
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
   m_Radius: 0.5

@@ -38,7 +38,6 @@ public class ClockController : MonoBehaviour
     private float currentTime;
     private int currentTimeSpan;
     private bool canRunClock;
-    private Action instructionHandler;
 
     void Start()
     {
@@ -63,19 +62,15 @@ public class ClockController : MonoBehaviour
         // 动画等待两秒，舒缓节奏
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
-        _dialogGenerator.GenerateDialog("它将历经时光的洗礼");
+        _dialogGenerator.GenerateDialog("它将从远古穿越至今");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
         BeginScene();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
-        instructionHandler = _instructionGenerator.GenerateInstruction("握拳加速", "手掌握拳可以加速时间流逝");
-
-        await UniTask.Delay(TimeSpan.FromSeconds(5.5f), ignoreTimeScale: false);
-
-        HideSpeedUpInstruction();
+        _instructionGenerator.GenerateInstruction("目标：公元2023年", "握拳可以「加速」时间\n松开拳头「恢复」流速", 6);
     }
 
     private async void BeginScene()
@@ -95,7 +90,7 @@ public class ClockController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
 
-        _dialogGenerator.GenerateDialog("这是跨越时空的相遇");
+        _dialogGenerator.GenerateDialog("历经四千五百年岁月");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
@@ -128,7 +123,6 @@ public class ClockController : MonoBehaviour
             {
                 currentTimeSpan = acceleratedTimeSpan;
                 speedModeListener?.Invoke(SpeedMode.Accelerated);
-                HideSpeedUpInstruction();
             }  
         } else
         {
@@ -137,15 +131,6 @@ public class ClockController : MonoBehaviour
                 currentTimeSpan = normalTimeSpan;
                 speedModeListener?.Invoke(SpeedMode.Normal);
             } 
-        }
-    }
-
-    private void HideSpeedUpInstruction()
-    {
-        if(instructionHandler != null)
-        {
-            instructionHandler();
-            instructionHandler = null;
         }
     }
 

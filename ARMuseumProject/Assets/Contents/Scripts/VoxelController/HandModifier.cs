@@ -20,16 +20,14 @@ public class NearestHitResult
 
 public class HandModifier : MonoBehaviour
 {
-    public ColliderEvent leftHandColliderEvent;
-    public ColliderEvent rightHandColliderEvent;
-    public VoxelController voxelController;
-    public VoxelBoundary voxelBoundary;
-    public GameObject fingerTorchPrefab;
-    public GameObject fingerHitVisualizerPrefab;
-    public float maxVisualDistance;
-    public float minVisualDistance;
-    public AudioClip audioClip_voxelOperation;
-    public AnimationCurve Distance_IDCurve;
+    [SerializeField] private VoxelController voxelController;
+    [SerializeField] private VoxelBoundary voxelBoundary;
+    [SerializeField] private GameObject fingerTorchPrefab;
+    [SerializeField] private GameObject fingerHitVisualizerPrefab;
+    [SerializeField] private float maxVisualDistance;
+    [SerializeField] private float minVisualDistance;
+    [SerializeField] private AudioClip audioClip_voxelOperation;
+    [SerializeField] private AnimationCurve Distance_IDCurve;
 
     private readonly HandEnum addVoxelHand = HandEnum.RightHand;
     private readonly HandGesture addVoxelHandGesture = HandGesture.Point;
@@ -52,23 +50,27 @@ public class HandModifier : MonoBehaviour
     private Vector3 subPrePosition = new(0, 0, 0);
     private int defaultIDValue;
 
+    public AudioClip AudioClip_voxelOperation { get => audioClip_voxelOperation; set => audioClip_voxelOperation = value; }
+
     private void Start()
     {
         modifier = GetComponent<VoxelModifier>();
-        audioSource_voxelOperation = new AudioGenerator(gameObject, audioClip_voxelOperation, true);
+        audioSource_voxelOperation = new AudioGenerator(gameObject, AudioClip_voxelOperation, true);
 
-        leftHandColliderEvent.triggerEnterListener += LeftIndexTipTrigger;
-        rightHandColliderEvent.triggerEnterListener += RightIndexTipTrigger;
-        voxelBoundary.leftHandExitBoundaryListener += LeftIndexTipExitBoundary;
-        voxelBoundary.rightHandExitBoundaryListener += RightIndexTipExitBoundary;
+        ColliderEvent leftHandColliderEvent = NRInput.AnchorsHelper.GetAnchor(ControllerAnchorEnum.LeftColliderEntity).GetComponent<ColliderEvent>();
+        ColliderEvent rightHandColliderEvent = NRInput.AnchorsHelper.GetAnchor(ControllerAnchorEnum.RightColliderEntity).GetComponent<ColliderEvent>();
+        addVoxelHandState = NRInput.Hands.GetHandState(addVoxelHand);
+        subVoxelHandState = NRInput.Hands.GetHandState(subVoxelHand);
 
         addFingerTorch = Instantiate(fingerTorchPrefab, transform);
         subFingerTorch = Instantiate(fingerTorchPrefab, transform);
         addVisualizer = Instantiate(fingerHitVisualizerPrefab, transform);
         subVisualizer = Instantiate(fingerHitVisualizerPrefab, transform);
 
-        addVoxelHandState = NRInput.Hands.GetHandState(addVoxelHand);
-        subVoxelHandState = NRInput.Hands.GetHandState(subVoxelHand);
+        leftHandColliderEvent.triggerEnterListener += LeftIndexTipTrigger;
+        rightHandColliderEvent.triggerEnterListener += RightIndexTipTrigger;
+        voxelBoundary.leftHandExitBoundaryListener += LeftIndexTipExitBoundary;
+        voxelBoundary.rightHandExitBoundaryListener += RightIndexTipExitBoundary;
 
         Reset();
     }
@@ -115,7 +117,6 @@ public class HandModifier : MonoBehaviour
     {
         canAddVoxel = false;
     }
-
 
     private void ModifyAtPosition(VoxelModifyMode mode, Vector3 pos, float id, float radius = 0.2f)
     {

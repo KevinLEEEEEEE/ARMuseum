@@ -38,8 +38,9 @@ public class ShellController : MonoBehaviour
     [SerializeField] private GameObject burningPoint;
     [SerializeField] private float burningDuration;
     [SerializeField] private float burnoutRadius;
-    [SerializeField] private float objectDetectionFrequency;
+    [SerializeField] private AnimationCurve burningRadiusCurve;
 
+    [SerializeField] private float objectDetectionFrequency;
     [SerializeField] private bool lockToBurningState;
 
     private HandState rightHandState;
@@ -93,18 +94,18 @@ public class ShellController : MonoBehaviour
         // 等待生成动画结束
         await UniTask.Delay(TimeSpan.FromSeconds(8), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("容器已形成......");
+        dialogGenerator.GenerateDialog("铸模已形成......");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
         dialogGenerator.GenerateDialog("现在，点燃熔融之火");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5f), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
         // 给出下一步操作提示
-        hideMatchInstruction = instructionGenerator.GenerateInstruction("任务:引燃火种", "划开火柴并用火苗触碰模型，点燃青铜之火");
+        hideMatchInstruction = instructionGenerator.GenerateInstruction("引燃火柴", "将火苗「缓慢」靠近并触碰模型");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
 
         // 启动物体识别服务
         boxCollierComp.enabled = true;
@@ -138,7 +139,14 @@ public class ShellController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        StartBurningProgress(other.transform.position);
+        // 注意，此处绑定了检测对象
+        if (other.gameObject.name == _matchManager.gameObject.name)
+        {
+            StartBurningProgress(other.bounds.ClosestPoint(transform.position));
+        } else
+        {
+            NRDebugger.Info("[ShellController] Trigger enter but that target is not Match");
+        }
     }
 
     private async void StartBurningProgress(Vector3 point)
@@ -154,6 +162,9 @@ public class ShellController : MonoBehaviour
         hideMatchInstruction();
         hideMatchInstruction = null;
 
+        // 启动蒙层，遮挡火焰底部
+        _gameController.ShowGroundMask();
+
         // 广播燃烧状态
         shellStateListener?.Invoke(ShellNode.Burning);
 
@@ -168,10 +179,9 @@ public class ShellController : MonoBehaviour
         // 广播燃烧结束状态
         shellStateListener?.Invoke(ShellNode.Burnout);
 
-        // 等待一定时间
-        await UniTask.Delay(TimeSpan.FromSeconds(1.5f), ignoreTimeScale: false);
+        await UniTask.NextFrame();
 
-        dialogGenerator.GenerateDialog("青铜器已完成铸造");
+        dialogGenerator.GenerateDialog("青铜器浇筑完成");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
@@ -180,6 +190,7 @@ public class ShellController : MonoBehaviour
         shellStateListener?.Invoke(ShellNode.Stop);
         Reset();
 
+        _gameController.HideGroundMask();
         _gameController.NextScene();
     }
 
@@ -188,8 +199,9 @@ public class ShellController : MonoBehaviour
         burningPoint.transform.position = point;
 
         DOTween.To(() => 0, r => {
-            cutoutController_front.target1Radius = r;
-            cutoutController_back.target1Radius = r;
+            float radius = burningRadiusCurve.Evaluate(r / burnoutRadius) * burnoutRadius;
+            cutoutController_front.target1Radius = radius;
+            cutoutController_back.target1Radius = radius;
         }, burnoutRadius, burningDuration);
     }
 

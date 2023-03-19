@@ -59,7 +59,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainMask:
-        m_Texture: {fileID: 2800000, guid: 29bb105f25374740a9a3e2965cd487f8, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6c1ffa37b9e643040932a2a65c2b7a4e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
@@ -226,7 +226,7 @@ Material:
     m_Colors:
     - _CustomColorMaskChannels: {r: 1, g: 0, b: 0, a: 0}
     - _CustomColorMaskChannels1: {r: 1, g: 0, b: 0, a: 0}
-    - _FinalColor: {r: 0.7529412, g: 0.52006596, b: 0.09411765, a: 1}
+    - _FinalColor: {r: 0.65, g: 0.40625, b: 0.06500001, a: 1}
     - _MainMaskChannelsMultiply: {r: 1, g: 0, b: 0, a: 0}
     - _Noise01ScrollSpeedUV: {r: 1, g: 1, b: 0, a: 0}
     - _RampColorTint: {r: 1, g: 1, b: 1, a: 1}

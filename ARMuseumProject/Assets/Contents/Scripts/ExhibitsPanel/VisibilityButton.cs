@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using NRKernal;
+using TMPro;
+using DG.Tweening;
 
 public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
 {
@@ -15,17 +17,16 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
     [FormerlySerializedAs("InteractionHint_Pinch")]
     private InteractionHint interactionHint;
 
-    [SerializeField]
-    [FormerlySerializedAs("VisibleSprite")]
-    private Sprite visibleSprite;
+    [SerializeField] private SpriteRenderer spriteRendererComp;
+    [SerializeField] private Sprite visibleSprite;
+    [SerializeField] private Sprite invisibleSprite;
+    [SerializeField] private TextMeshProUGUI textMeshComp;
+    [SerializeField] private string visibleText;
+    [SerializeField] private string invisibleText;
 
-    [SerializeField]
-    [FormerlySerializedAs("InvisibleSprite")]
-    private Sprite invisibleSprite;
-
-    private SpriteRenderer spriteRenderer;
     private MeshRenderer meshRenderer;
     private Animation animator;
+    private Transform root;
     private bool isHandCoached_Pinch = false; // 不需要重置
     private bool isPointerDown = false;
     private bool freezeAfterPointerDown = false;
@@ -34,9 +35,9 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
 
     void Start()
     {
-        spriteRenderer = transform.GetChild(0).GetComponent<SpriteRenderer>();
         meshRenderer = transform.GetComponent<MeshRenderer>();
         animator = transform.GetComponent<Animation>();
+        root = transform.GetChild(0);
 
         gameController.StartRaycastEvent += StartRaycastDetection;
         gameController.StopRaycastEvent += StopRayastDetection;
@@ -61,12 +62,14 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
 
         if (visibility)
         {
-            spriteRenderer.sprite = visibleSprite;
+            spriteRendererComp.sprite = invisibleSprite;
+            textMeshComp.text = invisibleText;
             gameController.BeginTour();
         }
         else
         {
-            spriteRenderer.sprite = invisibleSprite;
+            spriteRendererComp.sprite = visibleSprite;
+            textMeshComp.text = visibleText;
             gameController.EndTour();
         }
     }
@@ -119,7 +122,8 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
         if (canDetectRaycast)
         {
             meshRenderer.enabled = true;
-        }
+            root.DOScale(1.2f, 0.15f);
+        }   
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -127,6 +131,7 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
         if (canDetectRaycast)
         {
             meshRenderer.enabled = false;
-        } 
+            root.DOScale(1, 0.15f);
+        }
     }
 }

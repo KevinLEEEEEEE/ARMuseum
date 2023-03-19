@@ -4,9 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using NRKernal;
+using UnityEngine.SceneManagement;
+using Cysharp.Threading.Tasks;
 
 public class GameController : MonoBehaviour
 {
+    public SceneIndexUpdateEvent sceneIndexUpdateEvent;
+
+    [SerializeField] private VideoCapture _videoCapture;
+
     [SerializeField]
     [FormerlySerializedAs("Observer")]
     private TrackableObserver observer;
@@ -27,11 +33,12 @@ public class GameController : MonoBehaviour
 
     void Start()
     {
-#if !UNITY_EDITOR
-        Destroy(GameObject.Find("Env_Room"));
-#endif
         observer.FoundEvent += Found;
         observer.LostEvent += Lost;
+
+        _videoCapture.StartRecord();
+
+        PlayerData.Scene2Entry++;
     }
 
     private void Found(Vector3 pos, Quaternion qua)
@@ -65,6 +72,7 @@ public class GameController : MonoBehaviour
 
     public void EndTour()
     {
+        _videoCapture.StopRecord();
         EndTourEvent?.Invoke();
     }
 
@@ -76,6 +84,22 @@ public class GameController : MonoBehaviour
     public void GrabEnd()
     {
         isGrabbing = false;
+    }
+
+    public async void LoadMainScene()
+    {
+        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("BeginScene");
+        asyncLoad.allowSceneActivation = false;
+
+        while (!asyncLoad.isDone)
+        {
+            if (asyncLoad.progress >= 0.9f)
+            {
+                asyncLoad.allowSceneActivation = true;
+            }
+
+            await UniTask.Yield();
+        }
     }
 
     private void Update()
@@ -100,4 +124,6 @@ public class GameController : MonoBehaviour
             NRInput.LaserVisualActive = canRaycast;
         }
     }
+
+    public delegate void SceneIndexUpdateEvent(int index);
 }

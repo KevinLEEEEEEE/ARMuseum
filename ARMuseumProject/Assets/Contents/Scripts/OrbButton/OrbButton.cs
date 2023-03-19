@@ -22,8 +22,10 @@ public class OrbButton : MonoBehaviour
     [SerializeField] private AudioClip audioClip_stopActivation;
     [SerializeField] private float scaleRatio;
     [SerializeField] private float scaleDuration;
+    [SerializeField] private bool enableAtStart = false;
     [SerializeField] private bool disableAfterActivated;
 
+    private const float activationDuration = 1f;
     private AudioGenerator audioSource_startActivation;
     private AudioGenerator audioSource_stopActivation;
 
@@ -44,7 +46,7 @@ public class OrbButton : MonoBehaviour
         defaultLocalScale = orbMesh.localScale;
 
         Reset();
-        DisableButton();
+        if (!enableAtStart) DisableButton();
     }
 
     private void OnDisable()
@@ -107,7 +109,7 @@ public class OrbButton : MonoBehaviour
         audioSource_startActivation.Play();
 
         // 在指定时间内实现由0至1的运行
-        triggeredTween = DOTween.To(UpdateProgress, 0, 1, 2).OnComplete(FinishProgress);
+        triggeredTween = DOTween.To(UpdateProgress, 0, 1, activationDuration).OnComplete(FinishProgress);
 
         // 激活事件
         orbButtonStartEvent?.Invoke();

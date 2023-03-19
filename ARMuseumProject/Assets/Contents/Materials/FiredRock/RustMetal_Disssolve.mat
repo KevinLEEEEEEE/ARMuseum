@@ -89,7 +89,7 @@ Material:
         m_Scale: {x: 7, y: 7}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
-        m_Texture: {fileID: 2800000, guid: e8821e8a8a1cf8a4f90f815862265e43, type: 3}
+        m_Texture: {fileID: 2800000, guid: ad3b0d3a8777e0047b9729cf7795d603, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -379,11 +379,11 @@ Material:
     - _EnableFogOnTransparent: 1
     - _EnvironmentReflections: 1
     - _GlossMapScale: 0.85
-    - _Glossiness: 0
+    - _Glossiness: 0.02
     - _GlossyReflections: 1
     - _IncludeVertexColor: 0
     - _LightLookupOffset: 0
-    - _Metallic: 0
+    - _Metallic: 0.49
     - _Mode: 0
     - _NormalMapStrength: 1
     - _OcclusionStrength: 1

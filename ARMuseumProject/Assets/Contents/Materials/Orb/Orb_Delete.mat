@@ -13,7 +13,6 @@ Material:
   - _ALPHABLEND_ON
   - _DIRECTIONAL_LIGHT
   - _DISABLE_ALBEDO_MAP
-  - _REFLECTIONS
   - _RIM_LIGHT
   - _SPECULAR_HIGHLIGHTS
   m_InvalidKeywords: []
@@ -98,7 +97,7 @@ Material:
     - _ColorWriteMask: 15
     - _CullMode: 2
     - _CustomMode: 2
-    - _Cutoff: 0.5
+    - _Cutoff: 1
     - _DetailNormalMapScale: 1
     - _DirectionalLight: 1
     - _DstBlend: 1
@@ -131,7 +130,7 @@ Material:
     - _IridescenceAngle: -0.78
     - _IridescenceIntensity: 0.5
     - _IridescenceThreshold: 0.05
-    - _Metallic: 0
+    - _Metallic: 1
     - _MipmapBias: -2
     - _Mode: 4
     - _NearLightFade: 0
@@ -142,16 +141,16 @@ Material:
     - _ProximityLight: 0
     - _ProximityLightSubtractive: 0
     - _ProximityLightTwoSided: 0
-    - _Reflections: 1
+    - _Reflections: 0
     - _Refraction: 0
     - _RefractiveIndex: 0
     - _RenderQueueOverride: -1
     - _RimLight: 1
-    - _RimPower: 3.5
+    - _RimPower: 4
     - _RoundCornerMargin: 0.01
     - _RoundCornerRadius: 0.25
     - _RoundCorners: 0
-    - _Smoothness: 1
+    - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SphericalHarmonics: 0

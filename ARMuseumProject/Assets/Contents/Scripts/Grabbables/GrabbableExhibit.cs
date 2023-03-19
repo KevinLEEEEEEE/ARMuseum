@@ -2,14 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
-
+using DG.Tweening;
 
 public class GrabbableExhibit : MonoBehaviour
 {
-    public GameObject mesh;
-    public GameObject Orbs;
-    public Material emissiveMaterial;
-    private Transform centerAnchor
+    [SerializeField] private OrbButton deleteOrb;
+    [SerializeField] private GameObject mesh;
+    [SerializeField] private GameObject Orbs;
+    [SerializeField] private Material emissiveMaterial;
+    private Transform CenterAnchor
     {
         get
         {
@@ -19,7 +20,9 @@ public class GrabbableExhibit : MonoBehaviour
 
     private void Start()
     {
-        //emissiveMaterial = mesh.GetComponent<MeshRenderer>().material;
+        deleteOrb.orbButtonStartEvent += DeleteStart;
+        deleteOrb.orbButtonStopEvent += DeleteStop;
+        deleteOrb.orbButtonFinishEvent += DeleteComplete;
     }
 
     private void OnEnable()
@@ -36,10 +39,11 @@ public class GrabbableExhibit : MonoBehaviour
     public void DeleteStart()
     {
         emissiveMaterial.EnableKeyword("_EMISSION");
-        StartCoroutine(.6f.Tweeng((p) =>
+
+        DOTween.To((p) =>
         {
             emissiveMaterial.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * p);
-        }, 2.5f, 0));  
+        }, 2.5f, 0, 0.6f);
     }
 
     public void DeleteStop()
@@ -52,6 +56,7 @@ public class GrabbableExhibit : MonoBehaviour
     {
         DeleteStop();
         SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
+
     }
 
     public void ShowOrbs()
@@ -73,13 +78,12 @@ public class GrabbableExhibit : MonoBehaviour
     public void MoveToDestinationFrom(Transform point)
     {
         Vector3 startPoint = point.position;
-        Vector3 endPoint = centerAnchor.position + centerAnchor.forward * 0.4f;
+        Vector3 endPoint = CenterAnchor.position + CenterAnchor.forward * 0.4f;
 
         StartCoroutine(.4f.Tweeng((p) => {
             transform.position = p;
-            transform.LookAt(2 * transform.position - centerAnchor.transform.position);
+            transform.LookAt(2 * transform.position - CenterAnchor.transform.position);
         }, startPoint, endPoint));
-        
     }
 }
 

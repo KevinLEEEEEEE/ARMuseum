@@ -15,6 +15,7 @@ public class LightManager : MonoBehaviour
     private Animator lightAnimatorComp;
     private Light lightComp;
     private bool isLightCompOccupied;
+    private float ambientLightIntensity;
 
     void Start()
     {
@@ -44,7 +45,8 @@ public class LightManager : MonoBehaviour
 
     private void StartEventHandler()
     {
-        _gameController.SetAmbientLightInSeconds(0.1f, lightFadeDuration);
+        ambientLightIntensity = _gameController.GetAmbientLightIntensity();
+        _gameController.SetAmbientLightInSeconds(0.15f, lightFadeDuration);
         lightComp.gameObject.SetActive(true);
         lightComp.DOIntensity(lightIntensityDefault, lightFadeDuration).OnComplete(() => { isLightCompOccupied = false; });
         lightAnimatorComp.SetTrigger("Enter"); 
@@ -53,7 +55,7 @@ public class LightManager : MonoBehaviour
     private void StopEventHandler()
     {
         isLightCompOccupied = true;
-        _gameController.SetAmbientLightInSeconds(1.2f, lightFadeDuration);
+        _gameController.SetAmbientLightInSeconds(ambientLightIntensity, lightFadeDuration);
         lightComp.DOIntensity(0, lightFadeDuration / 2);
         lightAnimatorComp.SetFloat("CycleSpeed", 50);
         lightAnimatorComp.SetTrigger("Exit");

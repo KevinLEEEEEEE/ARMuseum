@@ -32,15 +32,15 @@ public class GrabbablePanel : MonoBehaviour
     }
 
     // ÕûºÏ½øorb-prefab
-    //public void OpenOrbMessage()
-    //{
-    //    PlaySound(OpenOrb);
-    //}
+    public void OpenOrbMessage()
+    {
+        PlaySound(OpenOrb);
+    }
 
-    //public void CloseOrbMessage()
-    //{
-    //    PlaySound(CloseOrb);
-    //}
+    public void CloseOrbMessage()
+    {
+        PlaySound(CloseOrb);
+    }
 
     public void ActiveGrabbableItem(GameObject obj)
     {

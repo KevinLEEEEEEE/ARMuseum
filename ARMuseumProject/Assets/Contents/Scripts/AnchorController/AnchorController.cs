@@ -10,13 +10,14 @@ public class EventAnchor
     private RaycastHit hitResult;
     private Vector3 hitDirection;
     private float offset;
+    private float heightOffset;
 
-    public EventAnchor(RaycastHit res, Vector3 dir, float distanceFromCenter, float handModelOffset)
+    public EventAnchor(RaycastHit res, Vector3 dir, float distanceFromCenter, float handModelOffset, float yAxisOffset)
     {
-
         hitResult = res;
         hitDirection = dir;
         offset = distanceFromCenter + handModelOffset;
+        heightOffset = yAxisOffset;
     }
 
     public GameObject GetHitObject()
@@ -31,7 +32,9 @@ public class EventAnchor
         Vector3 planeCenter = hitResult.point;
         Plane plane = new(planeNormal, planeCenter);
 
-        return plane.ClosestPointOnPlane(point);
+        Vector3 centerPoint = plane.ClosestPointOnPlane(point);
+
+        return centerPoint + new Vector3(0, heightOffset, 0);
     }
 
     public Vector3 GetHitPoint()
@@ -56,11 +59,11 @@ public class AnchorController : MonoBehaviour
     public Progress progressUI;
     public ParticleSystem groundEffect_orbHit;
     public ParticleSystem groundEffect_planeActive;
-    public GameObject effectLayer_planeActive;
     public float distanceFromCenter;
     public float handModelOffset;
     public float activationRange;
     public float motionThreshold;
+    public float yAxisOffset;
     public AudioClip audioClip_planeActive;
 
     private HandState rightHandState;
@@ -107,19 +110,19 @@ public class AnchorController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("你集齐了历史碎片");
+        dialogGenerator.GenerateDialog("你将体验青铜器的铸造过程");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("现在，激活遗迹......\n唤醒久远的回忆......");
+        dialogGenerator.GenerateDialog("现在，稍微退后\n看向木板......");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2), ignoreTimeScale: false);
 
         gameController.StartAmbientSound();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2 + 1), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2), ignoreTimeScale: false);
 
-        planeActivateInstruction = instructionGenerator.GenerateInstruction("任务: 激活遗迹", "将手掌贴在手印痕迹处，并保持两秒");
+        planeActivateInstruction = instructionGenerator.GenerateInstruction("贴住手印", "将掌心贴在木板手印处，保持两秒");
         gameController.StartPlaneHint();
         currentState = SceneState.Ready;
     }
@@ -131,16 +134,16 @@ public class AnchorController : MonoBehaviour
 
         gameController.StopPlaneHint();
         gameController.ShowGroundMask();
-        gameController.SetEventAnchor(confirmedEventAnchor);
 
         audioSource_planeActive.Play();
 
         await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("遗迹已激活...请收回手掌");
+        dialogGenerator.GenerateDialog("已定位目标...可以收回手掌");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
+        gameController.SetEventAnchor(confirmedEventAnchor);
         glowingOrb.HideTrail();
         glowingOrb.FadeOut();
 
@@ -152,6 +155,7 @@ public class AnchorController : MonoBehaviour
 
         currentState = SceneState.Suspend;
         glowingOrb.gameObject.SetActive(false);
+        gameController.HideGroundMask();
         gameController.NextScene();
     }
 
@@ -184,7 +188,8 @@ public class AnchorController : MonoBehaviour
         } else if (motionCount == 1)
         {
             progressUI.StartRadialProgress();
-            groundEffect_planeActive.transform.position = eventAnchor.GetCorrectedHitPoint();
+            groundEffect_planeActive.transform.parent.position = eventAnchor.GetCorrectedHitPoint();
+            groundEffect_planeActive.transform.parent.forward = eventAnchor.GetHitDirection();
             groundEffect_planeActive.Play();
             gameController.SetAmbientVolumeInSeconds(1, 2);
             motionCount++;
@@ -237,7 +242,9 @@ public class AnchorController : MonoBehaviour
         {
             // 如果右手MiddleTip与目标平面的距离在激活范围内
             StartActivationTiming();
-            eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset);
+
+            float heightOffset = Application.isEditor ? 0 : yAxisOffset;
+            eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset, heightOffset);
             glowingOrb.SetEventAnchor(confirmedEventAnchor ?? eventAnchor);
             glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.planeAnchor);
         }

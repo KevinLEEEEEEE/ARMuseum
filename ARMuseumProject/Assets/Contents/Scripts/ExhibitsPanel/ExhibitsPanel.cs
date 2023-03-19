@@ -3,24 +3,28 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using NRKernal;
+using Cysharp.Threading.Tasks;
+using System;
 
 public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public GameController gameController;
-    public NRPointerRaycaster raycaster;
     public GrabbablePanel grabbablePanel;
+    [SerializeField] private InstructionGenerator m_InstructionGenerator;
     public Frame frame;
-    public HandCoach_Point handCoach_Point;
     public GameObject exhibits;
     public GameObject status_TargetLost;
     public AudioClip showExhibits;
     public AudioClip hoverExhibits;
     public AudioClip selectExhibits;
+
+    private NRPointerRaycaster raycaster;
     private AudioSource audioPlayer;
     private bool isNavigating;
     private bool canDetectRaycast;
     private bool freezeDuringPointerDown;
-    private bool isInitializing
+    private bool isFirstSelect;
+    private bool IsInitializing
     {
         get
         {
@@ -42,6 +46,8 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
         gameController.EndTourEvent += StopNavigating;
         audioPlayer = transform.GetComponent<AudioSource>();
 
+        raycaster = NRInput.AnchorsHelper.GetAnchor(ControllerAnchorEnum.RightHandLaserAnchor).GetComponent<NRPointerRaycaster>();
+
         Initialize();
         SaveOriginalPosition();
         StopNavigating();
@@ -50,6 +56,7 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
     private void Initialize()
     {
         isNavigating = false;
+        isFirstSelect = true;
         canDetectRaycast = true;
         freezeDuringPointerDown = false;
         initializingCount = 0;
@@ -193,7 +200,7 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
 
     void Update()
     {
-        if(!isNavigating || !canDetectRaycast || isInitializing)
+        if(!isNavigating || !canDetectRaycast || IsInitializing)
         {
             ResetHoverExhibit();
             return;
@@ -236,12 +243,24 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
                 }
             }
 
-            Debug.Log("[Player] Select exhibit: " + hoverExhibit.name);
+            NRDebugger.Info("[Player] Select exhibit: " + hoverExhibit.name);
             grabbablePanel.ActiveGrabbableItem(hoverExhibit);
-            handCoach_Point.StartHintLoop();
             hoverExhibit.SetActive(false);
             PlaySound(selectExhibits);
+
+            if(isFirstSelect)
+            {
+                isFirstSelect = false;
+                ShowPointInstruction();
+            }
         }
+    }
+
+    private async void ShowPointInstruction()
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+
+        m_InstructionGenerator.GenerateInstruction("与展品互动", "「捏」住展品可移动\n「伸出食指」点按钮", 8);
     }
 
     public void OnPointerDown(PointerEventData eventData)

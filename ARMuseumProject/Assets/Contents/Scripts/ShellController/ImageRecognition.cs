@@ -82,8 +82,10 @@ public class ImageRecognition : MonoBehaviour
 {
     [SerializeField] private OnPhotoAnalysisedCallback onPhotoAnalysisedCallback;
     [SerializeField] private CameraManager cameraManager;
+    [SerializeField] private string easydl_ip_editor;
+    [SerializeField] private string easydl_port_editor;
     [SerializeField] private string easydl_ip;
-    [SerializeField] private string port;
+    [SerializeField] private string easydl_port;
     [SerializeField] private float threshold;
     [SerializeField] private int timeout;
 
@@ -92,7 +94,10 @@ public class ImageRecognition : MonoBehaviour
 
     void Start()
     {
-        uri = new(easydl_ip + ":" + port + "?threshold=" + threshold);
+        string ip = Application.isEditor ? easydl_ip_editor : easydl_ip;
+        string port = Application.isEditor ? easydl_port_editor : easydl_port;
+
+        uri = new(ip + ":" + port + "?threshold=" + threshold);
     }
 
     public void TakePhotoAndAnalysis(OnPhotoAnalysisedCallback callback)
