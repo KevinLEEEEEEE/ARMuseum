@@ -37,7 +37,7 @@ public class ClockController : MonoBehaviour
     }
     private float currentTime;
     private int currentTimeSpan;
-    private bool canRunClock;
+    private bool canLoop;
 
     void Start()
     {
@@ -49,8 +49,7 @@ public class ClockController : MonoBehaviour
 
     public void Reset()
     {
-        canRunClock = true;
-        
+        canLoop = true;
         currentTime = 0;
         currentTimeSpan = normalTimeSpan;
     }
@@ -70,14 +69,14 @@ public class ClockController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
-        _instructionGenerator.GenerateInstruction("目标：公元2023年", "握拳可以「加速」时间\n松开拳头「恢复」流速", 6);
+        _instructionGenerator.GenerateInstruction("目标：公元2023年", "握拳可以「加速」时间\n松开拳头「恢复」流速", 8);
     }
 
     private async void BeginScene()
     {
         startEventListener?.Invoke();
 
-        while(canRunClock)
+        while(canLoop)
         {
             await UniTask.NextFrame();
 
@@ -104,7 +103,7 @@ public class ClockController : MonoBehaviour
 
         if (currentTime >= DateDuration)
         {
-            canRunClock = false;
+            canLoop = false;
         }
 
         int date = Mathf.FloorToInt(currentTime + startDate);
@@ -123,6 +122,7 @@ public class ClockController : MonoBehaviour
             {
                 currentTimeSpan = acceleratedTimeSpan;
                 speedModeListener?.Invoke(SpeedMode.Accelerated);
+                _instructionGenerator.HideInstruction();
             }  
         } else
         {

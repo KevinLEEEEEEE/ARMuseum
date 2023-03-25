@@ -1,0 +1,11 @@
+Model Information:
+* title:	Stylized Low-poly Sand Block
+* source:	https://sketchfab.com/3d-models/stylized-low-poly-sand-block-4739b8843eb942bb918d684055b1cfba
+* author:	Rocco Giandomenico (https://sketchfab.com/Rocco.Giandomenico)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Stylized Low-poly Sand Block" (https://sketchfab.com/3d-models/stylized-low-poly-sand-block-4739b8843eb942bb918d684055b1cfba) by Rocco Giandomenico (https://sketchfab.com/Rocco.Giandomenico) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

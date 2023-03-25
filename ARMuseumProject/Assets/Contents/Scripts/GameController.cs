@@ -11,7 +11,9 @@ public class GameController : MonoBehaviour
 {
     public SceneIndexUpdateEvent sceneIndexUpdateEvent;
 
-    [SerializeField] private VideoCapture _videoCapture;
+    [SerializeField] private VideoCapture m_videoCapture;
+    [SerializeField] private InstructionGenerator m_InstructionGenerator;
+    [SerializeField] private DialogGenerator m_DialogGenerator;
 
     [SerializeField]
     [FormerlySerializedAs("Observer")]
@@ -30,23 +32,24 @@ public class GameController : MonoBehaviour
 
     private bool isTracking = false;
     private bool isGrabbing = false;
+    private bool firstFound = true;
+    private bool firstTour = true;
 
     void Start()
     {
         observer.FoundEvent += Found;
         observer.LostEvent += Lost;
 
-        _videoCapture.StartRecord();
-
         PlayerData.Scene2Entry++;
+
+        m_videoCapture.StartRecord();
     }
 
     private void Found(Vector3 pos, Quaternion qua)
     {
         foreach(Transform trans in FollowTrackerList)
         {
-            trans.position = pos;
-            trans.rotation = qua;
+            trans.SetPositionAndRotation(pos, qua);
         }
 
         if(!isTracking)
@@ -54,6 +57,18 @@ public class GameController : MonoBehaviour
             FoundObserverEvent?.Invoke();
             isTracking = true;
         }
+
+        if (firstFound) FirstFound();
+    }
+
+    private async void FirstFound()
+    {
+        firstFound = false;
+
+        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+
+        m_DialogGenerator.GenerateDialog("看向展板...开始探索");
+        
     }
 
     private void Lost()
@@ -68,11 +83,23 @@ public class GameController : MonoBehaviour
     public void BeginTour()
     {
         BeginTourEvent?.Invoke();
+
+        if(firstTour) FirstTour();
+    }
+
+    private async void FirstTour()
+    {
+        firstTour = false;
+        m_InstructionGenerator.HideInstruction();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
+
+        m_InstructionGenerator.GenerateInstruction("探索更多", "伸手指向展品，「捏」一下", 10);
     }
 
     public void EndTour()
     {
-        _videoCapture.StopRecord();
+        m_videoCapture.StopRecord();
         EndTourEvent?.Invoke();
     }
 

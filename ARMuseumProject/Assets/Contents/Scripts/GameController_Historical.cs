@@ -167,6 +167,14 @@ public class GameController_Historical : MonoBehaviour
         audioSource_ambientWind.SetVolumeInSeconds(volume, duration);
     }
 
+    public void SetEnvLightIntensityInSeconds(float intensity, float duration)
+    {
+        DOTween.To(() => RenderSettings.ambientIntensity, (t) =>
+        {
+            RenderSettings.ambientIntensity = t;
+        }, intensity, duration);
+    }
+
     public void StartPlaneHint()
     {
         _planeDetector.StartPlaneHint();

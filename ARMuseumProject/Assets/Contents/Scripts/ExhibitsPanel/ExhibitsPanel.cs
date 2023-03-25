@@ -44,8 +44,8 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
         gameController.StopRaycastEvent += StopRayastDetection;
         gameController.BeginTourEvent += StartNavigating;
         gameController.EndTourEvent += StopNavigating;
-        audioPlayer = transform.GetComponent<AudioSource>();
 
+        audioPlayer = transform.GetComponent<AudioSource>();
         raycaster = NRInput.AnchorsHelper.GetAnchor(ControllerAnchorEnum.RightHandLaserAnchor).GetComponent<NRPointerRaycaster>();
 
         Initialize();
@@ -258,9 +258,11 @@ public class ExhibitsPanel : MonoBehaviour, IPointerClickHandler, IPointerDownHa
 
     private async void ShowPointInstruction()
     {
+
+
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
-        m_InstructionGenerator.GenerateInstruction("与展品互动", "「捏」住展品可移动\n「伸出食指」点按钮", 8);
+        m_InstructionGenerator.GenerateInstruction("与展品互动", "「捏」住本体可拖拽\n「伸出食指」点按钮", 10);
     }
 
     public void OnPointerDown(PointerEventData eventData)

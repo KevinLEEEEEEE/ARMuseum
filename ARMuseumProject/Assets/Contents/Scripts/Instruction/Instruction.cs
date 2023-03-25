@@ -6,7 +6,8 @@ using System;
 
 public class Instruction : MonoBehaviour
 {
-    public Action AnimationEndEventListener;
+    public Action FadeInEventListener;
+    public Action FadeOutEventListener;
     [SerializeField] private TextMeshProUGUI ins_title;
     [SerializeField] private TextMeshProUGUI ins_content;
     [SerializeField] private AudioClip audioClip_instructionActive;
@@ -35,11 +36,12 @@ public class Instruction : MonoBehaviour
 
     private void FadeInComplete()
     {
+        FadeInEventListener?.Invoke();
         animatorComp.Play("InsInProgress");
     }
 
     private void FadeOutComplete()
     {
-        AnimationEndEventListener?.Invoke();
+        FadeOutEventListener?.Invoke();
     }
 }

@@ -6490,6 +6490,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useRelative: 0
+  moveSmoothly: 1
 --- !u!114 &711110075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6585,6 +6586,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   useRelative: 0
+  moveSmoothly: 0
 --- !u!4 &739874233
 Transform:
   m_ObjectHideFlags: 0
@@ -7252,7 +7254,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 411989880480236641, guid: fdcee3f6ef4d1cf4388850b49c5437d5, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -400
+      value: -415
       objectReference: {fileID: 0}
     - target: {fileID: 411989880480236641, guid: fdcee3f6ef4d1cf4388850b49c5437d5, type: 3}
       propertyPath: m_AnchoredPosition.y

@@ -13,23 +13,23 @@ public class VoxelController : MonoBehaviour
     [SerializeField] private DialogGenerator _dialogGenerator;
     [SerializeField] private InstructionGenerator _instructionGenerator;
     [SerializeField] private HandModifier handModifier;
+    [SerializeField] private HandRotator handRotator;
     [SerializeField] private OrbButton orbButton;
     [SerializeField] private VoxelSaveSystem voxelSaveSystem;
-    [SerializeField] private InteractionHint interactionHint_L;
+    //[SerializeField] private InteractionHint interactionHint_L;
     [SerializeField] private InteractionHint interactionHint_R;
     [SerializeField] private GameObject voxelBlock;
-    [SerializeField] private GameObject orbButtonInstruction;
+    [SerializeField] private GameObject Menu;
     [SerializeField] private AudioClip audioClip_voxelAppear;
     [SerializeField] private AudioClip audioClip_voxelScale;
 
     private LeanServer leanServer;
-    private CameraShakeInstance shake;
+    //private CameraShakeInstance shake;
     private AudioGenerator audioSource_voxelAppear;
     private AudioGenerator audioSource_voxelScale;
     private Animation animationComp;
-    private Action modifyInstructionHandler;
-    private bool hasModified;
     private bool byteBufferSaved;
+    private bool hasModified;
 
     void Start()
     {
@@ -47,10 +47,10 @@ public class VoxelController : MonoBehaviour
 
     private void Reset()
     {
-        hasModified = false;
         byteBufferSaved = false;
+        hasModified = false;
         voxelBlock.SetActive(false);
-        orbButtonInstruction.SetActive(false);
+        Menu.SetActive(false);
     }
 
     public void Init()
@@ -69,106 +69,72 @@ public class VoxelController : MonoBehaviour
         voxelBlock.SetActive(true);
         animationComp.Play("VoxelMoveIn");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(9), ignoreTimeScale: false);
 
-        shake = CameraShaker.Instance.StartShake(1f, 5f, 2f);
+        // 暂时不启用相机抖动，效果一般
+        //shake = CameraShaker.Instance.StartShake(1f, 5f, 2f);
+        //await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
+        //shake.StartFadeOut(2f);
+        //await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
-
-        shake.StartFadeOut(2f);
-
-        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
-
+        // 关闭底部遮罩
         _gameController.HideGroundMask();
-        modifyInstructionHandler = _instructionGenerator.GenerateInstruction("设计你的胚模", "左手食指触碰「删除」\n右手食指触碰「增加」");
+        
+
+        // 启用手势交互与菜单
         handModifier.EnableModify();
-        ModifyInstructionLoop();
+        handRotator.EnableRotator();
+        Menu.SetActive(true);
+
+        // 提示用户下一步操作
+        interactionHint_R.StartHintLoop();
+        _instructionGenerator.GenerateInstruction("制作你的青铜器", "阅读平面上的操作提示，完成模具制作");
     }
 
     private async void EndingScene()
     {
         handModifier.DisableModify();
-        orbButtonInstruction.SetActive(false);
+        handRotator.DisableRotator();
+        Menu.SetActive(false);
 
-        // 防卡顿等待
-        await UniTask.NextFrame();
+        // 如果编辑过，则存储数据，否则直接跳过存储环节
+        if(hasModified)
+        {
+            // 将Voxel数据传送至服务器并等待数据传输完成
+            SaveUserVoxel();
 
-        // 将Voxel数据传送至服务器
-        SaveUserVoxel();
-
-        // 等待数据传输完成
-        await UniTask.WaitUntil(() => byteBufferSaved == true);
-
-        // 防卡顿等待
-        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
+            await UniTask.WaitUntil(() => byteBufferSaved == true);
+        } else
+        {
+            FirstModify();
+        }
 
         _dialogGenerator.GenerateDialog("器形已固定，铸模形成中...");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
         // 播放结束动画
         audioSource_voxelScale.Play();
         animationComp.Play("VoxelScale");
         _gameController.StopAmbientSound();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
         _gameController.NextScene();
 
+        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
+
         // 等待shell成型后，voxel可以隐藏
-        await UniTask.Delay(TimeSpan.FromSeconds(12), ignoreTimeScale: false);
-
+        audioSource_voxelAppear.Unload();
+        audioSource_voxelScale.Unload();
         Reset();
-    }
-
-    private async void ModifyInstructionLoop()
-    {
-        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
-
-        while (!hasModified)
-        {
-            interactionHint_R.StartHintLoop();
-
-            await UniTask.Delay(TimeSpan.FromSeconds(2.1), ignoreTimeScale: false);
-
-            interactionHint_R.StopHintLoop();
-
-            await UniTask.Delay(TimeSpan.FromSeconds(1.2), ignoreTimeScale: false);
-
-            interactionHint_L.StartHintLoop();
-
-            await UniTask.Delay(TimeSpan.FromSeconds(2.1), ignoreTimeScale: false);
-
-            interactionHint_L.StopHintLoop();
-
-            await UniTask.Delay(TimeSpan.FromSeconds(3.5), ignoreTimeScale: false);
-        }
-    }
-
-    private void HideModifyInstruction()
-    {
-        modifyInstructionHandler();
-        interactionHint_R.gameObject.SetActive(false);
-        interactionHint_L.gameObject.SetActive(false);
     }
 
     public void FirstModify()
     {
         hasModified = true;
-        HideModifyInstruction();
-
-        orbButton.EnableButton();
-        orbButtonInstruction.SetActive(true);
-
-        // 等待一段时间后再给出下一步任务提示
-        //await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
-
-
-        //_instructionGenerator.GenerateInstruction("按钮位置提示", "完成后点击右侧「下一步」按钮", 12f);
-
-        //await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
-
-        //_instructionGenerator.GenerateTrail(orbButton.transform.position, 4f, 4f);
+        interactionHint_R.StopHintLoop();
+        _instructionGenerator.HideInstruction();
     }
 
     private void SaveUserVoxel()

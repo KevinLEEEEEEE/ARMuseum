@@ -26,8 +26,13 @@ public class HandModifier : MonoBehaviour
     [SerializeField] private GameObject fingerHitVisualizerPrefab;
     [SerializeField] private float maxVisualDistance;
     [SerializeField] private float minVisualDistance;
-    [SerializeField] private AudioClip audioClip_voxelOperation;
+    [SerializeField] private float addRadius;
+    [SerializeField] private float subRadius;
+    [SerializeField] private float defaultIDValue;
     [SerializeField] private AnimationCurve Distance_IDCurve;
+    [SerializeField] private AudioClip audioClip_voxelOperation;
+
+    public bool mirrorMode;
 
     private readonly HandEnum addVoxelHand = HandEnum.RightHand;
     private readonly HandGesture addVoxelHandGesture = HandGesture.Point;
@@ -42,13 +47,12 @@ public class HandModifier : MonoBehaviour
     private GameObject subVisualizer;
     private VoxelModifier modifier;
     private AudioGenerator audioSource_voxelOperation;
-    private bool isFirstModify;
+    private bool isFirstModify = true;
     private bool canAddVoxel;
     private bool canSubVoxel;
     private bool canModify;
     private Vector3 addPrePosition = new(0, 0, 0);
     private Vector3 subPrePosition = new(0, 0, 0);
-    private int defaultIDValue;
 
     public AudioClip AudioClip_voxelOperation { get => audioClip_voxelOperation; set => audioClip_voxelOperation = value; }
 
@@ -77,25 +81,28 @@ public class HandModifier : MonoBehaviour
 
     private void Reset()
     {
-        isFirstModify = true;
+        canModify = false;
         canAddVoxel = false;
         canSubVoxel = false;
-        canModify = false;
-        defaultIDValue = modifier.ID;
+        addPrePosition = Vector3.zero;
+        subPrePosition = Vector3.zero;
+
+        addVisualizer.SetActive(false);
+        addFingerTorch.SetActive(false);
+        subVisualizer.SetActive(false);
+        subFingerTorch.SetActive(false);
     }
 
     public void EnableModify()
     {
         canModify = true;
+        audioSource_voxelOperation.Reload();
     }
 
     public void DisableModify()
     {
-        canModify = false;
-        addVisualizer.SetActive(false);
-        addFingerTorch.SetActive(false);
-        subVisualizer.SetActive(false);
-        subFingerTorch.SetActive(false);
+        Reset();
+        audioSource_voxelOperation.Unload();
     }
 
     private void LeftIndexTipTrigger()
@@ -126,14 +133,16 @@ public class HandModifier : MonoBehaviour
             isFirstModify = false;
         }
 
-        if (modifier.Mode != mode)
-        { 
-            modifier.SetModificationMode(mode);
-        }
+        if (modifier.Mode != mode) modifier.SetModificationMode(mode);
+        if(modifier.ID != id) modifier.SetID(id);
+        if(modifier.Radius != radius) modifier.SetRadius(radius);
 
-        modifier.SetID(id);
-        modifier.SetRadius(radius);
         modifier.ModifyAtPos(pos);
+
+        if(mirrorMode)
+        {
+            modifier.ModifyAtPos(new(2 * transform.position.x - pos.x, pos.y, 2 * transform.position.z - pos.z));
+        }
     }
 
     private Vector3[] GetSphereDirections(int numDirections)
@@ -218,13 +227,14 @@ public class HandModifier : MonoBehaviour
 
             if (canAddVoxel)
             {
-                float distance = Vector3.Distance(addPrePosition, addPosition);
+                // 首次触碰时，初始移动距离设置为0，避免造成一触碰就寄一大坨的效果
+                float distance = addPrePosition == Vector3.zero ? 0 : Vector3.Distance(addPrePosition, addPosition);
                 float id = Distance_IDCurve.Evaluate(distance) * defaultIDValue;
-                ModifyAtPosition(VoxelModifyMode.Additive, addPosition, id, 0.2f);
+                ModifyAtPosition(VoxelModifyMode.Additive, addPosition, id, addRadius);
             }
 
             addPrePosition = addPosition;
-        } else
+        } else if(canAddVoxel)
         {
             canAddVoxel = false;
             addPrePosition = Vector3.zero;
@@ -241,24 +251,22 @@ public class HandModifier : MonoBehaviour
 
             if (canSubVoxel)
             {
-                float distance = Vector3.Distance(subPrePosition, subPosition);
+                float distance = subPrePosition == Vector3.zero ? 0 : Vector3.Distance(subPrePosition, subPosition);
                 float id = Distance_IDCurve.Evaluate(distance) * defaultIDValue;
-
-                // 删除的尺寸比添加的稍大一些，能够将原有轨迹擦得更干净，符合预期
-                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition, id, 0.25f);
+                ModifyAtPosition(VoxelModifyMode.Subtractive, subPosition, id, subRadius);
             }
 
             subPrePosition = subPosition;
-        } else
+        } else if (canSubVoxel)
         {
             canSubVoxel = false;
+            subPrePosition = Vector3.zero;
             subVisualizer.SetActive(false);
             subFingerTorch.SetActive(false);
         }
 
         // Play audio if operating
-
-        if(canAddVoxel || canSubVoxel)
+        if (canAddVoxel || canSubVoxel)
         {
             audioSource_voxelOperation.Play();
         } else

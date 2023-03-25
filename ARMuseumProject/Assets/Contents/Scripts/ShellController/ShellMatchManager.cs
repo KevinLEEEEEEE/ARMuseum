@@ -29,7 +29,7 @@ public class ShellMatchManager : MonoBehaviour
 
     private void Start()
     {
-        _shellController.shellStateListener += ShellStateHandler;
+        //_shellController.shellStateListener += ShellStateHandler;
         rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
         leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
         colliderComp = GetComponent<Collider>();
@@ -47,18 +47,18 @@ public class ShellMatchManager : MonoBehaviour
         haloParticleComp.gameObject.SetActive(false);
     }
 
-    private void ShellStateHandler(ShellNode node)
-    {
-        if(node == ShellNode.ToBurn)
-        {
-            currentState = MatchState.Default;
-            lightComp.gameObject.SetActive(true);
-            haloParticleComp.gameObject.SetActive(true);
-        } else if(node == ShellNode.Burning)
-        {
-            Reset();
-        }
-    }
+    //private void ShellStateHandler(ShellNode node)
+    //{
+    //    if(node == ShellNode.ToBurn)
+    //    {
+    //        currentState = MatchState.Default;
+    //        lightComp.gameObject.SetActive(true);
+    //        haloParticleComp.gameObject.SetActive(true);
+    //    } else if(node == ShellNode.Burning)
+    //    {
+    //        Reset();
+    //    }
+    //}
 
     public void PutOutMatch()
     {

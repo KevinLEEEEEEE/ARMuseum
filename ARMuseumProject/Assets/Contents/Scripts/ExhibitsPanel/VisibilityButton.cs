@@ -122,7 +122,7 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
         if (canDetectRaycast)
         {
             meshRenderer.enabled = true;
-            root.DOScale(1.2f, 0.15f);
+            root.DOScale(1.15f, 0.15f);
         }   
     }
 

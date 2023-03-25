@@ -59,6 +59,16 @@ public class AudioGenerator
         });
     }
 
+    public void Unload()
+    {
+        source.enabled = false;
+    }
+
+    public void Reload()
+    {
+        source.enabled = true;
+    }
+
     private float GetTargetVolume(float volume)
     {
         return volume < _minVolume ? _minVolume : volume;

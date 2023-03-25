@@ -6,18 +6,29 @@ using UnityEngine;
 using DG.Tweening;
 using NRKernal;
 
+public enum InstructionState
+{
+    Ready,
+    FadeIn,
+    Looping,
+    FadeOut,
+}
+
 public class InstructionGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject instruction;
     [SerializeField] private GameObject trail;
     private Instruction insComp;
     private ParticleSystem trailParticleComp;
+    private InstructionState state;
 
     private void Start()
     {
         trailParticleComp = trail.GetComponent<ParticleSystem>();
         insComp = instruction.GetComponent<Instruction>();
-        insComp.AnimationEndEventListener += AnimationEndEventHandler;
+
+        insComp.FadeOutEventListener += FadeOutEventHandler;
+        insComp.FadeInEventListener += FadeInEventHandler;
 
         Reset();
     }
@@ -25,29 +36,47 @@ public class InstructionGenerator : MonoBehaviour
     private void Reset()
     {
         instruction.SetActive(false);
+        state = InstructionState.Ready;
+    }
+
+    public InstructionState GetState()
+    {
+        return state;
     }
 
     public Action GenerateInstruction(string title, string content)
     {
+        if (state != InstructionState.Ready) return () => { };
+
+        state = InstructionState.FadeIn;
         instruction.SetActive(true);
         insComp.StartInstruction(title, content);
 
-        return () =>
-        {
-            insComp.EndInstruction();
-        };
+        return HideInstruction;
     }
 
     public async void GenerateInstruction(string title, string content, float duration)
     {
+        if (state != InstructionState.Ready) return;
+
+        state = InstructionState.FadeIn;
         instruction.SetActive(true);
         insComp.StartInstruction(title, content);
 
         await UniTask.Delay(TimeSpan.FromSeconds(duration), ignoreTimeScale: false);
 
-        insComp.EndInstruction();
+        HideInstruction();
     }
 
+    public void HideInstruction()
+    {
+        if(state == InstructionState.Looping)
+        {
+            insComp.EndInstruction();
+            state = InstructionState.FadeOut;
+        }
+    }
+ 
     public void GenerateTrail(Vector3 endPoint, float moveDuration, float residenceDuration)
     {
         if(!trailParticleComp)
@@ -65,7 +94,12 @@ public class InstructionGenerator : MonoBehaviour
         });
     }
 
-    private void AnimationEndEventHandler()
+    private void FadeInEventHandler()
+    {
+        state = InstructionState.Looping;
+    }
+
+    private void FadeOutEventHandler()
     {
         Reset();
     }
