@@ -6,6 +6,7 @@ using UnityEngine;
 public class Rotator : MonoBehaviour
 {
     [SerializeField] private HandEnum handEnum;
+    [SerializeField] private HandGesture rotatingGesture = HandGesture.Grab;
     private HandRotator m_HandRotator;
     private HandState handState;
     private bool isEntering;
@@ -26,7 +27,7 @@ public class Rotator : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         // 进入时如果已经处于捏的状态，则不能激活Enter，必须要先进入后捏
-        isEntering = true && !handState.isPinching;
+        isEntering = true && !IsRotatingGesture();
     }
 
     private void OnTriggerExit(Collider other)
@@ -34,12 +35,17 @@ public class Rotator : MonoBehaviour
         isEntering = false;
     }
 
+    private bool IsRotatingGesture()
+    {
+        return handState.currentGesture == rotatingGesture;
+    }
+
     void Update()
     {
         // 开始旋转的条件：接触物体、不处于旋转状态且处于捏状态
         if (isEntering)
         {
-            if(!isRotatingCondition && handState.isPinching)
+            if(!isRotatingCondition && IsRotatingGesture())
             {
                 isRotatingCondition = true;
                 m_HandRotator.StartRotating(handEnum);
@@ -47,7 +53,7 @@ public class Rotator : MonoBehaviour
         }
 
         // 结束旋转条件：满足旋转条件，但是下一刻不满足捏状态
-        if(isRotatingCondition && !handState.isPinching)
+        if(isRotatingCondition && !IsRotatingGesture())
         {
             isRotatingCondition = false;
             m_HandRotator.StopRotating(handEnum);

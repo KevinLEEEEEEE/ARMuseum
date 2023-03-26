@@ -107,6 +107,7 @@ public class HandRotator : MonoBehaviour
         if (handState == null || !handState.isTracked)
         {
             rotator.gameObject.SetActive(false);
+            StopRotating(handEnum);
             return;
         }
 

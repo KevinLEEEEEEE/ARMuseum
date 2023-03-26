@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using EZCameraShake;
 using NRKernal;
 using System;
 using Fraktalia.VoxelGen;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 
 public class VoxelController : MonoBehaviour
 {
@@ -16,7 +16,6 @@ public class VoxelController : MonoBehaviour
     [SerializeField] private HandRotator handRotator;
     [SerializeField] private OrbButton orbButton;
     [SerializeField] private VoxelSaveSystem voxelSaveSystem;
-    //[SerializeField] private InteractionHint interactionHint_L;
     [SerializeField] private InteractionHint interactionHint_R;
     [SerializeField] private GameObject voxelBlock;
     [SerializeField] private GameObject Menu;
@@ -24,7 +23,6 @@ public class VoxelController : MonoBehaviour
     [SerializeField] private AudioClip audioClip_voxelScale;
 
     private LeanServer leanServer;
-    //private CameraShakeInstance shake;
     private AudioGenerator audioSource_voxelAppear;
     private AudioGenerator audioSource_voxelScale;
     private Animation animationComp;
@@ -71,12 +69,6 @@ public class VoxelController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(9), ignoreTimeScale: false);
 
-        // 暂时不启用相机抖动，效果一般
-        //shake = CameraShaker.Instance.StartShake(1f, 5f, 2f);
-        //await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
-        //shake.StartFadeOut(2f);
-        //await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
-
         // 关闭底部遮罩
         _gameController.HideGroundMask();
         
@@ -116,13 +108,14 @@ public class VoxelController : MonoBehaviour
         // 播放结束动画
         audioSource_voxelScale.Play();
         animationComp.Play("VoxelScale");
+        voxelBlock.transform.DORotate(new Vector3(0, 0, 0), 2.5f);
         _gameController.StopAmbientSound();
 
         await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
         _gameController.NextScene();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(8), ignoreTimeScale: false);
 
         // 等待shell成型后，voxel可以隐藏
         audioSource_voxelAppear.Unload();

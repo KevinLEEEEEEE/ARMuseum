@@ -14,13 +14,13 @@ public class ShellController : MonoBehaviour
     [SerializeField] private GameController_Historical _gameController;
     [SerializeField] private DialogGenerator dialogGenerator;
     [SerializeField] private InstructionGenerator instructionGenerator;
-    [SerializeField] private ShellMatchManager _matchManager;
+    [SerializeField] private ShellMatchManager m_matchManager;
+    [SerializeField] private AudioClip clip_AncientAmbient;
     [SerializeField] private AudioClip clip_shellFadeIn;
     [SerializeField] private AudioClip clip_shellBurning;
     [SerializeField] private AudioClip clip_shellCasting;
     [SerializeField] private float objectDetectionFrequency;
     [SerializeField] private bool lockToBurningState;
-    [SerializeField] private GameObject[] roots;
 
     private CameraManager cameraManager;
     private Animator animatorComp;
@@ -30,9 +30,11 @@ public class ShellController : MonoBehaviour
     private ImageRecogResult latestRecogResult;
     private AudioGenerator source_shellFadeIn;
     private AudioGenerator source_shellBurning;
+    private AudioGenerator source_AncientAmbient;
     private AudioGenerator source_shellCasting;
     private bool canDetectObject;
     private bool hasObjectDetectedBefore;
+    private bool isObjectFound;
 
     void Start()
     {
@@ -44,6 +46,7 @@ public class ShellController : MonoBehaviour
 
         source_shellFadeIn = new AudioGenerator(gameObject, clip_shellFadeIn);
         source_shellBurning = new AudioGenerator(gameObject, clip_shellBurning, true, false, 0);
+        source_AncientAmbient = new AudioGenerator(gameObject, clip_AncientAmbient);
         source_shellCasting = new AudioGenerator(gameObject, clip_shellCasting);
         source_shellCasting.source.pitch = 0.92f;
 
@@ -52,6 +55,7 @@ public class ShellController : MonoBehaviour
 
     private void Reset()
     {
+        isObjectFound = false;
         canDetectObject = true;
         hasObjectDetectedBefore = false;
         HideRoots();
@@ -59,17 +63,17 @@ public class ShellController : MonoBehaviour
 
     private void ShowRoots()
     {
-        foreach(GameObject obj in roots)
+        foreach(Transform trans in transform)
         {
-            obj.SetActive(true);
+            trans.gameObject.SetActive(true);
         }
     }
 
     private void HideRoots()
     {
-        foreach (GameObject obj in roots)
+        foreach (Transform trans in transform)
         {
-            obj.SetActive(false);
+            trans.gameObject.SetActive(false);
         }
     }
 
@@ -80,18 +84,20 @@ public class ShellController : MonoBehaviour
 
     private async void OpeningScene()
     {
-        _gameController.SetAmbientLightInSeconds(0.1f, 2);
-        _gameController.SetEnvLightIntensityInSeconds(0.2f, 2);
-
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
-        // 广播开始事件，播放容器生成动画
+        // 播放容器生成动画
         ShowRoots();
         source_shellFadeIn.Play();
         animatorComp.Play("ShellFadeIn");
 
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
+
+        _gameController.SetAmbientLightInSeconds(0.1f, 4);
+        _gameController.SetEnvLightIntensityInSeconds(0.25f, 4);
+
         // 等待生成动画结束
-        await UniTask.Delay(TimeSpan.FromSeconds(7.5), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
 
         dialogGenerator.GenerateDialog("铸模已形成......");
 
@@ -112,7 +118,7 @@ public class ShellController : MonoBehaviour
         // 启动燃烧动画
         animatorComp.Play("ShellBurning");
         source_shellBurning.Play();
-        source_shellBurning.SetVolumeInSeconds(0.4f, 15);
+        source_shellBurning.SetVolumeInSeconds(0.2f, 15);
 
         // 启动物体识别服务
         StartObjectDetectionLoop();
@@ -150,14 +156,16 @@ public class ShellController : MonoBehaviour
         cameraManager.Close();
         canDetectObject = false;
 
-        // 将动画速度缓步调整至快速
+        // 将动画速度缓步调整至快速并关闭火柴模组
         FastSpeedMode();
+        m_matchManager.PutOutMatch();
+        StopAncientAmbientSound();
 
         // 恢复光源
         _gameController.SetAmbientLightInSeconds(1.5f, 7);
         _gameController.SetEnvLightIntensityInSeconds(1.3f, 7);
 
-        source_shellBurning.SetVolumeInSeconds(0, 4);
+        source_shellBurning.SetVolumeInSeconds(0, 6);
         source_shellCasting.Play();
         animatorComp.Play("ShellCasting");
     }
@@ -169,10 +177,6 @@ public class ShellController : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
         Reset();
-
-        source_shellFadeIn.Unload();
-        source_shellBurning.Unload();
-        source_shellCasting.Unload();
 
         _gameController.HideGroundMask();
         _gameController.NextScene();
@@ -217,18 +221,51 @@ public class ShellController : MonoBehaviour
 
     private void TargetObjectFound()
     {
+        if (isObjectFound)
+            return;
+
         if(!hasObjectDetectedBefore)
         {
             instructionGenerator.HideInstruction();
             hasObjectDetectedBefore = true;
         }
 
+        isObjectFound = true;
         FastSpeedMode();
+        PlayAncientAmbientSound();
+        m_matchManager.LightUpMatch();
     }
 
     private void TargetObjectLost()
     {
+        if (!isObjectFound)
+            return;
+
+        isObjectFound = false;
         NormalSpeedMode();
+        PauseAncientAmbientSound();
+        m_matchManager.PutOutMatch();
+    }
+
+    private void PlayAncientAmbientSound()
+    {
+        source_AncientAmbient.Play();
+        source_AncientAmbient.source.DOFade(1f, 2f);
+    }
+
+    private void PauseAncientAmbientSound()
+    {
+        source_AncientAmbient.source.DOFade(0, 2f).OnComplete(() => {
+            if(!isObjectFound)
+                source_AncientAmbient.source.Pause();
+        });
+    }
+
+    private void StopAncientAmbientSound()
+    {
+        source_AncientAmbient.source.DOFade(0, 2f).OnComplete(() => {
+            source_AncientAmbient.Stop();
+        });
     }
 
     private void FastSpeedMode()

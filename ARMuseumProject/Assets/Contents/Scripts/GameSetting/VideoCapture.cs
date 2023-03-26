@@ -17,7 +17,7 @@ public class VideoCapture : MonoBehaviour
     void Start()
     {
         capture.gameObject.SetActive(enableVideoCapture);
-        previewer.SetActive(showPreviewer);
+        previewer.SetActive(enableVideoCapture && showPreviewer);
         isRecording = false;
     }
 

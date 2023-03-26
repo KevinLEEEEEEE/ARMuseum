@@ -15,6 +15,7 @@ Material:
   - _AD_EDGE_BASE_SOURCE_CUTOUT_GEOMETRIC
   - _AD_STATE_ENABLED
   - _NORMALMAP
+  - _SPECULARHIGHLIGHTS_OFF
   m_InvalidKeywords:
   - _AD_CUTOUT_GEOMETRIC_COUNT_ONE
   - _AD_CUTOUT_STANDARD_MAPS_MAPPING_TYPE_DEFAULT
@@ -190,7 +191,7 @@ Material:
     - _AdvancedDissolveCutoutBaseInvert: 0
     - _AdvancedDissolveCutoutClip: 0
     - _AdvancedDissolveCutoutGeometric1Height: 1
-    - _AdvancedDissolveCutoutGeometric1Radius: 0
+    - _AdvancedDissolveCutoutGeometric1Radius: 0.10095083
     - _AdvancedDissolveCutoutGeometric2Height: 1
     - _AdvancedDissolveCutoutGeometric2Radius: 1
     - _AdvancedDissolveCutoutGeometric3Height: 1
@@ -405,7 +406,7 @@ Material:
     - _Shininess: 0.7
     - _Smoothness: 0
     - _SmoothnessTextureChannel: 0
-    - _SpecularHighlights: 1
+    - _SpecularHighlights: 0
     - _SpecularMaskOffset: 0
     - _SrcBlend: 1
     - _StencilRef: 0
@@ -439,7 +440,7 @@ Material:
     m_Colors:
     - _AdvancedDissolveBakedKeywords: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric1Normal: {r: 0, g: 1, b: 0, a: 0}
-    - _AdvancedDissolveCutoutGeometric1Position: {r: 0, g: 0.3, b: 0, a: 0}
+    - _AdvancedDissolveCutoutGeometric1Position: {r: 1, g: 0.3, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric2Normal: {r: 1, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric2Position: {r: 0, g: 0, b: 0, a: 0}
     - _AdvancedDissolveCutoutGeometric3Normal: {r: 1, g: 0, b: 0, a: 0}
