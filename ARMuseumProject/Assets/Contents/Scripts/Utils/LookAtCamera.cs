@@ -16,14 +16,13 @@ public class LookAtCamera : MonoBehaviour
 
     void Update()
     {
+        Vector3 point = CenterAnchor.transform.position;
+
         if(lockY)
         {
-            Vector3 point = CenterAnchor.transform.position;
             point.y = transform.position.y;
-            transform.LookAt(2 * transform.position - point);
-        } else
-        {
-            transform.LookAt(2 * transform.position - CenterAnchor.transform.position);
-        }  
+        }
+
+        transform.LookAt(2 * transform.position - point);
     }
 }

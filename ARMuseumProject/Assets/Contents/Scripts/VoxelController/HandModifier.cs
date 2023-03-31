@@ -23,9 +23,8 @@ public class HandModifier : MonoBehaviour
     [SerializeField] private VoxelController voxelController;
     [SerializeField] private VoxelBoundary voxelBoundary;
     [SerializeField] private GameObject fingerTorchPrefab;
-    //[SerializeField] private GameObject fingerHitVisualizerPrefab;
-    [SerializeField] private float maxVisualDistance;
-    [SerializeField] private float minVisualDistance;
+    //[SerializeField] private float maxVisualDistance;
+    //[SerializeField] private float minVisualDistance;
     [SerializeField] private float addRadius;
     [SerializeField] private float subRadius;
     [SerializeField] private float defaultIDValue;
@@ -38,13 +37,10 @@ public class HandModifier : MonoBehaviour
     private readonly HandGesture addVoxelHandGesture = HandGesture.Point;
     private readonly HandEnum subVoxelHand = HandEnum.LeftHand;
     private readonly HandGesture subVoxelHandGesture = HandGesture.Point;
-    private readonly int layerMask = 1 << 13;
     private HandState addVoxelHandState;
     private HandState subVoxelHandState;
     private GameObject addFingerTorch;
     private GameObject subFingerTorch;
-    //private GameObject addVisualizer;
-    //private GameObject subVisualizer;
     private VoxelModifier modifier;
     private AudioGenerator audioSource_voxelOperation;
     private bool isFirstModify = true;
@@ -68,8 +64,6 @@ public class HandModifier : MonoBehaviour
 
         addFingerTorch = Instantiate(fingerTorchPrefab, transform);
         subFingerTorch = Instantiate(fingerTorchPrefab, transform);
-        //addVisualizer = Instantiate(fingerHitVisualizerPrefab, transform);
-        //subVisualizer = Instantiate(fingerHitVisualizerPrefab, transform);
 
         leftHandColliderEvent.triggerEnterListener += LeftIndexTipTrigger;
         rightHandColliderEvent.triggerEnterListener += RightIndexTipTrigger;
@@ -87,9 +81,7 @@ public class HandModifier : MonoBehaviour
         addPrePosition = Vector3.zero;
         subPrePosition = Vector3.zero;
 
-        //addVisualizer.SetActive(false);
         addFingerTorch.SetActive(false);
-        //subVisualizer.SetActive(false);
         subFingerTorch.SetActive(false);
     }
 
@@ -145,42 +137,6 @@ public class HandModifier : MonoBehaviour
         }
     }
 
-    //private Vector3[] GetSphereDirections(int numDirections)
-    //{
-    //    var pts = new Vector3[numDirections];
-    //    var inc = Mathf.PI * (3 - Mathf.Sqrt(5));
-    //    var off = 2f / numDirections;
-
-    //    foreach (var k in Enumerable.Range(0, numDirections))
-    //    {
-    //        var y = k * off - 1 + (off / 2);
-    //        var r = Mathf.Sqrt(1 - y * y);
-    //        var p = k * inc;
-    //        var x = (float)(Mathf.Cos(p) * r);
-    //        var z = (float)(Mathf.Sin(p) * r);
-    //        pts[k] = new Vector3(x, y, z);
-    //    }
-    //    return pts;
-    //}
-
-    //private NearestHitResult GenerateSphereRaycast(Vector3 pos, float distance, int mask)
-    //{
-    //    NearestHitResult result = new(false, new RaycastHit());
-
-    //    foreach (var direction in GetSphereDirections(360))
-    //    {
-    //        if (Physics.Raycast(pos, direction, out var hit, distance, mask))
-    //        {
-    //            if (!result.isHitted || hit.distance < result.hitResult.distance)
-    //            {
-    //                result = new NearestHitResult(true, hit);
-    //            }
-    //        }
-    //    }
-
-    //    return result;
-    //}
-
     private void UpdateFingerTorch(GameObject torch, Vector3 pos)
     {
         if (!torch.activeSelf)
@@ -190,26 +146,6 @@ public class HandModifier : MonoBehaviour
 
         torch.transform.position = pos;
     }
-
-    //private void UpdateHitVisualizer(GameObject visualizer, NearestHitResult result, bool isModifying)
-    //{
-    //    if(result.isHitted && result.hitResult.distance >= minVisualDistance && !isModifying)
-    //    {
-    //        if(visualizer.activeSelf)
-    //        {
-    //            visualizer.transform.position = Vector3.Lerp(visualizer.transform.position, result.hitResult.point, 0.05f);
-    //            visualizer.transform.forward = Vector3.Lerp(visualizer.transform.forward, result.hitResult.normal, 0.05f);
-    //        } else
-    //        {
-    //            visualizer.transform.position = result.hitResult.point;
-    //            visualizer.transform.forward = result.hitResult.normal;
-    //            visualizer.SetActive(true);
-    //        }
-    //    } else
-    //    {
-    //        visualizer.SetActive(false);
-    //    }
-    //}
 
     void Update()
     {
@@ -221,8 +157,6 @@ public class HandModifier : MonoBehaviour
         if (addVoxelHandState.currentGesture == addVoxelHandGesture)
         {
             Vector3 addPosition = addVoxelHandState.GetJointPose(HandJointID.IndexTip).position;
-            //NearestHitResult addResult = GenerateSphereRaycast(addPosition, maxVisualDistance, layerMask);
-            //UpdateHitVisualizer(addVisualizer, addResult, canAddVoxel);
             UpdateFingerTorch(addFingerTorch, addPosition);
 
             if (canAddVoxel)
@@ -234,19 +168,16 @@ public class HandModifier : MonoBehaviour
             }
 
             addPrePosition = addPosition;
-        } else if(canAddVoxel)
+        } else
         {
             canAddVoxel = false;
             addPrePosition = Vector3.zero;
-            //addVisualizer.SetActive(false);
             addFingerTorch.SetActive(false);
         }
 
         if (subVoxelHandState.currentGesture == subVoxelHandGesture)
         {
             Vector3 subPosition = subVoxelHandState.GetJointPose(HandJointID.IndexTip).position;
-            //NearestHitResult subResult = GenerateSphereRaycast(subPosition, maxVisualDistance, layerMask);
-            //UpdateHitVisualizer(subVisualizer, subResult, canSubVoxel);
             UpdateFingerTorch(subFingerTorch, subPosition);
 
             if (canSubVoxel)
@@ -257,11 +188,10 @@ public class HandModifier : MonoBehaviour
             }
 
             subPrePosition = subPosition;
-        } else if (canSubVoxel)
+        } else
         {
             canSubVoxel = false;
             subPrePosition = Vector3.zero;
-            //subVisualizer.SetActive(false);
             subFingerTorch.SetActive(false);
         }
 
@@ -275,3 +205,63 @@ public class HandModifier : MonoBehaviour
         }
     }
 }
+
+
+
+
+//private Vector3[] GetSphereDirections(int numDirections)
+//{
+//    var pts = new Vector3[numDirections];
+//    var inc = Mathf.PI * (3 - Mathf.Sqrt(5));
+//    var off = 2f / numDirections;
+
+//    foreach (var k in Enumerable.Range(0, numDirections))
+//    {
+//        var y = k * off - 1 + (off / 2);
+//        var r = Mathf.Sqrt(1 - y * y);
+//        var p = k * inc;
+//        var x = (float)(Mathf.Cos(p) * r);
+//        var z = (float)(Mathf.Sin(p) * r);
+//        pts[k] = new Vector3(x, y, z);
+//    }
+//    return pts;
+//}
+
+//private NearestHitResult GenerateSphereRaycast(Vector3 pos, float distance, int mask)
+//{
+//    NearestHitResult result = new(false, new RaycastHit());
+
+//    foreach (var direction in GetSphereDirections(360))
+//    {
+//        if (Physics.Raycast(pos, direction, out var hit, distance, mask))
+//        {
+//            if (!result.isHitted || hit.distance < result.hitResult.distance)
+//            {
+//                result = new NearestHitResult(true, hit);
+//            }
+//        }
+//    }
+
+//    return result;
+//}
+
+
+//private void UpdateHitVisualizer(GameObject visualizer, NearestHitResult result, bool isModifying)
+//{
+//    if(result.isHitted && result.hitResult.distance >= minVisualDistance && !isModifying)
+//    {
+//        if(visualizer.activeSelf)
+//        {
+//            visualizer.transform.position = Vector3.Lerp(visualizer.transform.position, result.hitResult.point, 0.05f);
+//            visualizer.transform.forward = Vector3.Lerp(visualizer.transform.forward, result.hitResult.normal, 0.05f);
+//        } else
+//        {
+//            visualizer.transform.position = result.hitResult.point;
+//            visualizer.transform.forward = result.hitResult.normal;
+//            visualizer.SetActive(true);
+//        }
+//    } else
+//    {
+//        visualizer.SetActive(false);
+//    }
+//}

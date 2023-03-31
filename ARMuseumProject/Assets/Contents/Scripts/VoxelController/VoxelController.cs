@@ -18,7 +18,7 @@ public class VoxelController : MonoBehaviour
     [SerializeField] private VoxelSaveSystem voxelSaveSystem;
     [SerializeField] private InteractionHint interactionHint_R;
     [SerializeField] private GameObject voxelBlock;
-    [SerializeField] private GameObject Menu;
+    [SerializeField] private GameObject menuRoot;
     [SerializeField] private AudioClip audioClip_voxelAppear;
     [SerializeField] private AudioClip audioClip_voxelScale;
 
@@ -29,7 +29,7 @@ public class VoxelController : MonoBehaviour
     private bool byteBufferSaved;
     private bool hasModified;
 
-    void Start()
+    void Awake()
     {
         animationComp = transform.GetComponent<Animation>();
         leanServer = transform.GetComponent<LeanServer>();
@@ -47,8 +47,14 @@ public class VoxelController : MonoBehaviour
     {
         byteBufferSaved = false;
         hasModified = false;
-        voxelBlock.SetActive(false);
-        Menu.SetActive(false);
+        menuRoot.SetActive(false);
+        SetRootsActive(false);
+    }
+
+    private void SetRootsActive(bool state)
+    {
+        foreach (Transform trans in transform)
+            trans.gameObject.SetActive(state);
     }
 
     public void Init()
@@ -64,7 +70,7 @@ public class VoxelController : MonoBehaviour
         audioSource_voxelAppear.Play();
 
         // 启动入场动画
-        voxelBlock.SetActive(true);
+        SetRootsActive(true);
         animationComp.Play("VoxelMoveIn");
 
         await UniTask.Delay(TimeSpan.FromSeconds(9), ignoreTimeScale: false);
@@ -72,11 +78,10 @@ public class VoxelController : MonoBehaviour
         // 关闭底部遮罩
         _gameController.HideGroundMask();
         
-
         // 启用手势交互与菜单
         handModifier.EnableModify();
         handRotator.EnableRotator();
-        Menu.SetActive(true);
+        menuRoot.SetActive(true);
 
         // 提示用户下一步操作
         interactionHint_R.StartHintLoop();
@@ -87,12 +92,12 @@ public class VoxelController : MonoBehaviour
     {
         handModifier.DisableModify();
         handRotator.DisableRotator();
-        Menu.SetActive(false);
+        menuRoot.SetActive(false);
 
-        // 如果编辑过，则存储数据，否则直接跳过存储环节
+        // 如果编辑过，则存储数据，否则跳过存储环节
         if(hasModified)
         {
-            // 将Voxel数据传送至服务器并等待数据传输完成
+            // 将Voxel数据传送至服务器并等待数据传输完成，防止卡顿
             SaveUserVoxel();
 
             await UniTask.WaitUntil(() => byteBufferSaved == true);

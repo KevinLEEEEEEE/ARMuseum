@@ -36,19 +36,20 @@ public class ShellController : MonoBehaviour
     private bool hasObjectDetectedBefore;
     private bool isObjectFound;
 
-    void Start()
+    void Awake()
     {
+        rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
+        leftHnadState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
         imageRecognition = transform.GetComponent<ImageRecognition>();
         cameraManager = transform.GetComponent<CameraManager>();
         animatorComp = transform.GetComponent<Animator>();
-        rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
-        leftHnadState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
 
         source_shellFadeIn = new AudioGenerator(gameObject, clip_shellFadeIn);
         source_shellBurning = new AudioGenerator(gameObject, clip_shellBurning, true, false, 0);
-        source_AncientAmbient = new AudioGenerator(gameObject, clip_AncientAmbient);
+        source_AncientAmbient = new AudioGenerator(gameObject, clip_AncientAmbient, true);
         source_shellCasting = new AudioGenerator(gameObject, clip_shellCasting);
-        source_shellCasting.source.pitch = 0.92f;
+        source_AncientAmbient.SetPinch(0.9f);
+        source_shellCasting.SetPinch(0.92f);
 
         Reset();
     }
@@ -58,23 +59,19 @@ public class ShellController : MonoBehaviour
         isObjectFound = false;
         canDetectObject = true;
         hasObjectDetectedBefore = false;
-        HideRoots();
+        SetRootsActive(false);
+        SetAnimatorEnable(false);
     }
 
-    private void ShowRoots()
-    {
-        foreach(Transform trans in transform)
-        {
-            trans.gameObject.SetActive(true);
-        }
-    }
-
-    private void HideRoots()
+    private void SetRootsActive(bool state)
     {
         foreach (Transform trans in transform)
-        {
-            trans.gameObject.SetActive(false);
-        }
+            trans.gameObject.SetActive(state);
+    }
+
+    private void SetAnimatorEnable(bool state)
+    {
+        animatorComp.enabled = state;
     }
 
     public void Init()
@@ -84,10 +81,11 @@ public class ShellController : MonoBehaviour
 
     private async void OpeningScene()
     {
-        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
 
         // 播放容器生成动画
-        ShowRoots();
+        SetRootsActive(true);
+        SetAnimatorEnable(true);
         source_shellFadeIn.Play();
         animatorComp.Play("ShellFadeIn");
 
@@ -103,14 +101,9 @@ public class ShellController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("划开火柴，加速炉温提升");
+        dialogGenerator.GenerateDialog("将炉温提升至浇筑温度");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
-
-        // 给出下一步操作提示
-        instructionGenerator.GenerateInstruction("划开火柴", "划开火柴「加速」炉温上升");
-
-        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
         // 启动蒙层，遮挡火焰底部
         _gameController.ShowGroundMask();
@@ -119,6 +112,11 @@ public class ShellController : MonoBehaviour
         animatorComp.Play("ShellBurning");
         source_shellBurning.Play();
         source_shellBurning.SetVolumeInSeconds(0.2f, 15);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
+
+        // 给出下一步操作提示
+        instructionGenerator.GenerateInstruction("划开火柴", "划开火柴可以「加速」升温");
 
         // 启动物体识别服务
         StartObjectDetectionLoop();
@@ -130,8 +128,6 @@ public class ShellController : MonoBehaviour
         {
             if (rightHandState.isPinching || leftHnadState.isPinching)
             {
-                NRDebugger.Info("[ShellController] Detected pinch gesture, start taking photo.");
-
                 if(lockToBurningState)
                 {
                     TargetObjectFound();
@@ -161,8 +157,7 @@ public class ShellController : MonoBehaviour
         m_matchManager.PutOutMatch();
         StopAncientAmbientSound();
 
-        // 恢复光源
-        _gameController.SetAmbientLightInSeconds(1.5f, 7);
+        // 恢复skebox环境光，但不需要恢复ambientlight，下一个章节不需要该光源
         _gameController.SetEnvLightIntensityInSeconds(1.3f, 7);
 
         source_shellBurning.SetVolumeInSeconds(0, 6);
@@ -250,20 +245,20 @@ public class ShellController : MonoBehaviour
     private void PlayAncientAmbientSound()
     {
         source_AncientAmbient.Play();
-        source_AncientAmbient.source.DOFade(1f, 2f);
+        source_AncientAmbient.SetVolumeInSeconds(1, 2);
     }
 
     private void PauseAncientAmbientSound()
     {
-        source_AncientAmbient.source.DOFade(0, 2f).OnComplete(() => {
+        source_AncientAmbient.SetVolumeInSeconds(0, 2).OnComplete(() => {
             if(!isObjectFound)
-                source_AncientAmbient.source.Pause();
+                source_AncientAmbient.Pause();
         });
     }
 
     private void StopAncientAmbientSound()
     {
-        source_AncientAmbient.source.DOFade(0, 2f).OnComplete(() => {
+        source_AncientAmbient.SetVolumeInSeconds(0, 2).OnComplete(() => {
             source_AncientAmbient.Stop();
         });
     }

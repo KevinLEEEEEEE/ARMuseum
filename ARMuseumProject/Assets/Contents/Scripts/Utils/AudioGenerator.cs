@@ -19,6 +19,11 @@ public class AudioGenerator
         _minVolume = minVolume;
     }
 
+    public void SetPinch(float pinch)
+    {
+        source.pitch = pinch;
+    }
+
     public void SetClip(AudioClip clip)
     {
         source.clip = clip;
@@ -40,6 +45,14 @@ public class AudioGenerator
         }
     }
 
+    public void Pause()
+    {
+        if (source.isPlaying)
+        {
+            source.Pause();
+        }
+    }
+
     public float GetVolume()
     {
         return source.volume;
@@ -50,13 +63,15 @@ public class AudioGenerator
         source.volume = GetTargetVolume(volume);
     }
 
-    public void SetVolumeInSeconds(float volume, float duration)
+    public Tween SetVolumeInSeconds(float volume, float duration)
     {
         if (tween != null) tween.Kill();
 
         tween = source.DOFade(GetTargetVolume(volume), duration).OnComplete(() => {
             tween = null;
         });
+
+        return tween;
     }
 
     public void Unload()

@@ -1,0 +1,214 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: RustMetal_Transition
+  m_Shader: {fileID: 4800000, guid: 116bb39ade638cc45b43193fe708c56a, type: 3}
+  m_ValidKeywords:
+  - _EMISSION
+  m_InvalidKeywords: []
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 1
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ColorMap:
+        m_Texture: {fileID: 2800000, guid: 18123660e6ff18243835569bc8f36bf9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlobalOpacity:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GrungeMap:
+        m_Texture: {fileID: 2800000, guid: 1f3eb13fefd1a2346bc3476bcfd24a4c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GrungeMap2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L1ColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L1EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L1MetallicRustDustSmoothness:
+        m_Texture: {fileID: 2800000, guid: 99d26454ff6a8ff498e49c9a4553621f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L1Normal:
+        m_Texture: {fileID: 2800000, guid: ff351f7948b9bda4e9df926e15de2fe8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L2ColorMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L2EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L2MetallicRustDustSmoothness:
+        m_Texture: {fileID: 2800000, guid: 99d26454ff6a8ff498e49c9a4553621f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _L2Normal:
+        m_Texture: {fileID: 2800000, guid: ff351f7948b9bda4e9df926e15de2fe8, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MaterialMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicRustDustSmoothness:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Normal:
+        m_Texture: {fileID: 2800000, guid: 1ddfb2191a15c144fa34d5547768d20a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RustColor:
+        m_Texture: {fileID: 2800000, guid: 0a77c99d3ea79104799243ae7b56a34a, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RustColorStatic:
+        m_Texture: {fileID: 2800000, guid: de2102009f96020469039a912c292e62, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _RustNormal:
+        m_Texture: {fileID: 2800000, guid: cab3e7ce8db9abb44babb8121dca8cd6, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample9:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _texcoord:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BumpScale: 1
+    - _Cutoff: 0.5
+    - _DetailNormalMapScale: 1
+    - _DirtContrast: 4.5
+    - _DirtIntensity: 0
+    - _DirtLevel: 0.9
+    - _DirtMaskWeight: 0
+    - _DstBlend: 0
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
+    - _Keyword0: 0
+    - _L1DirtContrast: 0.84
+    - _L1DirtIntensity: 0.96
+    - _L1DirtLevel: 1
+    - _L1DirtMaskTiling: 1
+    - _L1DirtMaskWeight: 0.583
+    - _L1EmissionIntensity: 0
+    - _L1Metallic: 1
+    - _L1RustContrast: 2.52
+    - _L1RustIntensity: 0.83
+    - _L1RustMaskTiling: 1
+    - _L1RustMaskWeight: 1
+    - _L1RustSecondPattern: 0
+    - _L1RustTiling: 6
+    - _L1Smoothness: 0.947
+    - _L2DirtContrast: 1.73
+    - _L2DirtIntensity: 1.2
+    - _L2DirtLevel: 1
+    - _L2DirtMaskTiling: 1
+    - _L2DirtMaskWeight: 1
+    - _L2EmissionIntensity: 0
+    - _L2Metallic: 1
+    - _L2RustContrast: 1.28
+    - _L2RustIntensity: 4.01
+    - _L2RustMaskTiling: 6.59
+    - _L2RustMaskWeight: 1
+    - _L2RustSecondPattern: 1.29
+    - _L2RustTiling: 7
+    - _L2Smoothness: 0.569
+    - _MaterialMaskContrast: 1
+    - _MaterialMaskIntensity: 1
+    - _Metallic: 0.887
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Opacity: 1
+    - _Parallax: 0.02
+    - _RustContrast: 1
+    - _RustIntensity: 2
+    - _RustMaskTiling: 5
+    - _RustMaskWeight: 0.575
+    - _RustSecondPattern: 2
+    - _RustTiling: 1
+    - _Smoothness: 0.8
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _UVSec: 0
+    - _VertexColorWeight: 1
+    - _ZWrite: 1
+    - __dirty: 1
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _DirtColor: {r: 0.18867922, g: 0.13671799, b: 0.087931626, a: 0}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _EmissionColor1: {r: 0, g: 0, b: 0, a: 0}
+    - _L1Color: {r: 0, g: 0, b: 0, a: 0}
+    - _L1DirtColor: {r: 0.29699996, g: 0.26958176, b: 0.21057296, a: 0}
+    - _L1EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+    - _L2Color: {r: 0.09861588, g: 0.16713691, b: 0.4191176, a: 0}
+    - _L2DirtColor: {r: 0.29699996, g: 0.26958176, b: 0.21057296, a: 0}
+    - _L2EmissionColor: {r: 0, g: 0, b: 0, a: 0}
+  m_BuildTextureStacks: []

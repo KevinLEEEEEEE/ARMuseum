@@ -2,142 +2,147 @@ using Cysharp.Threading.Tasks;
 using NRKernal;
 using System;
 using UnityEngine;
+using UnityEngine.Video;
+using AmazingAssets.AdvancedDissolve;
+using DG.Tweening;
 
-public enum SpeedMode
+public enum ClockState
 {
-    Normal,
-    Accelerated,
+    Stop,
+    Pause,
+    Playing,
+    Fading,
 }
 
 public class ClockController : MonoBehaviour
 {
-    public DateMessageListener dateMessageListener;
-    public SpeedModeListener speedModeListener;
-    public LoadEventListener loadEventListener;
-    public UnloadEventListener unloadEventListener;
-    public StartEventListener startEventListener;
-    public StopEventListener stopEventListener;
-
-    [SerializeField] private GameController_Historical _gameController;
-    [SerializeField] private DialogGenerator _dialogGenerator;
-    [SerializeField] private InstructionGenerator _instructionGenerator;
-    [SerializeField] private int startDate;
-    [SerializeField] private int endDate;
-    [SerializeField] private int normalTimeSpan; // 常规速度下走完全程所需时间(秒)
-    [SerializeField] private int acceleratedTimeSpan; // 加速状态下走完全程所需时间(秒)
+    [SerializeField] private GameController_Historical m_gameController;
+    [SerializeField] private DialogGenerator m_dialogGenerator;
+    [SerializeField] private InstructionGenerator m_instructionGenerator;
+    [SerializeField] private AdvancedDissolvePropertiesController m_DissolveController;
+    [SerializeField] private GameObject fractureRoot;
+    [SerializeField] private RenderTexture renderTexComp;
+    [SerializeField] private VideoPlayer videoPlayerComp;
+    [SerializeField] private AudioSource audioSourceComp;
 
     private HandState rightHandState;
     private HandState leftHandState;
-    private int DateDuration
-    {
-        get
-        {
-            return endDate - startDate;
-        }
-    }
-    private float currentTime;
-    private int currentTimeSpan;
-    private bool canLoop;
+    private Animator animatorComp;
+    private ClockState state;
+    private float defaultVolume;
 
-    void Start()
+    void Awake()
     {
         rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
         leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
+        animatorComp = transform.GetComponent<Animator>();
 
         Reset();
     }
 
     public void Reset()
     {
-        canLoop = true;
-        currentTime = 0;
-        currentTimeSpan = normalTimeSpan;
+        state = ClockState.Stop;
+        defaultVolume = audioSourceComp.volume;
+        renderTexComp.Release();
+
+        SetRootsActive(false);
+        SetAnimatorEnable(false);
+    }
+
+    private void SetRootsActive(bool state)
+    {
+        foreach (Transform trans in transform)
+            trans.gameObject.SetActive(state);
+    }
+
+    private void SetAnimatorEnable(bool state)
+    {
+        animatorComp.enabled = state;
     }
 
     public async void Init()
     {
-        loadEventListener?.Invoke();
+        await UniTask.NextFrame();
 
-        // 动画等待两秒，舒缓节奏
+        SetRootsActive(true);
+        SetAnimatorEnable(true);
+
+        m_dialogGenerator.GenerateDialog("它见证了华夏文明的历程");
+
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
+
+        m_instructionGenerator.GenerateInstruction("握拳暂停", "伸手握拳「暂停」\n松开拳头「恢复」", 5);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(6.5), ignoreTimeScale: false);
+
+        state = ClockState.Playing;
+        videoPlayerComp.Play();
+        animatorComp.Play("ClockFadeIn");
+    }
+
+    public async void ClockFadeInComplete()
+    {
+        state = ClockState.Stop;
+
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
-        _dialogGenerator.GenerateDialog("它将从远古穿越至今");
+        m_dialogGenerator.GenerateDialog("青铜时代的光辉已然暗淡");
+        m_gameController.SetEnvLightIntensityInSeconds(0.2f, 7f);
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
-        BeginScene();
+        m_dialogGenerator.GenerateDialog("亘古的记忆化为尘土");
+        animatorComp.Play("ClockFadeOut");
+
+        // 1s后碎块逐渐消散
+        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
+
+        DOTween.To((t) =>
+        {
+            m_DissolveController.cutoutStandard.clip = t;
+        }, 0, 1, 6);
+    }
+
+    public async void ClockFadeOutComplete()
+    {
+        m_gameController.NextScene();
 
         await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
-        _instructionGenerator.GenerateInstruction("目标：公元2023年", "握拳可以「加速」时间\n松开拳头「恢复」流速", 8);
+        // 等待粒子消散
+        Reset();
     }
 
-    private async void BeginScene()
+    private void Update()
     {
-        startEventListener?.Invoke();
-
-        while(canLoop)
+        if(state != ClockState.Stop && state != ClockState.Fading)
         {
-            await UniTask.NextFrame();
-
-            UpdateTime();
-            UpdateSpeed();  
-        }
-
-        speedModeListener?.Invoke(SpeedMode.Normal);
-        stopEventListener?.Invoke();
-
-        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
-
-        _dialogGenerator.GenerateDialog("历经四千五百年岁月");
-
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
-
-        unloadEventListener?.Invoke();
-        _gameController.NextScene();
-    }
-
-    private void UpdateTime()
-    {
-        currentTime += Time.deltaTime * (DateDuration / currentTimeSpan);
-
-        if (currentTime >= DateDuration)
-        {
-            canLoop = false;
-        }
-
-        int date = Mathf.FloorToInt(currentTime + startDate);
-        float progress = currentTime / DateDuration;
-
-        dateMessageListener?.Invoke(Mathf.Min(date, endDate), Mathf.Min(progress, 1));
-    }
-
-    private void UpdateSpeed()
-    {
-        bool accelerateCondition = rightHandState.currentGesture == HandGesture.Grab || leftHandState.currentGesture == HandGesture.Grab;
-
-        if(accelerateCondition)
-        {
-            if(currentTimeSpan != acceleratedTimeSpan)
+            if(leftHandState.currentGesture == HandGesture.Grab || rightHandState.currentGesture == HandGesture.Grab)
             {
-                currentTimeSpan = acceleratedTimeSpan;
-                speedModeListener?.Invoke(SpeedMode.Accelerated);
-                _instructionGenerator.HideInstruction();
-            }  
-        } else
-        {
-            if(currentTimeSpan != normalTimeSpan)
+                if(state == ClockState.Playing)
+                {
+                    state = ClockState.Fading;
+                    audioSourceComp.DOFade(0, 0.5f).OnComplete(() =>
+                    {
+                        state = ClockState.Pause;
+                        videoPlayerComp.Pause();
+                        animatorComp.speed = 0;
+                    });
+                }
+            } else
             {
-                currentTimeSpan = normalTimeSpan;
-                speedModeListener?.Invoke(SpeedMode.Normal);
-            } 
+                if (state == ClockState.Pause)
+                {
+                    state = ClockState.Fading;
+                    videoPlayerComp.Play();
+                    animatorComp.speed = 1;
+                    audioSourceComp.DOFade(defaultVolume, 1).OnComplete(() =>
+                    {
+                        state = ClockState.Playing;
+                    });
+                }
+            }
         }
     }
-
-    public delegate void DateMessageListener(int date, float progress);
-    public delegate void SpeedModeListener(SpeedMode mode);
-    public delegate void StartEventListener();
-    public delegate void StopEventListener();
-    public delegate void LoadEventListener();
-    public delegate void UnloadEventListener();
 }
