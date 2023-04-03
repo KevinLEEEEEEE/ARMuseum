@@ -1,131 +1,73 @@
+using NRKernal;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NRKernal;
 
 public class GrabbablePanel : MonoBehaviour
 {
-    public ExhibitsPanel exhibitsPanel;
-    public GameController gameController;
-    public AudioClip GrabStart;
-    public AudioClip GrabEnd;
-    public AudioClip SelectExhibit;
-    public AudioClip DeleteExhibit;
-    public AudioClip OpenOrb;
-    public AudioClip CloseOrb;
+    [SerializeField] private ExhibitsPanel exhibitsPanel;
+    [SerializeField] private GameController gameController;
+    [SerializeField] private GrabbableExhibit[] grabbableExhibitsList;
+    [SerializeField] private AudioClip grabStartClip;
+    [SerializeField] private AudioClip grabEndClip;
+    [SerializeField] private AudioClip deleteExhibitClip;
 
-    private AudioSource AudioPlayer;
-    private GrabbableState state = GrabbableState.Default;
-    private enum GrabbableState
+    private AudioGenerator grabStartPlayer;
+    private AudioGenerator grabEndPlayer;
+    private AudioGenerator deleteExhibitPlayer;
+
+    void Awake()
     {
-        Default,
-        Grab, // 在Grab期间通知画布不检测raycast避免误触
-        ShowOrbs,
-    }
+        grabStartPlayer = new AudioGenerator(gameObject, grabStartClip);
+        grabEndPlayer = new AudioGenerator(gameObject, grabEndClip);
+        deleteExhibitPlayer = new AudioGenerator(gameObject, deleteExhibitClip);
+        gameController.EndTourEvent += Reset;
 
-    void Start()
-    {
-        AudioPlayer = transform.GetComponent<AudioSource>();
-        gameController.EndTourEvent += ResetAll;
-
-        ResetAll();
-    }
-
-    // 整合进orb-prefab
-    public void OpenOrbMessage()
-    {
-        PlaySound(OpenOrb);
-    }
-
-    public void CloseOrbMessage()
-    {
-        PlaySound(CloseOrb);
-    }
-
-    public void ActiveGrabbableItem(GameObject obj)
-    {
-        Transform targetObject = transform.Find(obj.name);
-
-        targetObject.gameObject.SetActive(true);
-        targetObject.GetComponent<GrabbableExhibit>().MoveToDestinationFrom(obj.transform.GetChild(0));
-        PlaySound(SelectExhibit);
-    }
-
-    public void InactiveGrabbleItem(GameObject obj)
-    {
-        obj.SetActive(false);
-        PlaySound(DeleteExhibit);
-        exhibitsPanel.ActiveExhibit(obj.transform.name);
-    }
-
-    private void PlaySound(AudioClip clip)
-    {
-        AudioPlayer.clip = clip;
-        AudioPlayer.Play();
-    }
-
-    private void ShowOrbs()
-    {
-        foreach(Transform child in transform)
+        foreach (GrabbableExhibit exhibit in grabbableExhibitsList)
         {
-            child.gameObject.GetComponent<GrabbableExhibit>().ShowOrbs();
+            exhibit.grabBeginEvent += GrabBeginEventHandler;
+            exhibit.grabEndEvent += GrabEndEventHandler;
+        }
+
+        Reset();
+    }
+
+    private void Reset()
+    {
+        foreach(GrabbableExhibit exhibit in grabbableExhibitsList)
+        { 
+            exhibit.Reset();
         }
     }
 
-    private void HideOrbs()
+    public void EnableGrabbaleExhibit(string id, Transform trans)
     {
-        foreach (Transform child in transform)
+        foreach(GrabbableExhibit exhibit in grabbableExhibitsList)
         {
-            child.gameObject.GetComponent<GrabbableExhibit>().HideOrbs();
+            if(exhibit.exhibitID == id)
+            {
+                exhibit.EnableGrabbableExhibit();
+                exhibit.MoveToDestinationFrom(trans);
+                return;
+            }
         }
     }
 
-    public void StartGrab()
+    public void InactiveGrabbleItem()
     {
+        deleteExhibitPlayer.Play();
+        exhibitsPanel.ResumeExhibitPanel();
+    }
+
+    private void GrabBeginEventHandler()
+    {
+        grabStartPlayer.Play();
         gameController.GrabStart();
-        PlaySound(GrabStart);
     }
 
-    public void StopGrab()
+    private void GrabEndEventHandler()
     {
+        grabEndPlayer.Play();
         gameController.GrabEnd();
-        PlaySound(GrabEnd);
-    }
-
-    public void ResetAll()
-    {
-        foreach(Transform child in transform)
-        {
-            child.gameObject.SetActive(false);
-        }
-
-        state = GrabbableState.Default;
-    }
-
-    private void Update()
-    {
-        HandState RightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
-        HandState LeftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
-
-        if(!RightHandState.isTracked && !LeftHandState.isTracked)
-        {
-            return;
-        }
-
-        if(RightHandState.currentGesture == HandGesture.Point || LeftHandState.currentGesture == HandGesture.Point)
-        {
-            if(state != GrabbableState.ShowOrbs)
-            {
-                ShowOrbs();
-                state = GrabbableState.ShowOrbs;
-            }
-        } else
-        {
-            if(state != GrabbableState.Default)
-            {
-                HideOrbs();
-                state = GrabbableState.Default;
-            }
-        }
     }
 }

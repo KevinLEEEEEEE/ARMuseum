@@ -6,6 +6,6 @@ public class ExhibitMesh : MonoBehaviour
 {
     public void FinishInitializingAnimation()
     {
-        SendMessageUpwards("FinishInitializingObject");
+        //SendMessageUpwards("FinishInitializingObject");
     }
 }

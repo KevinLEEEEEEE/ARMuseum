@@ -9,50 +9,40 @@ using Cysharp.Threading.Tasks;
 
 public class GameController : MonoBehaviour
 {
-    public SceneIndexUpdateEvent sceneIndexUpdateEvent;
-
     [SerializeField] private VideoCapture m_videoCapture;
     [SerializeField] private InstructionGenerator m_InstructionGenerator;
     [SerializeField] private DialogGenerator m_DialogGenerator;
-
-    [SerializeField]
-    [FormerlySerializedAs("Observer")]
-    private TrackableObserver observer;
-
-    [SerializeField]
-    [FormerlySerializedAs("TrackingItemList")]
-    private Transform[] FollowTrackerList;
+    [SerializeField] private TrackableObserver observer;
+    [SerializeField] private Transform observerFollower;
+    [SerializeField] AudioClip audioClip_CurrentEntry;
 
     public event Action FoundObserverEvent;
     public event Action LostObserverEvent;
-    public event Action StartRaycastEvent;
-    public event Action StopRaycastEvent;
     public event Action BeginTourEvent;
     public event Action EndTourEvent;
 
+    private AudioGenerator audioSource_CurrentEntry;
     private bool isTracking = false;
     private bool isGrabbing = false;
+    private bool isTouring = false;
     private bool firstFound = true;
     private bool firstTour = true;
 
-    void Start()
+    void Awake()
     {
+        audioSource_CurrentEntry = new AudioGenerator(gameObject, audioClip_CurrentEntry);
+
         observer.FoundEvent += Found;
         observer.LostEvent += Lost;
-
-        PlayerData.Scene2Entry++;
 
         m_videoCapture.StartRecord();
     }
 
     private void Found(Vector3 pos, Quaternion qua)
     {
-        foreach(Transform trans in FollowTrackerList)
-        {
-            trans.SetPositionAndRotation(pos, qua);
-        }
+        observerFollower.SetPositionAndRotation(pos, qua);
 
-        if(!isTracking)
+        if (!isTracking)
         {
             FoundObserverEvent?.Invoke();
             isTracking = true;
@@ -64,11 +54,15 @@ public class GameController : MonoBehaviour
     private async void FirstFound()
     {
         firstFound = false;
+        audioSource_CurrentEntry.Play();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(8), ignoreTimeScale: false);
 
-        m_DialogGenerator.GenerateDialog("看向展板...开始探索");
-        
+        // 到特定节点仍然未开启展板
+        if(firstTour)
+        {
+            m_InstructionGenerator.GenerateInstruction("开始探索", "激活「开始探索」按钮，查看更多内容");
+        }
     }
 
     private void Lost()
@@ -80,27 +74,26 @@ public class GameController : MonoBehaviour
         }
     }
 
-    public void BeginTour()
+    public void ToggleTourState()
     {
-        BeginTourEvent?.Invoke();
-
-        if(firstTour) FirstTour();
+        if(!isTouring)
+        {
+            isTouring = true;
+            if (firstTour) 
+                FirstTour();
+            BeginTourEvent?.Invoke();
+        } else
+        {
+            isTouring = false;
+            m_videoCapture.StopRecord();
+            EndTourEvent?.Invoke();
+        }
     }
 
-    private async void FirstTour()
+    private void FirstTour()
     {
         firstTour = false;
         m_InstructionGenerator.HideInstruction();
-
-        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
-
-        m_InstructionGenerator.GenerateInstruction("探索更多", "伸手指向展品，「捏」一下", 10);
-    }
-
-    public void EndTour()
-    {
-        m_videoCapture.StopRecord();
-        EndTourEvent?.Invoke();
     }
 
     public void GrabStart()
@@ -113,44 +106,22 @@ public class GameController : MonoBehaviour
         isGrabbing = false;
     }
 
-    public async void LoadMainScene()
+    public void LoadMenuScene()
     {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("BeginScene");
-        asyncLoad.allowSceneActivation = false;
-
-        while (!asyncLoad.isDone)
-        {
-            if (asyncLoad.progress >= 0.9f)
-            {
-                asyncLoad.allowSceneActivation = true;
-            }
-
-            await UniTask.Yield();
-        }
+        SceneManager.LoadSceneAsync("BeginScene");
     }
 
     private void Update()
     {
         HandState rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
         HandState leftHandState = NRInput.Hands.GetHandState(HandEnum.LeftHand);
-        bool canRaycast = true;
 
-        // Stop raycast detection when grabbing or pointing
         if (isGrabbing || rightHandState.currentGesture == HandGesture.Point || leftHandState.currentGesture == HandGesture.Point)
         {
-            canRaycast = false;
-        }
-
-        if(NRInput.LaserVisualActive && !canRaycast)
+            NRInput.LaserVisualActive = false;
+        } else
         {
-            StopRaycastEvent?.Invoke();
-            NRInput.LaserVisualActive = canRaycast;
-        } else if (!NRInput.LaserVisualActive && canRaycast)
-        {
-            StartRaycastEvent?.Invoke();
-            NRInput.LaserVisualActive = canRaycast;
+            NRInput.LaserVisualActive = true;
         }
     }
-
-    public delegate void SceneIndexUpdateEvent(int index);
 }

@@ -19,6 +19,11 @@ public class AudioGenerator
         _minVolume = minVolume;
     }
 
+    public bool IsPlaying()
+    {
+        return source.isPlaying;
+    }
+
     public void SetPinch(float pinch)
     {
         source.pitch = pinch;

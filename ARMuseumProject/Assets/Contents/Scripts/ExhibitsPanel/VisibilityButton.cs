@@ -39,8 +39,8 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
         animator = transform.GetComponent<Animation>();
         root = transform.GetChild(0);
 
-        gameController.StartRaycastEvent += StartRaycastDetection;
-        gameController.StopRaycastEvent += StopRayastDetection;
+        //gameController.StartRaycastEvent += StartRaycastDetection;
+        //gameController.StopRaycastEvent += StopRayastDetection;
         gameController.FoundObserverEvent += Found;
 
         interactionHint.gameObject.SetActive(true);
@@ -64,13 +64,13 @@ public class VisibilityButton : MonoBehaviour, IPointerClickHandler, IPointerDow
         {
             spriteRendererComp.sprite = invisibleSprite;
             textMeshComp.text = invisibleText;
-            gameController.BeginTour();
+            //gameController.BeginTour();
         }
         else
         {
             spriteRendererComp.sprite = visibleSprite;
             textMeshComp.text = visibleText;
-            gameController.EndTour();
+            //gameController.EndTour();
         }
     }
 

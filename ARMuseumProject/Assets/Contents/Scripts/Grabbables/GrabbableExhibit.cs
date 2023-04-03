@@ -3,88 +3,127 @@ using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
 using DG.Tweening;
+using Cysharp.Threading.Tasks;
+using System;
 
 public class GrabbableExhibit : MonoBehaviour
 {
-    [SerializeField] private OrbButton deleteOrb;
-    [SerializeField] private GameObject mesh;
-    [SerializeField] private GameObject Orbs;
-    [SerializeField] private Material emissiveMaterial;
-    private Transform CenterAnchor
-    {
-        get
-        {
-            return NRSessionManager.Instance.CenterCameraAnchor;
-        }
-    }
+    public string exhibitID;
+    public GrabBeginEvent grabBeginEvent;
+    public GrabEndEvent grabEndEvent;
 
-    private void Start()
+    [SerializeField] private OrbButton deleteOrb;
+    [SerializeField] private OrbButton toggleOrb;
+    [SerializeField] private MeshRenderer rendererComp;
+    [SerializeField] private AudioClip exhibitIntroductionClip;
+    [SerializeField] private bool playOnEnabled = false;
+
+    private NRGrabbableObject m_NRGrabbableObject;
+    private AudioGenerator exhibitIntroductionPlayer;
+    private Collider colliderComp;
+    private GameObject root;
+
+    private void Awake()
     {
+        root = transform.GetChild(0).gameObject;
+        colliderComp = transform.GetComponent<Collider>();
+        m_NRGrabbableObject = transform.GetComponent<NRGrabbableObject>();
+        exhibitIntroductionPlayer = new AudioGenerator(gameObject, exhibitIntroductionClip, false, false, 0);
+
         deleteOrb.orbButtonStartEvent += DeleteStart;
         deleteOrb.orbButtonStopEvent += DeleteStop;
         deleteOrb.orbButtonFinishEvent += DeleteComplete;
+        toggleOrb.orbButtonFinishEvent += () => TogglePlayMode();
+        m_NRGrabbableObject.OnGrabBegan += GrabBeginEventHandler;
+        m_NRGrabbableObject.OnGrabEnded += GrabEndEventHandler;
     }
 
-    private void OnEnable()
+    public void Reset()
     {
-        ResetAll();
+        DisableGrabbableExhibit();
     }
 
-    public void ResetAll()
+    private void GrabBeginEventHandler()
     {
-        HideOrbs();
-        DeleteStop();
+        grabBeginEvent?.Invoke();
+        deleteOrb.DisableButton();
+        toggleOrb.DisableButton();
+    }
+
+    private void GrabEndEventHandler()
+    {
+        grabEndEvent?.Invoke();
+        deleteOrb.EnableButton();
+        toggleOrb.EnableButton();
+    }
+
+    public void EnableGrabbableExhibit()
+    {
+        deleteOrb.EnableButton();
+        toggleOrb.EnableButton();
+        colliderComp.enabled = true;
+        root.SetActive(true);
+
+        if (playOnEnabled)
+            TogglePlayMode(2, 2);
+    }
+
+    public void DisableGrabbableExhibit()
+    {
+        deleteOrb.DisableButton();
+        toggleOrb.DisableButton();
+        colliderComp.enabled = false;
+        root.SetActive(false);
+        exhibitIntroductionPlayer.Stop();
+    }
+
+    private async void TogglePlayMode(float delay = 0, float duration = 2)
+    {
+        await UniTask.Delay(TimeSpan.FromSeconds(delay), ignoreTimeScale: false);
+
+        if (exhibitIntroductionPlayer.IsPlaying())
+        {
+            exhibitIntroductionPlayer.Pause();
+        } else
+        {
+            exhibitIntroductionPlayer.Play();
+            exhibitIntroductionPlayer.SetVolumeInSeconds(1, duration);     
+        }
     }
 
     public void DeleteStart()
     {
-        emissiveMaterial.EnableKeyword("_EMISSION");
-
+        rendererComp.material.EnableKeyword("_EMISSION");
         DOTween.To((p) =>
         {
-            emissiveMaterial.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * p);
-        }, 2.5f, 0, 0.6f);
+            rendererComp.material.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * p);
+        }, 2.5f, 0, 1f);
     }
 
     public void DeleteStop()
     {
-        emissiveMaterial.DisableKeyword("_EMISSION");
-        emissiveMaterial.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * 2.5f);
+        rendererComp.material.DisableKeyword("_EMISSION");
+        rendererComp.material.SetColor("_EmissionColor", new Color(0.2f, 0, 0) * 2.5f);
     }
 
     public void DeleteComplete()
     {
         DeleteStop();
-        SendMessageUpwards("InactiveGrabbleItem", transform.gameObject);
-
-    }
-
-    public void ShowOrbs()
-    {
-        foreach (Transform child in Orbs.transform)
-        {
-            child.gameObject.SetActive(true);
-        }
-    }   
-
-    public void HideOrbs()
-    {
-        foreach (Transform child in Orbs.transform)
-        {
-            child.gameObject.SetActive(false);
-        }
+        DisableGrabbableExhibit();
+        SendMessageUpwards("InactiveGrabbleItem");
     }
 
     public void MoveToDestinationFrom(Transform point)
     {
-        Vector3 startPoint = point.position;
-        Vector3 endPoint = CenterAnchor.position + CenterAnchor.forward * 0.4f;
+        Transform centerAnchor = NRSessionManager.Instance.CenterCameraAnchor;
 
-        StartCoroutine(.4f.Tweeng((p) => {
-            transform.position = p;
-            transform.LookAt(2 * transform.position - CenterAnchor.transform.position);
-        }, startPoint, endPoint));
+        transform.position = point.position;
+        transform.LookAt(2 * transform.position - centerAnchor.position);
+        transform.DOLocalMove(centerAnchor.position + centerAnchor.forward * 0.45f, 0.5f);
     }
+
+    public delegate void GrabBeginEvent();
+    public delegate void GrabEndEvent();
 }
 
 

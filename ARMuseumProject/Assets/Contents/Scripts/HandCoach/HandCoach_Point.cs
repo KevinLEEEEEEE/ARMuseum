@@ -18,7 +18,7 @@ public class HandCoach_Point : MonoBehaviour
 
     private void Start()
     {
-        gameController.StopRaycastEvent += GrabStart;
+        //gameController.StopRaycastEvent += GrabStart;
     }
 
     public void StartHintLoop()

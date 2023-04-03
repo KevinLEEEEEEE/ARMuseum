@@ -37,7 +37,7 @@ public class OrbButton : MonoBehaviour
     private HandState triggeredHand;
     private Tween triggeredTween;
 
-    private void Start()
+    private void Awake()
     {
         audioSource_startActivation = new AudioGenerator(gameObject, audioClip_startActivation);
         audioSource_stopActivation = new AudioGenerator(gameObject, audioClip_stopActivation);
@@ -59,8 +59,10 @@ public class OrbButton : MonoBehaviour
         isTriggered = false;
         triggeredHand = null;
         triggeredTween = null;
-        textMeshComp.text = textBeforeActivation;
         UpdateProgress(0);
+        textMeshComp.text = textBeforeActivation; 
+        colliderComp.radius = defaultColliderRadius;
+        orbMesh.transform.localScale = defaultLocalScale;
     }
 
     public void EnableButton()

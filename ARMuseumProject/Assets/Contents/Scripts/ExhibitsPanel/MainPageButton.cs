@@ -20,8 +20,8 @@ public class MainPageButton : MonoBehaviour, IPointerClickHandler, IPointerDownH
         meshRendererComp = transform.GetComponent<MeshRenderer>();
         animatorComp = transform.GetComponent<Animation>();
 
-        m_gameController.StartRaycastEvent += StartRaycastDetection;
-        m_gameController.StopRaycastEvent += StopRayastDetection;
+        //m_gameController.StartRaycastEvent += StartRaycastDetection;
+        //m_gameController.StopRaycastEvent += StopRayastDetection;
 
         root = transform.GetChild(0);
 
@@ -57,7 +57,7 @@ public class MainPageButton : MonoBehaviour, IPointerClickHandler, IPointerDownH
                 animatorComp.Play();
                 isPointerDown = false;
 
-                m_gameController.LoadMainScene();
+                //m_gameController.LoadMainScene();
 
                 // »ØÍË
             }

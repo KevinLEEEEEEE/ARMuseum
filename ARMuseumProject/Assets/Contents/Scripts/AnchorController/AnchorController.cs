@@ -9,8 +9,8 @@ public class EventAnchor
 {
     private RaycastHit hitResult;
     private Vector3 hitDirection;
-    private float offset;
-    private float heightOffset;
+    private readonly float offset;
+    private readonly float heightOffset;
 
     public EventAnchor(RaycastHit res, Vector3 dir, float distanceFromCenter, float handModelOffset, float yAxisOffset)
     {
@@ -55,37 +55,37 @@ public class AnchorController : MonoBehaviour
     public DialogGenerator dialogGenerator;
     public InstructionGenerator instructionGenerator;
     public GameController_Historical gameController;
-    public GlowingOrb glowingOrb;
     public Progress progressUI;
-    public ParticleSystem groundEffect_orbHit;
     public ParticleSystem groundEffect_planeActive;
-    public float distanceFromCenter;
-    public float handModelOffset;
     public float activationRange;
     public float motionThreshold;
+    public float distanceFromCenter;
+    public float handModelOffset;
     public float yAxisOffset;
     public AudioClip audioClip_planeActive;
+    [SerializeField] private AudioClip audioClip_HistoricalEntry;
 
-    private HandState rightHandState;
+    private AudioGenerator audioSource_HistoricalEntry;
     private AudioGenerator audioSource_planeActive;
     private EventAnchor eventAnchor;
     private EventAnchor confirmedEventAnchor;
-    private Action planeActivateInstruction;
+    private HandState rightHandState;
     private Vector3 prePosition;
     private int motionCount;
     private readonly int planeMask = 1 << 8;
-    private enum SceneState
+    private enum AnchorState
     {
         Suspend,
         Ready,
         Counting,
         Anchored,
     }
-    private SceneState currentState;
+    private AnchorState currentState;
 
     void Start()
     {
         audioSource_planeActive = new AudioGenerator(gameObject, audioClip_planeActive);
+        audioSource_HistoricalEntry = new AudioGenerator(gameObject, audioClip_HistoricalEntry, false, false, 0.5f);
         rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
 
         ResetAll();
@@ -93,9 +93,17 @@ public class AnchorController : MonoBehaviour
 
     public void ResetAll()
     {
-        currentState = SceneState.Suspend;
+        currentState = AnchorState.Suspend;
         eventAnchor = null;
         motionCount = -1;
+
+        SetRootsActive(false);
+    }
+
+    private void SetRootsActive(bool state)
+    {
+        foreach (Transform trans in transform)
+            trans.gameObject.SetActive(state);
     }
 
     public void Init()
@@ -105,86 +113,80 @@ public class AnchorController : MonoBehaviour
 
     private async void OpeningScene()
     {
-        glowingOrb.ShowBody();
-        glowingOrb.ShowTrail();
-
-        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
-
-        dialogGenerator.GenerateDialog("你将体验青铜器的铸造过程");
-
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1.5), ignoreTimeScale: false);
-
-        dialogGenerator.GenerateDialog("现在，稍微退后\n看向木板......");
-
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2), ignoreTimeScale: false);
-
+        SetRootsActive(true);
         gameController.StartAmbientSound();
+        gameController.SetAmbientVolumeInSeconds(0.4f, 4);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration / 2), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
 
-        planeActivateInstruction = instructionGenerator.GenerateInstruction("贴住手印", "将掌心贴在木板手印处，保持两秒");
+        audioSource_HistoricalEntry.Play();
+        audioSource_HistoricalEntry.SetVolumeInSeconds(1, 4);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(18), ignoreTimeScale: false);
+
+        dialogGenerator.GenerateDialog("即将开启青铜器穿越之旅");
+
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
+
+        dialogGenerator.GenerateDialog("现在，稍微退后\n看向平面...");
+
+        await UniTask.Delay(TimeSpan.FromSeconds(4.5), ignoreTimeScale: false);
+
+        instructionGenerator.GenerateInstruction("贴住手印", "将手掌贴在平面手印处，保持两秒");
         gameController.StartPlaneHint();
-        currentState = SceneState.Ready;
+        currentState = AnchorState.Ready;
     }
 
     private async void EndingScene()
     {
-        currentState = SceneState.Anchored;
-        planeActivateInstruction();
-
+        currentState = AnchorState.Anchored;
+        
         gameController.StopPlaneHint();
-        gameController.ShowGroundMask();
+        gameController.SetEventAnchor(confirmedEventAnchor);
 
         audioSource_planeActive.Play();
+        instructionGenerator.HideInstruction();
 
         await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
         dialogGenerator.GenerateDialog("已定位目标...可以收回手掌");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
-        gameController.SetEventAnchor(confirmedEventAnchor);
-        glowingOrb.HideTrail();
-        glowingOrb.FadeOut();
-
-        await UniTask.Delay(TimeSpan.FromSeconds(4.47f), ignoreTimeScale: false);
-
-        groundEffect_orbHit.Play();
-
-        await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
-
-        currentState = SceneState.Suspend;
-        glowingOrb.gameObject.SetActive(false);
-        gameController.HideGroundMask();
+        currentState = AnchorState.Suspend;
+        audioSource_planeActive.Unload();
+        audioSource_HistoricalEntry.Unload();
+        SetRootsActive(false);
         gameController.NextScene();
     }
 
     private void StartActivationTiming()
     {
-        if(currentState == SceneState.Ready)
+        if(currentState == AnchorState.Ready)
         {
-            currentState = SceneState.Counting;
+            currentState = AnchorState.Counting;
             InvokeRepeating(nameof(MotionDetection), 0, 0.5f);
         }
     }
 
     private void StopActivationTiming()
     {
-        if (currentState == SceneState.Counting)
+        if (currentState == AnchorState.Counting)
         {
-            currentState = SceneState.Ready;
+            currentState = AnchorState.Ready;
             motionCount = -1;
-            CancelInvoke("MotionDetection");  
+            CancelInvoke(nameof(MotionDetection));  
         }
     }
 
     private void MotionDetection()
     {
         Vector3 motionAnchor = rightHandState.GetJointPose(HandJointID.Palm).position;
+        NRDebugger.Info("[AnchorController] Motion counting: " + motionCount);
 
         if (motionCount == -1)
         {
-            motionCount++;
+            prePosition = motionAnchor;
         } else if (motionCount == 1)
         {
             progressUI.StartRadialProgress();
@@ -192,37 +194,34 @@ public class AnchorController : MonoBehaviour
             groundEffect_planeActive.transform.parent.forward = eventAnchor.GetHitDirection();
             groundEffect_planeActive.Play();
             gameController.SetAmbientVolumeInSeconds(1, 2);
-            motionCount++;
         } else if (motionCount == 4) {
             confirmedEventAnchor = eventAnchor;
-            motionCount++;
         } else if (motionCount == 5)
         {
             StopActivationTiming();
             EndingScene();
-        } else
-        {
-            if (Vector3.Distance(motionAnchor, prePosition) <= motionThreshold)
-            {
-                motionCount++;
-            }
-            else
-            {
-                motionCount = -1;
-                confirmedEventAnchor = null;
-                progressUI.ResetRadialProgress();
-                groundEffect_planeActive.Stop();
-                gameController.SetAmbientVolumeInSeconds(0, 1);
-            }
         }
 
-        NRDebugger.Info("[AnchorController] Motion counting: " + motionCount);
+        // 判断手掌移动距离是否超出阈值
+        if (Vector3.Distance(motionAnchor, prePosition) <= motionThreshold)
+        {
+            motionCount++;
+        }
+        else
+        {
+            motionCount = -1;
+            confirmedEventAnchor = null;
+            progressUI.ResetRadialProgress();
+            groundEffect_planeActive.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            gameController.SetAmbientVolumeInSeconds(0.4f, 1);
+        }
+        
         prePosition = motionAnchor;
     }
 
      void Update()
     {
-        if (currentState == SceneState.Suspend || currentState == SceneState.Anchored)
+        if (currentState == AnchorState.Suspend || currentState == AnchorState.Anchored)
         {
             return;
         }
@@ -230,7 +229,6 @@ public class AnchorController : MonoBehaviour
         if (!rightHandState.isTracked)
         {
             StopActivationTiming();
-            glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
             return;
         }
 
@@ -240,18 +238,14 @@ public class AnchorController : MonoBehaviour
 
         if (Physics.Raycast(new Ray(laserPoint, Vector3.down), out var hitResult, activationRange, planeMask))
         {
-            // 如果右手MiddleTip与目标平面的距离在激活范围内
-            StartActivationTiming();
-
             float heightOffset = Application.isEditor ? 0 : yAxisOffset;
             eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset, heightOffset);
-            glowingOrb.SetEventAnchor(confirmedEventAnchor ?? eventAnchor);
-            glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.planeAnchor);
+            StartActivationTiming();
         }
         else
         {
+            eventAnchor = null;
             StopActivationTiming();
-            glowingOrb.SetOrbTarget(GlowingOrb.OrbTarget.centerCamera);
         }
     }
 }
