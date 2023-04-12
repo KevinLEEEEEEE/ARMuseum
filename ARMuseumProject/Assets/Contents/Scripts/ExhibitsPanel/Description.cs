@@ -1,29 +1,71 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
+using System;
+
+[Serializable]
+public class DescriptionData
+{
+    public string exhibitID;
+    public string title;
+    public string content;
+}
 
 public class Description : MonoBehaviour
 {
     [SerializeField] private GameController m_GameController;
-    private GameObject root;
+    [SerializeField] private TextMeshProUGUI title;
+    [SerializeField] private TextMeshProUGUI content;
+    [SerializeField] private DescriptionData[] descriptionData;
 
-    void Start()
+    private string currentID;
+
+    void Awake()
     {
-        root = transform.GetChild(0).gameObject;
+        m_GameController.BeginTourEvent += ShowRoot;
+        m_GameController.EndTourEvent += HideRoot;
 
-        m_GameController.BeginTourEvent += BeginTourEventHandler;
-        m_GameController.EndTourEvent += EndTourEventHandler;
-
-        EndTourEventHandler();
+        Reset();
     }
 
-    private void BeginTourEventHandler()
+    private void ShowRoot()
     {
-        root.SetActive(true);
+        transform.GetChild(0).gameObject.SetActive(true);
     }
 
-    private void EndTourEventHandler()
+    private void HideRoot()
     {
-        root.SetActive(false);
+        transform.GetChild(0).gameObject.SetActive(false);
+        Reset();
+    }
+
+    private void Reset()
+    {
+        currentID = "";
+        title.text = "";
+        content.text = "";
+    }
+
+    public void HoverExhibit(string id)
+    {
+        foreach(DescriptionData data in descriptionData)
+        {
+            currentID = id;
+
+            if(data.exhibitID == id)
+            {
+                title.text = data.title;
+                content.text = data.content;
+            }
+        }
+    }
+
+    public void ExitExhibit(string id)
+    {
+        if(currentID == id)
+        {
+            Reset();
+        }
     }
 }

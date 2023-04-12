@@ -12,9 +12,9 @@ Shader "ARMuseum/AlwaysVisible" {
             LOD 100
 
             Pass {
-                Cull Off
+           /*     Cull Off
                 ZWrite Off
-                ZTest Always
+                ZTest Always*/
 
                 CGPROGRAM
                 #pragma vertex vert

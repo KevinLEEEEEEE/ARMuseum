@@ -93,6 +93,7 @@ public class GameController : MonoBehaviour
     private void FirstTour()
     {
         firstTour = false;
+        audioSource_CurrentEntry.Stop();
         m_InstructionGenerator.HideInstruction();
     }
 

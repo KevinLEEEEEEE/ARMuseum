@@ -9,7 +9,8 @@ public class ExhibitsPanel : MonoBehaviour
     [SerializeField] private GameController m_GameController;
     [SerializeField] private GrabbablePanel m_GrabbablePanel;
     [SerializeField] private InstructionGenerator m_InstructionGenerator;
-    [SerializeField] private Frame frame;
+    //[SerializeField] private Frame frame;
+    [SerializeField] private Description m_Description;
     [SerializeField] private AudioClip enableExhibitClip;
     [SerializeField] private AudioClip hoverExhibitClip;
     [SerializeField] private AudioClip clickExhibitClip;
@@ -32,6 +33,7 @@ public class ExhibitsPanel : MonoBehaviour
         {
             exhibit.hoverExhibitEvent += HoverExhibitEventHandler;
             exhibit.clickExhibitEvent += ClickExhibitEventHandler;
+            exhibit.exitExhibitEvent += ExitExhibitEventHandler;
         }
     }
 
@@ -56,19 +58,23 @@ public class ExhibitsPanel : MonoBehaviour
     private void BeginTourEventHandler()
     {  
         EnableExhibits();
-        frame.ActiveFrames();
         enableExhibitPlayer.Play();
     }
 
     private void EndTourEventHandler()
     {
         DisableExhibits();
-        frame.InactiveFrames();
     }
 
-    private void HoverExhibitEventHandler()
-    {
+    private void HoverExhibitEventHandler(string exhibitID)
+    { 
+        m_Description.HoverExhibit(exhibitID);
         hoverExhibitPlayer.Play();
+    }
+
+    private void ExitExhibitEventHandler(string exhibitID)
+    {
+        m_Description.ExitExhibit(exhibitID);
     }
 
     private void ClickExhibitEventHandler(string id, Transform trans)

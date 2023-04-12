@@ -2,45 +2,88 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using NRKernal;
+using System;
+using Cysharp.Threading.Tasks;
+
+public enum FrameState
+{
+    Disabled,
+    Enabled,
+    Hightlighted,
+}
 
 public class Frame : MonoBehaviour
 {
-    public void ActiveFrames()
+    [SerializeField] private GameController m_GameController;
+    [SerializeField] private GameObject[] frames;
+
+    //private string currentExhibitID;
+    private FrameState state;
+
+    private void Awake()
     {
-        SwitchFrameState(true);
+        m_GameController.FoundObserverEvent += FoundObserverEventHandler;
+
+        Reset();
     }
 
-    public void InactiveFrames()
+    private void Reset()
     {
-        SwitchFrameState(false);
-    }
+        state = FrameState.Disabled;
 
-    public void HightlightFrames()
-    {
-        foreach (Transform child in transform)
+        foreach (GameObject obj in frames)
         {
-            child.GetChild(0).GetComponent<Animation>().Play("HightlightCorner-" + child.name);
+            obj.SetActive(false);
         }
     }
 
-    public void RestoreFrames()
+    private async void FoundObserverEventHandler()
     {
-        foreach (Transform child in transform)
+        if(state == FrameState.Disabled)
         {
-            child.GetChild(0).transform.localPosition = new Vector3(0, 0, 0);
+            state = FrameState.Enabled;
+
+            foreach (GameObject obj in frames)
+            {
+                obj.SetActive(true);
+                obj.GetComponent<Animator>().Play("ShowFrame");
+
+                await UniTask.Delay(TimeSpan.FromSeconds(0.5), ignoreTimeScale: false);
+            }
         }
     }
 
-    private void SwitchFrameState(bool state)
-    {
-        foreach(Transform child in transform)
-        {
-            child.gameObject.SetActive(state);
-        }
-    }
+    //public void HoverExhibit(string id)
+    //{
+    //    currentExhibitID = id;
 
-    public void ResetAll()
-    {
-        SwitchFrameState(false);
-    }
+    //    if (state == FrameState.Enabled)
+    //    {  
+    //        state = FrameState.Hightlighted;
+
+    //        Debug.Log("hover: " + id);
+
+    //        foreach (GameObject obj in frames)
+    //        {
+    //            obj.GetComponent<Animator>().SetFloat("Speed", 1);
+    //            obj.GetComponent<Animator>().Play("HightlightFrame");
+    //        }
+    //    }
+    //}
+
+    //public void ExitExhibit(string id)
+    //{
+    //    if(state == FrameState.Hightlighted && id == currentExhibitID)
+    //    {
+    //        state = FrameState.Enabled;
+
+    //        Debug.Log("exit: " + id);
+
+    //        foreach (GameObject obj in frames)
+    //        {
+    //            obj.GetComponent<Animator>().SetFloat("Speed", -1);
+    //            obj.GetComponent<Animator>().Play("HightlightFrame");
+    //        }
+    //    }
+    //}
 }

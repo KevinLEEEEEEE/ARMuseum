@@ -7,6 +7,7 @@ using DG.Tweening;
 public class Exhibit : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     public HoverExhibit hoverExhibitEvent;
+    public ExitExhibit exitExhibitEvent;
     public ClickExhibit clickExhibitEvent;
 
     [SerializeField] private Material defaultMaterial;
@@ -61,12 +62,13 @@ public class Exhibit : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     public void OnPointerEnter(PointerEventData eventData)
     {
         HightlightState();
-        hoverExhibitEvent?.Invoke();
+        hoverExhibitEvent?.Invoke(exhibitID);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         EnableState();
+        exitExhibitEvent?.Invoke(exhibitID);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -74,6 +76,7 @@ public class Exhibit : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
         clickExhibitEvent?.Invoke(exhibitID, transform);
     }
 
-    public delegate void HoverExhibit();
+    public delegate void HoverExhibit(string exhibitID);
+    public delegate void ExitExhibit(string exhibitID);
     public delegate void ClickExhibit(string exhibitID, Transform trans);
 }

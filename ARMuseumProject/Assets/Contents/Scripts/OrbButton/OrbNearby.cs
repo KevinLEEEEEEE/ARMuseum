@@ -47,6 +47,11 @@ public class OrbNearby : MonoBehaviour
 
     void Update()
     {
+        if(!rightHandState.isTracked && !leftHandState.isTracked)
+        {
+            return;
+        }
+
         Vector3 rightHandIndexPosition = rightHandState.GetJointPose(HandJointID.IndexTip).position;
         Vector3 leftHandIndexPosition = leftHandState.GetJointPose(HandJointID.IndexTip).position;
         float rightHandIndexDistance = Vector3.Distance(rightHandIndexPosition, transform.position);

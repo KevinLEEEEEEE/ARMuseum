@@ -17,14 +17,14 @@ public enum InstructionState
 public class InstructionGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject instruction;
-    [SerializeField] private GameObject trail;
+    //[SerializeField] private GameObject trail;
     private Instruction insComp;
-    private ParticleSystem trailParticleComp;
+    //private ParticleSystem trailParticleComp;
     private InstructionState state;
 
     private void Start()
     {
-        trailParticleComp = trail.GetComponent<ParticleSystem>();
+        //trailParticleComp = trail.GetComponent<ParticleSystem>();
         insComp = instruction.GetComponent<Instruction>();
 
         insComp.FadeOutEventListener += FadeOutEventHandler;
@@ -77,22 +77,22 @@ public class InstructionGenerator : MonoBehaviour
         }
     }
  
-    public void GenerateTrail(Vector3 endPoint, float moveDuration, float residenceDuration)
-    {
-        if(!trailParticleComp)
-        {
-            NRDebugger.Error("[InstructionGenerator] Cannot find trail particle component");
-            return;
-        }
+    //public void GenerateTrail(Vector3 endPoint, float moveDuration, float residenceDuration)
+    //{
+    //    if(!trailParticleComp)
+    //    {
+    //        NRDebugger.Error("[InstructionGenerator] Cannot find trail particle component");
+    //        return;
+    //    }
 
-        trailParticleComp.Play();
-        trail.transform.position = instruction.transform.position;
+    //    trailParticleComp.Play();
+    //    trail.transform.position = instruction.transform.position;
 
-        trail.transform.DOMove(endPoint, moveDuration).OnComplete(async () =>  {
-            await UniTask.Delay(TimeSpan.FromSeconds(residenceDuration), ignoreTimeScale: false);
-            trailParticleComp.Stop(false, ParticleSystemStopBehavior.StopEmitting);
-        });
-    }
+    //    trail.transform.DOMove(endPoint, moveDuration).OnComplete(async () =>  {
+    //        await UniTask.Delay(TimeSpan.FromSeconds(residenceDuration), ignoreTimeScale: false);
+    //        trailParticleComp.Stop(false, ParticleSystemStopBehavior.StopEmitting);
+    //    });
+    //}
 
     private void FadeInEventHandler()
     {
