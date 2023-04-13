@@ -48,18 +48,18 @@ public class GameController_Tutorial : MonoBehaviour
     private async void FirstStep()
     {
         fadeInPlayer.Play();
-        firstStepPlayer.Play();
         animatorComp.Play("Step01");
 
-        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
 
+        firstStepPlayer.Play();
         m_MoveWithCamera.enabled = false;
         transform.localEulerAngles = new Vector3(transform.localEulerAngles.x, transform.localEulerAngles.y, 0);
         fadeInPlayer.SetVolumeInSeconds(0.1f, 10);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(17), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(18), ignoreTimeScale: false);
 
-        m_InstructionGenerator.GenerateInstruction("如何激活按钮", "张开手掌，指向目标，做「捏住-松开」动作");
+        m_InstructionGenerator.GenerateInstruction("如何激活按钮", "五指张开，指向目标，做「捏住-松开」动作");
 
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 

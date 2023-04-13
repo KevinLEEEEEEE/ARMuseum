@@ -9,7 +9,6 @@ public class ExhibitsPanel : MonoBehaviour
     [SerializeField] private GameController m_GameController;
     [SerializeField] private GrabbablePanel m_GrabbablePanel;
     [SerializeField] private InstructionGenerator m_InstructionGenerator;
-    //[SerializeField] private Frame frame;
     [SerializeField] private Description m_Description;
     [SerializeField] private AudioClip enableExhibitClip;
     [SerializeField] private AudioClip hoverExhibitClip;

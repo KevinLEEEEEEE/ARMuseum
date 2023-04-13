@@ -3,7 +3,7 @@
     "m_SelectedPackage": {
         "deviceId": "192.168.31.38:6666",
         "name": "com.Aillo.ARMuseum",
-        "processId": 7303,
+        "processId": 18675,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -42,7 +42,7 @@
             "deviceId": "192.168.31.38:6666",
             "name": "ai.nreal.nebula.mainland:space",
             "processId": 6267,
-            "exited": false
+            "exited": true
         },
         {
             "deviceId": "192.168.31.38:6666",
@@ -54,6 +54,18 @@
             "deviceId": "192.168.31.38:6666",
             "name": "com.Aillo.ARMuseum",
             "processId": 7303,
+            "exited": true
+        },
+        {
+            "deviceId": "192.168.31.38:6666",
+            "name": "ai.nreal.nebula.mainland:space",
+            "processId": 18271,
+            "exited": false
+        },
+        {
+            "deviceId": "192.168.31.38:6666",
+            "name": "com.Aillo.ARMuseum",
+            "processId": 18675,
             "exited": false
         }
     ],

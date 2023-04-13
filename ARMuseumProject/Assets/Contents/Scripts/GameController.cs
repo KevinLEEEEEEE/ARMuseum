@@ -61,7 +61,7 @@ public class GameController : MonoBehaviour
         // 到特定节点仍然未开启展板
         if(firstTour)
         {
-            m_InstructionGenerator.GenerateInstruction("开始探索", "激活「开始探索」按钮，查看更多内容");
+            m_InstructionGenerator.GenerateInstruction("开始探索", "使用「捏」手势，激活「开始探索」按钮");
         }
     }
 

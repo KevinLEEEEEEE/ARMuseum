@@ -48,42 +48,8 @@ public class Frame : MonoBehaviour
                 obj.SetActive(true);
                 obj.GetComponent<Animator>().Play("ShowFrame");
 
-                await UniTask.Delay(TimeSpan.FromSeconds(0.5), ignoreTimeScale: false);
+                await UniTask.Delay(TimeSpan.FromSeconds(0.7), ignoreTimeScale: false);
             }
         }
     }
-
-    //public void HoverExhibit(string id)
-    //{
-    //    currentExhibitID = id;
-
-    //    if (state == FrameState.Enabled)
-    //    {  
-    //        state = FrameState.Hightlighted;
-
-    //        Debug.Log("hover: " + id);
-
-    //        foreach (GameObject obj in frames)
-    //        {
-    //            obj.GetComponent<Animator>().SetFloat("Speed", 1);
-    //            obj.GetComponent<Animator>().Play("HightlightFrame");
-    //        }
-    //    }
-    //}
-
-    //public void ExitExhibit(string id)
-    //{
-    //    if(state == FrameState.Hightlighted && id == currentExhibitID)
-    //    {
-    //        state = FrameState.Enabled;
-
-    //        Debug.Log("exit: " + id);
-
-    //        foreach (GameObject obj in frames)
-    //        {
-    //            obj.GetComponent<Animator>().SetFloat("Speed", -1);
-    //            obj.GetComponent<Animator>().Play("HightlightFrame");
-    //        }
-    //    }
-    //}
 }

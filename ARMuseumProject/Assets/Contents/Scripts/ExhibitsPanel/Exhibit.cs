@@ -30,7 +30,6 @@ public class Exhibit : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     public void EnableExhibit()
     {
         root.SetActive(true);
-        colliderComp.enabled = true;
         EnableState();
     }
 
@@ -48,9 +47,12 @@ public class Exhibit : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
     }
 
     private void EnableState()
-    { 
+    {
         rendererComp.material = defaultMaterial;
-        root.transform.DOLocalMove(new Vector3(0, 0, 0), 0.5f);
+        root.transform.DOLocalMove(new Vector3(0, 0, 0), 0.5f).OnComplete(() =>
+        {
+            colliderComp.enabled = true;
+        });
     }
 
     private void DisableState()
@@ -67,7 +69,11 @@ public class Exhibit : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        EnableState();
+        if(colliderComp.enabled)
+        {
+            EnableState();
+        }
+
         exitExhibitEvent?.Invoke(exhibitID);
     }
 

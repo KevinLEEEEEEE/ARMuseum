@@ -38,6 +38,11 @@ public class GrabbableExhibit : MonoBehaviour
         m_NRGrabbableObject.OnGrabEnded += GrabEndEventHandler;
     }
 
+    private void Start()
+    {
+        Reset();
+    }
+
     public void Reset()
     {
         DisableGrabbableExhibit();

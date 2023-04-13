@@ -1,111 +1,73 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NRKernal.NRExamples;
-using NRKernal;
 using UnityEngine.SceneManagement;
 using System;
 using Cysharp.Threading.Tasks;
+using TMPro;
 
 public class Menu : MonoBehaviour
 {
-    [SerializeField] InstructionGenerator m_InstructionGenerator;
-    [SerializeField] InteractionHint m_InteractionHint;
-    [SerializeField] private AudioClip buttonHoverClip;
-    [SerializeField] private AudioClip buttonClickClip;
-    [SerializeField] private Transform[] trailTarget;
+    [SerializeField] private string[] overview;
+    [SerializeField] private TextMeshProUGUI textMesh;
+    [SerializeField] private AudioClip fadeInClip;
 
-    private AudioGenerator buttonHoverAudio;
-    private AudioGenerator buttonClickAudio;
-    private string targetSceneName;
-    private Action instructionHandler;
+    private AudioGenerator fadeInPlayer;
+    private Animator animatorComp;
+    private int currentID = -1;
+
+    private void Awake()
+    {
+        animatorComp = transform.GetComponent<Animator>();
+        fadeInPlayer = new AudioGenerator(gameObject, fadeInClip, false, false, 0.35f);
+        fadeInPlayer.SetPinch(1.2f);
+
+        textMesh.gameObject.SetActive(false);
+    }
 
     private void Start()
     {
-        buttonHoverAudio = new AudioGenerator(gameObject, buttonHoverClip);
-        buttonClickAudio = new AudioGenerator(gameObject, buttonClickClip);
+        animatorComp.Play("MenuFadeIn");
+        fadeInPlayer.Play();
+    }
 
-        PlayerData.Scene1Entry++;
+    public void PointEnterEventHandler(int index)
+    {
+        currentID = index;
+        textMesh.gameObject.SetActive(true);
+        textMesh.text = overview[index];
+    }
+
+    public void PointExitEventHandler(int index)
+    {
+        if(currentID == index)
+        {
+            textMesh.gameObject.SetActive(false);
+            currentID = index;
+        }
     }
 
     public void LoadScene1()
     {
-        ButtonClick();
         LoadScene("CurrentWorldScene");
     }
 
     public void LoadScene2()
     {
-        ButtonClick();
         LoadScene("HistoricalWorldScene");
     }
 
-    public void OfflineMode()
+    public void LoadGestureTutorial()
     {
-        ButtonClick();
-        NRDebugger.Info("[Menu] Offline mode is under construction");
+        LoadScene("GestureTutorial");
     }
 
-    public void AdvancedSetting()
+    private async void LoadScene(string name)
     {
-        ButtonClick();
-        NRDebugger.Info("[Menu] Advanced setting is under construction");
-    }
+        animatorComp.Play("MenuFadeOut");
 
-    public void PlayButtonHoverAudio()
-    {
-        buttonHoverAudio.Play();
-    }
+        await UniTask.Delay(TimeSpan.FromSeconds(5), ignoreTimeScale: false);
 
-    public void PlayButtonClickAudio()
-    {
-        buttonClickAudio.Play();
-    }
-
-    private void ButtonClick()
-    {
-        PlayButtonClickAudio();
-        StopInstruction(); 
-    }
-
-    private void LockPosition()
-    {
-        NRDebugger.Info("[Menu] Menu position locked");
-        transform.GetComponentInParent<MoveWithCamera>().enabled = false;
-    }
-
-    private void FadeInComplete()
-    {
-        StartInstruction();
-    }
-
-    private void FadeOutComplete()
-    {
-        SceneManager.LoadScene(targetSceneName);
-    }
-
-    private void LoadScene(string name)
-    {
-        targetSceneName = name;
-        transform.GetComponent<Animation>().Play("MenuFadeOut");
-    }
-
-    private void StartInstruction()
-    {
-        if (PlayerData.Scene1Entry == 1)
-        {
-            instructionHandler = m_InstructionGenerator.GenerateInstruction("选择章节", "用手势进入对应章节");
-            m_InteractionHint.StartHintLoop();
-        }
-    }
-
-    private void StopInstruction()
-    {
-        if (PlayerData.Scene1Entry == 1)
-        {
-            m_InteractionHint.StopHintLoop();
-        }
-
-        if (instructionHandler != null) instructionHandler();
+        SceneManager.LoadScene(name);
     }
 }
