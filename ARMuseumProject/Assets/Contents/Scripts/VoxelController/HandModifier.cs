@@ -207,8 +207,6 @@ public class HandModifier : MonoBehaviour
 }
 
 
-
-
 //private Vector3[] GetSphereDirections(int numDirections)
 //{
 //    var pts = new Vector3[numDirections];

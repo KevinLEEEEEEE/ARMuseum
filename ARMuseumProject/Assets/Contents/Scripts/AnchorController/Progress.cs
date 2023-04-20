@@ -16,7 +16,7 @@ public class Progress : MonoBehaviour
     private Animation animePlayer;
     private bool isActive = false;
 
-    private void Start()
+    private void Awake()
     {
         targetHandState = NRInput.Hands.GetHandState(followHand);
         animePlayer = transform.GetComponent<Animation>();

@@ -16,15 +16,19 @@ public enum ClockState
 
 public class ClockController : MonoBehaviour
 {
-    [SerializeField] private GameController_Historical m_gameController;
-    [SerializeField] private DialogGenerator m_dialogGenerator;
-    [SerializeField] private InstructionGenerator m_instructionGenerator;
+    [SerializeField] private GameController_Historical m_GameController;
+    [SerializeField] private DialogGenerator m_DialogGenerator;
+    [SerializeField] private InstructionGenerator m_InstructionGenerator;
     [SerializeField] private AdvancedDissolvePropertiesController m_DissolveController;
     [SerializeField] private GameObject fractureRoot;
     [SerializeField] private RenderTexture renderTexComp;
     [SerializeField] private VideoPlayer videoPlayerComp;
     [SerializeField] private AudioSource audioSourceComp;
+    [SerializeField] private AudioClip fadeOutClip01;
+    [SerializeField] private AudioClip fadeOutClip02;
 
+    private AudioGenerator fadeOutPlayer01;
+    private AudioGenerator fadeOutPlayer02;
     private HandState rightHandState;
     private HandState leftHandState;
     private Animator animatorComp;
@@ -63,18 +67,21 @@ public class ClockController : MonoBehaviour
 
     public async void Init()
     {
+        fadeOutPlayer01 = new AudioGenerator(gameObject, fadeOutClip01);
+        fadeOutPlayer02 = new AudioGenerator(gameObject, fadeOutClip02);
+
         await UniTask.NextFrame();
 
         SetRootsActive(true);
         SetAnimatorEnable(true);
 
-        m_dialogGenerator.GenerateDialog("它见证了华夏文明的历程");
+        m_DialogGenerator.GenerateDialog("它将见证华夏文明千年历程");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
-        m_instructionGenerator.GenerateInstruction("握拳暂停", "伸手握拳「暂停」\n松开拳头「恢复」", 5);
+        m_InstructionGenerator.GenerateInstruction("握拳暂停", "伸手握拳「暂停」\n松开拳头「恢复」", 7);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(6.5), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
 
         state = ClockState.Playing;
         videoPlayerComp.Play();
@@ -87,12 +94,21 @@ public class ClockController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
-        m_dialogGenerator.GenerateDialog("青铜时代的光辉已然暗淡");
-        m_gameController.SetEnvLightIntensityInSeconds(0.2f, 7f);
+        fadeOutPlayer01.Play();
 
-        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
+        await UniTask.Delay(TimeSpan.FromSeconds(1.4), ignoreTimeScale: false);
 
-        m_dialogGenerator.GenerateDialog("亘古的记忆化为尘土");
+        m_DialogGenerator.GenerateDialog("青铜的光辉已然暗淡");
+        m_GameController.SetEnvLightIntensityInSeconds(0.2f, 7f);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration - 0.5f), ignoreTimeScale: false);
+
+        fadeOutPlayer02.Play();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(1.45), ignoreTimeScale: false);
+
+        m_DialogGenerator.GenerateDialog("亘古的记忆化为尘土");
+        m_GameController.ShowGroundMask();
         animatorComp.Play("ClockFadeOut");
 
         // 1s后碎块逐渐消散
@@ -106,7 +122,8 @@ public class ClockController : MonoBehaviour
 
     public async void ClockFadeOutComplete()
     {
-        m_gameController.NextScene();
+        m_GameController.StopAmbientSound();
+        m_GameController.NextScene();
 
         await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 

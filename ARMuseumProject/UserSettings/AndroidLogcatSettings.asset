@@ -1,9 +1,9 @@
 {
-    "m_SelectedDeviceId": "192.168.31.38:6666",
+    "m_SelectedDeviceId": "R28M30GJHYB",
     "m_SelectedPackage": {
-        "deviceId": "192.168.31.38:6666",
-        "name": "com.Aillo.ARMuseum",
-        "processId": 18675,
+        "deviceId": "",
+        "name": "",
+        "processId": 0,
         "exited": false
     },
     "m_SelectedPriority": 0,
@@ -67,6 +67,30 @@
             "name": "com.Aillo.ARMuseum",
             "processId": 18675,
             "exited": false
+        },
+        {
+            "deviceId": "R28M30GJHYB",
+            "name": "com.Aillo.ARMuseum",
+            "processId": 26263,
+            "exited": true
+        },
+        {
+            "deviceId": "R28M30GJHYB",
+            "name": "com.Aillo.ARMuseum",
+            "processId": 30108,
+            "exited": true
+        },
+        {
+            "deviceId": "R28M30GJHYB",
+            "name": "com.sec.android.app.launcher",
+            "processId": 2571,
+            "exited": false
+        },
+        {
+            "deviceId": "R28M30GJHYB",
+            "name": "com.Aillo.ARMuseum",
+            "processId": 984,
+            "exited": true
         }
     ],
     "m_Tags": {

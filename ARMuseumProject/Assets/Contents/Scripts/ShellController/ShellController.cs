@@ -101,7 +101,7 @@ public class ShellController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("将炉温提升至浇筑温度");
+        dialogGenerator.GenerateDialog("升高温度直至铜水融化");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
@@ -116,7 +116,7 @@ public class ShellController : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
         // 给出下一步操作提示
-        instructionGenerator.GenerateInstruction("划开火柴", "划开火柴可以「加速」升温");
+        instructionGenerator.GenerateInstruction("加速升温", "拾起火柴并划开，\n可以「加速」升温");
 
         // 启动物体识别服务
         StartObjectDetectionLoop();

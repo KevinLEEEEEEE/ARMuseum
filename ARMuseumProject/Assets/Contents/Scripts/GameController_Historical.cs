@@ -9,7 +9,6 @@ using Cysharp.Threading.Tasks;
 
 public class GameController_Historical : MonoBehaviour
 {
-    public SceneIndexUpdateEvent sceneIndexUpdateEvent;
     [SerializeField] private VideoCapture _videoCapture;
     [SerializeField] private PlaneDetector _planeDetector;
     [SerializeField] private AudioClip audioClip_ambientWind;
@@ -18,13 +17,10 @@ public class GameController_Historical : MonoBehaviour
     [SerializeField] private Light ambientLightComp;
     [SerializeField] private GameObject[] initMessageListener;
     [SerializeField] private Transform[] eventAnchorListener;
-    [SerializeField] private Transform[] startPointListener;
     [Header("设置编辑器中启动场景的序号(从0开始)")]
     [SerializeField] private int initializeIndex;
     [Header("设置编辑器中场景的初始位置")]
     [SerializeField] private Vector3 customeAnchorPosition;
-    [Header("设置光球的初始位置")]
-    [SerializeField] private Vector3 customeStartPoint;
     [Header("录制设置")]
     [SerializeField] private int startIndex;
     [SerializeField] private int stopIndex;
@@ -43,19 +39,14 @@ public class GameController_Historical : MonoBehaviour
     private string _userID;
     private AudioGenerator audioSource_ambientWind;
 
-    void Start()
+    void Awake()
     {
         audioSource_ambientWind = new AudioGenerator(gameObject, audioClip_ambientWind, true, false, 0, 0.3f);
-        HideGroundMask();
-
-        PlayerData.Scene3Entry++;
 
         if(initializeIndex != 0)
-        {
             SkipPlaneDetectionStep();
-        }
 
-        SetStartPoint(customeStartPoint);
+        HideGroundMask();
         NextScene();
     }
 
@@ -69,14 +60,6 @@ public class GameController_Historical : MonoBehaviour
     {
         DateTime dt = DateTime.Now;
         return string.Format("{0}{1}{2}", dt.Day.ToString("00"), dt.Hour.ToString("00"), dt.Minute.ToString("00"));
-    }
-
-    private void SetStartPoint(Vector3 point)
-    {
-        foreach(Transform trans in startPointListener)
-        {
-            trans.position = point;
-        }
     }
 
     private void SetAnchoredPosition(Vector3 position, Vector3 forward)
@@ -112,28 +95,11 @@ public class GameController_Historical : MonoBehaviour
         if (initializeIndex < initMessageListener.Length)
         {
             NRDebugger.Info(string.Format("[GameController] Init scene NO.{0}", initializeIndex + 1));
-            sceneIndexUpdateEvent?.Invoke(initializeIndex);
             initMessageListener[initializeIndex++].SendMessage("Init");
         } else
         {
             NRDebugger.Info("[GameController] Game end, return to main scene");
-            LoadMainScene();
-        }
-    }
-
-    private async void LoadMainScene()
-    {
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync("BeginScene");
-        asyncLoad.allowSceneActivation = false;
-
-        while (!asyncLoad.isDone)
-        {
-            if (asyncLoad.progress >= 0.9f)
-            {
-                asyncLoad.allowSceneActivation = true;
-            }
-
-            await UniTask.Yield();
+            SceneManager.LoadSceneAsync("BeginScene");
         }
     }
 
@@ -198,6 +164,4 @@ public class GameController_Historical : MonoBehaviour
     {
         groundMask.SetActive(false);
     }
-
-    public delegate void SceneIndexUpdateEvent(int index);
 }

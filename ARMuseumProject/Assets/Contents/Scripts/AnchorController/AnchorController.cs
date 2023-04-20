@@ -82,7 +82,7 @@ public class AnchorController : MonoBehaviour
     }
     private AnchorState currentState;
 
-    void Start()
+    void Awake()
     {
         audioSource_planeActive = new AudioGenerator(gameObject, audioClip_planeActive);
         audioSource_HistoricalEntry = new AudioGenerator(gameObject, audioClip_HistoricalEntry, false, false, 0.5f);
@@ -124,7 +124,7 @@ public class AnchorController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(18), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("即将开启青铜器穿越之旅");
+        dialogGenerator.GenerateDialog("即将开启青铜穿越之旅");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
@@ -132,7 +132,7 @@ public class AnchorController : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(4.5), ignoreTimeScale: false);
 
-        instructionGenerator.GenerateInstruction("贴住手印", "将手掌贴在平面手印处，保持两秒");
+        instructionGenerator.GenerateInstruction("贴住手印", "将手掌贴在平面手印处，并保持两秒");
         gameController.StartPlaneHint();
         currentState = AnchorState.Ready;
     }

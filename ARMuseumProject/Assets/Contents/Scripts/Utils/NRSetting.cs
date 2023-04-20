@@ -7,8 +7,23 @@ public class NRSetting : MonoBehaviour
 {
     [SerializeField] private bool raycastersActive;
 
-    void Start()
+    void Awake()
+    {
+        Reset();
+    }
+
+    public void Reset()
     {
         NRInput.RaycastersActive = raycastersActive;
+    }
+
+    public void EnableRaycaster()
+    {
+        NRInput.RaycastersActive = true;
+    }
+
+    public void DisableRaycaster()
+    {
+        NRInput.RaycastersActive = false;
     }
 }

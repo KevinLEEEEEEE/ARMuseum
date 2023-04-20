@@ -91,6 +91,22 @@ PrefabInstance:
       propertyPath: m_Controller
       value: 
       objectReference: {fileID: 9100000, guid: c0e9e89fb69443e4cb8c7be8de76375e, type: 2}
+    - target: {fileID: 13700000, guid: 1dd838197b9c97f4bae6291d65446d89, type: 3}
+      propertyPath: m_CastShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 13700000, guid: 1dd838197b9c97f4bae6291d65446d89, type: 3}
+      propertyPath: m_ReceiveShadows
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 13700000, guid: 1dd838197b9c97f4bae6291d65446d89, type: 3}
+      propertyPath: m_LightProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 13700000, guid: 1dd838197b9c97f4bae6291d65446d89, type: 3}
+      propertyPath: m_ReflectionProbeUsage
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1dd838197b9c97f4bae6291d65446d89, type: 3}
 --- !u!4 &7772422766622430800 stripped

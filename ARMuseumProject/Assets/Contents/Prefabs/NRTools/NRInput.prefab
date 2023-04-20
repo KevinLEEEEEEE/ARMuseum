@@ -963,7 +963,7 @@ Transform:
   m_GameObject: {fileID: 6803677747909756255}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.022, y: 0.022, z: 0.022}
+  m_LocalScale: {x: 0.022999998, y: 0.022999998, z: 0.022999998}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6801745650206268289}
@@ -1152,7 +1152,7 @@ Transform:
   m_GameObject: {fileID: 6803677748454395142}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.022, y: 0.022, z: 0.022}
+  m_LocalScale: {x: 0.022999998, y: 0.022999998, z: 0.022999998}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 6801599081191903275}
@@ -1806,10 +1806,10 @@ MonoBehaviour:
   modelsGroups:
   - rightHandModel: {fileID: 6804682896295194105}
     leftHandModel: {fileID: 6804683722440641547}
-    activeEnv: 1
+    activeEnv: 0
   - rightHandModel: {fileID: 6803677747977248804}
     leftHandModel: {fileID: 6803677748705347947}
-    activeEnv: 0
+    activeEnv: 1
 --- !u!1 &6804422107590015373
 GameObject:
   m_ObjectHideFlags: 0
@@ -2482,6 +2482,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: GestureSimpleTip_L
       objectReference: {fileID: 0}
+    - target: {fileID: 1074428498397130, guid: 98cddc6b51ec7804bbbd0bb6384917f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4353827911608580, guid: 98cddc6b51ec7804bbbd0bb6384917f6, type: 3}
       propertyPath: m_RootOrder
       value: 2
@@ -2550,6 +2554,10 @@ PrefabInstance:
     - target: {fileID: 1074428498397130, guid: 98cddc6b51ec7804bbbd0bb6384917f6, type: 3}
       propertyPath: m_Name
       value: GestureSimpleTip_R
+      objectReference: {fileID: 0}
+    - target: {fileID: 1074428498397130, guid: 98cddc6b51ec7804bbbd0bb6384917f6, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4353827911608580, guid: 98cddc6b51ec7804bbbd0bb6384917f6, type: 3}
       propertyPath: m_RootOrder

@@ -19,7 +19,7 @@ public class Menu : MonoBehaviour
     private void Awake()
     {
         animatorComp = transform.GetComponent<Animator>();
-        fadeInPlayer = new AudioGenerator(gameObject, fadeInClip, false, false, 0.35f);
+        fadeInPlayer = new AudioGenerator(gameObject, fadeInClip, false, false, 0.6f);
         fadeInPlayer.SetPinch(1.2f);
 
         textMesh.gameObject.SetActive(false);

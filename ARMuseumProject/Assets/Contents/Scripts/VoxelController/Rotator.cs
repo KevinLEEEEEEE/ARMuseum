@@ -12,10 +12,12 @@ public class Rotator : MonoBehaviour
     private bool isEntering;
     private bool isRotatingCondition;
 
-    void Start()
+    void Awake()
     {
         m_HandRotator = transform.GetComponentInParent<HandRotator>();
         handState = NRInput.Hands.GetHandState(handEnum);
+
+        Reset();
     }
 
     private void Reset()
@@ -45,7 +47,7 @@ public class Rotator : MonoBehaviour
         // 开始旋转的条件：接触物体、不处于旋转状态且处于捏状态
         if (isEntering)
         {
-            if(!isRotatingCondition && IsRotatingGesture())
+            if (!isRotatingCondition && IsRotatingGesture())
             {
                 isRotatingCondition = true;
                 m_HandRotator.StartRotating(handEnum);
