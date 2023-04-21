@@ -76,7 +76,12 @@ public class TextButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         if (!buttonComp.interactable) 
             return;
 
-        if(clickSoundActive)
+        DOTween.Sequence()
+            .Append(root.DOScale(1.5f, 0.1f))
+            .Append(root.DOScale(1f, 0.1f))
+            .Play();
+
+        if (clickSoundActive)
             buttonClickPlayer.Play();
 
         if (needTransition)
