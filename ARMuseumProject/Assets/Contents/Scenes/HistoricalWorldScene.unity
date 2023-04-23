@@ -38589,7 +38589,7 @@ MonoBehaviour:
   dialogGenerator: {fileID: 1660831879}
   instructionGenerator: {fileID: 1976130724}
   m_matchManager: {fileID: 64944514}
-  clip_AncientAmbient: {fileID: 8300000, guid: b485a08d6037633449f366ba31e71dea, type: 3}
+  clip_AncientAmbient: {fileID: 8300000, guid: cba95bd838b9dd54788d419caf87cc67, type: 3}
   clip_shellFadeIn: {fileID: 8300000, guid: 29ff9808b390d4b4bb5658c67950a3ef, type: 3}
   clip_shellBurning: {fileID: 8300000, guid: c83f4418742e2aa4c88523535baa2fff, type: 3}
   clip_shellCasting: {fileID: 8300000, guid: 096307f3b3f70af45b2346efa840eab0, type: 3}
@@ -39426,7 +39426,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1050426021}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e05c010122dafe541b323cc38d0cf9e1, type: 3}
   m_Name: 
@@ -39515,7 +39515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf658aa4c2633ac418a6ccc69ca6d9c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  showFPS: 1
+  showFPS: 0
   FPSTextComp: {fileID: 1274343977}
   showCapturedImage: 0
   _cameraManager: {fileID: 886738554}

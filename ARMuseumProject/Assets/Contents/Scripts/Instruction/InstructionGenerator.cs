@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using NRKernal;
+using NRKernal.NRExamples;
 
 public enum InstructionState
 {
@@ -17,14 +18,14 @@ public enum InstructionState
 public class InstructionGenerator : MonoBehaviour
 {
     [SerializeField] private GameObject instruction;
-    //[SerializeField] private GameObject trail;
+
+    private MoveWithCamera m_MoveWithCamera;
     private Instruction insComp;
-    //private ParticleSystem trailParticleComp;
     private InstructionState state;
 
     private void Start()
     {
-        //trailParticleComp = trail.GetComponent<ParticleSystem>();
+        m_MoveWithCamera = transform.GetComponent<MoveWithCamera>();
         insComp = instruction.GetComponent<Instruction>();
 
         insComp.FadeOutEventListener += FadeOutEventHandler;
@@ -36,6 +37,7 @@ public class InstructionGenerator : MonoBehaviour
     private void Reset()
     {
         instruction.SetActive(false);
+        m_MoveWithCamera.enabled = false;
         state = InstructionState.Ready;
     }
 
@@ -46,26 +48,35 @@ public class InstructionGenerator : MonoBehaviour
 
     public Action GenerateInstruction(string title, string content)
     {
-        if (state != InstructionState.Ready) return () => { };
-
-        state = InstructionState.FadeIn;
-        instruction.SetActive(true);
-        insComp.StartInstruction(title, content);
-
-        return HideInstruction;
+        if (state != InstructionState.Ready)
+        {
+            return () => { };
+        } else
+        {
+            ShowInstruction(title, content);
+            return HideInstruction;
+        }   
     }
 
     public async void GenerateInstruction(string title, string content, float duration)
     {
-        if (state != InstructionState.Ready) return;
+        if (state != InstructionState.Ready) 
+            return;
 
-        state = InstructionState.FadeIn;
-        instruction.SetActive(true);
-        insComp.StartInstruction(title, content);
+        ShowInstruction(title, content);
 
         await UniTask.Delay(TimeSpan.FromSeconds(duration), ignoreTimeScale: false);
 
         HideInstruction();
+    }
+
+    private void ShowInstruction(string title, string content)
+    {
+        state = InstructionState.FadeIn;
+        m_MoveWithCamera.enabled = true;
+        m_MoveWithCamera.ResetTransform();
+        instruction.SetActive(true);
+        insComp.StartInstruction(title, content);
     }
 
     public void HideInstruction()
@@ -76,23 +87,6 @@ public class InstructionGenerator : MonoBehaviour
             state = InstructionState.FadeOut;
         }
     }
- 
-    //public void GenerateTrail(Vector3 endPoint, float moveDuration, float residenceDuration)
-    //{
-    //    if(!trailParticleComp)
-    //    {
-    //        NRDebugger.Error("[InstructionGenerator] Cannot find trail particle component");
-    //        return;
-    //    }
-
-    //    trailParticleComp.Play();
-    //    trail.transform.position = instruction.transform.position;
-
-    //    trail.transform.DOMove(endPoint, moveDuration).OnComplete(async () =>  {
-    //        await UniTask.Delay(TimeSpan.FromSeconds(residenceDuration), ignoreTimeScale: false);
-    //        trailParticleComp.Stop(false, ParticleSystemStopBehavior.StopEmitting);
-    //    });
-    //}
 
     private void FadeInEventHandler()
     {

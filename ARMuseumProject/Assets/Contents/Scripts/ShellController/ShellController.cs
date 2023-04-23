@@ -44,13 +44,6 @@ public class ShellController : MonoBehaviour
         cameraManager = transform.GetComponent<CameraManager>();
         animatorComp = transform.GetComponent<Animator>();
 
-        source_shellFadeIn = new AudioGenerator(gameObject, clip_shellFadeIn);
-        source_shellBurning = new AudioGenerator(gameObject, clip_shellBurning, true, false, 0);
-        source_AncientAmbient = new AudioGenerator(gameObject, clip_AncientAmbient, true);
-        source_shellCasting = new AudioGenerator(gameObject, clip_shellCasting);
-        source_AncientAmbient.SetPinch(0.9f);
-        source_shellCasting.SetPinch(0.92f);
-
         Reset();
     }
 
@@ -81,6 +74,13 @@ public class ShellController : MonoBehaviour
 
     private async void OpeningScene()
     {
+        source_shellFadeIn = new AudioGenerator(gameObject, clip_shellFadeIn);
+        source_shellBurning = new AudioGenerator(gameObject, clip_shellBurning, true, false, 0);
+        source_AncientAmbient = new AudioGenerator(gameObject, clip_AncientAmbient, true);
+        source_shellCasting = new AudioGenerator(gameObject, clip_shellCasting);
+        source_AncientAmbient.SetPinch(0.9f);
+        source_shellCasting.SetPinch(0.92f);
+
         await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
 
         // 播放容器生成动画

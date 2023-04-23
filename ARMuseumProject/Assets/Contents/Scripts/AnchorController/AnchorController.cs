@@ -84,14 +84,11 @@ public class AnchorController : MonoBehaviour
 
     void Awake()
     {
-        audioSource_planeActive = new AudioGenerator(gameObject, audioClip_planeActive);
-        audioSource_HistoricalEntry = new AudioGenerator(gameObject, audioClip_HistoricalEntry, false, false, 0.5f);
         rightHandState = NRInput.Hands.GetHandState(HandEnum.RightHand);
-
-        ResetAll();
+        Reset();
     }
 
-    public void ResetAll()
+    public void Reset()
     {
         currentState = AnchorState.Suspend;
         eventAnchor = null;
@@ -113,6 +110,9 @@ public class AnchorController : MonoBehaviour
 
     private async void OpeningScene()
     {
+        audioSource_planeActive = new AudioGenerator(gameObject, audioClip_planeActive);
+        audioSource_HistoricalEntry = new AudioGenerator(gameObject, audioClip_HistoricalEntry, false, false, 0.5f);
+
         SetRootsActive(true);
         gameController.StartAmbientSound();
         gameController.SetAmbientVolumeInSeconds(0.4f, 4);

@@ -37,9 +37,6 @@ public class VoxelController : MonoBehaviour
         Fraktalia.VoxelGen.SaveSystem.Modules.SaveModule_ByteBuffer_V2.OnDataBufferSaved += VoxelByteBufferSaved;
         orbButton.orbButtonFinishEvent += EndingScene;
 
-        audioSource_voxelAppear = new AudioGenerator(gameObject, audioClip_voxelAppear);
-        audioSource_voxelScale = new AudioGenerator(gameObject, audioClip_voxelScale);
-
         Reset();
     }
 
@@ -64,6 +61,9 @@ public class VoxelController : MonoBehaviour
 
     private async void OpeningScene()
     {
+        audioSource_voxelAppear = new AudioGenerator(gameObject, audioClip_voxelAppear);
+        audioSource_voxelScale = new AudioGenerator(gameObject, audioClip_voxelScale);
+
         // 设置背景音量并播放入场动画声音
         _gameController.SetAmbientVolumeInSeconds(0.4f, 2);
         _gameController.ShowGroundMask();
