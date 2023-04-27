@@ -2,16 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using NRKernal;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
 
 public class GameController : MonoBehaviour
 {
-    [SerializeField] private VideoCapture m_videoCapture;
+    [SerializeField] private VideoCapture m_VideoCapture;
     [SerializeField] private InstructionGenerator m_InstructionGenerator;
-    [SerializeField] private DialogGenerator m_DialogGenerator;
     [SerializeField] private TrackableObserver observer;
     [SerializeField] private Transform observerFollower;
     [SerializeField] AudioClip audioClip_CurrentEntry;
@@ -35,7 +33,7 @@ public class GameController : MonoBehaviour
         observer.FoundEvent += Found;
         observer.LostEvent += Lost;
 
-        m_videoCapture.StartRecord();
+        m_VideoCapture.StartRecord();
     }
 
     private void Found(Vector3 pos, Quaternion qua)
@@ -85,7 +83,6 @@ public class GameController : MonoBehaviour
         } else
         {
             isTouring = false;
-            m_videoCapture.StopRecord();
             EndTourEvent?.Invoke();
         }
     }
@@ -109,6 +106,7 @@ public class GameController : MonoBehaviour
 
     public void LoadMenuScene()
     {
+        m_VideoCapture.StopRecord();
         SceneManager.LoadSceneAsync("BeginScene");
     }
 

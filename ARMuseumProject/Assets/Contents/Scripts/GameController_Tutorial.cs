@@ -11,6 +11,7 @@ public class GameController_Tutorial : MonoBehaviour
 {
     [SerializeField] private InstructionGenerator m_InstructionGenerator;
     [SerializeField] private OrbButton m_OrbButton;
+    [SerializeField] private VideoCapture m_VideoCapture;
     [SerializeField] private VideoClip pinchGestureClip;
     [SerializeField] private VideoClip pointGestureClip;
     [SerializeField] private AudioClip fadeInClip;
@@ -18,7 +19,7 @@ public class GameController_Tutorial : MonoBehaviour
     [SerializeField] private AudioClip secondStepClip;
     [SerializeField] private GameObject videoPlayRoot;
     [SerializeField] private RenderTexture renderTexture;
-
+    
     private MoveWithCamera m_MoveWithCamera;
     private VideoPlayer videoPlayerComp;
     private Animator animatorComp;
@@ -47,6 +48,10 @@ public class GameController_Tutorial : MonoBehaviour
 
     private async void FirstStep()
     {
+        m_VideoCapture.StartRecord();
+
+        await UniTask.NextFrame();
+
         fadeInPlayer.Play();
         animatorComp.Play("Step01");
 
@@ -96,6 +101,10 @@ public class GameController_Tutorial : MonoBehaviour
         animatorComp.Play("Step03");
 
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+
+        m_VideoCapture.StopRecord();
+
+        await UniTask.NextFrame();
 
         SceneManager.LoadScene("BeginScene");
     }

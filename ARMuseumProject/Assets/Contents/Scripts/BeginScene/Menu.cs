@@ -8,17 +8,18 @@ using TMPro;
 
 public class Menu : MonoBehaviour
 {
+    [SerializeField] private VideoCapture m_VideoCapture;
     [SerializeField] private string[] overview;
     [SerializeField] private TextMeshProUGUI textMesh;
     [SerializeField] private AudioClip fadeInClip;
 
     private AudioGenerator fadeInPlayer;
-    private Animator animatorComp;
+    private Animation animationComp;
     private int currentID = -1;
 
     private void Awake()
     {
-        animatorComp = transform.GetComponent<Animator>();
+        animationComp = transform.GetComponent<Animation>();
         fadeInPlayer = new AudioGenerator(gameObject, fadeInClip, false, false, 0.6f);
         fadeInPlayer.SetPinch(1.2f);
 
@@ -27,7 +28,9 @@ public class Menu : MonoBehaviour
 
     private void Start()
     {
-        animatorComp.Play("MenuFadeIn");
+        m_VideoCapture.StartRecord();
+
+        animationComp.Play("MenuFadeIn");
         fadeInPlayer.Play();
     }
 
@@ -64,9 +67,13 @@ public class Menu : MonoBehaviour
 
     private async void LoadScene(string name)
     {
-        animatorComp.Play("MenuFadeOut");
+        animationComp.Play("MenuFadeOut");
 
         await UniTask.Delay(TimeSpan.FromSeconds(5), ignoreTimeScale: false);
+
+        m_VideoCapture.StopRecord();
+
+        await UniTask.NextFrame();
 
         SceneManager.LoadScene(name);
     }

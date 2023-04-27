@@ -22,6 +22,9 @@ public class Dialog : MonoBehaviour
 
     public void StartDialog(string content)
     {
+        audioSource_templeBell.Stop();
+        audioSource_chant.Stop();
+
         audioSource_chant.SetClip(audioClip_chant[Random.Range(0, 3)]);
         textMesh.text = content;
 
