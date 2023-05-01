@@ -14,10 +14,13 @@ public class ExhibitsPanel : MonoBehaviour
     [SerializeField] private AudioClip hoverExhibitClip;
     [SerializeField] private AudioClip clickExhibitClip;
     [SerializeField] private Exhibit[] exhibitsList;
+    [SerializeField] private Vector3 rootPosition;
 
     private AudioGenerator enableExhibitPlayer;
     private AudioGenerator hoverExhibitPlayer;
     private AudioGenerator clickExhibitPlayer;
+
+    private bool firstSelectExhibit = true;
 
     void Awake()
     {
@@ -33,6 +36,11 @@ public class ExhibitsPanel : MonoBehaviour
             exhibit.hoverExhibitEvent += HoverExhibitEventHandler;
             exhibit.clickExhibitEvent += ClickExhibitEventHandler;
             exhibit.exitExhibitEvent += ExitExhibitEventHandler;
+        }
+
+        if(!Application.isEditor)
+        {
+            transform.GetChild(0).localPosition = rootPosition;
         }
     }
 
@@ -76,11 +84,20 @@ public class ExhibitsPanel : MonoBehaviour
         m_Description.ExitExhibit(exhibitID);
     }
 
-    private void ClickExhibitEventHandler(string id, Transform trans)
+    private async void ClickExhibitEventHandler(string id, Transform trans)
     {
         DisableExhibits();
         clickExhibitPlayer.Play();
         m_GrabbablePanel.EnableGrabbaleExhibit(id, trans);
+
+        if (firstSelectExhibit)
+        {
+            firstSelectExhibit = false;
+
+            await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+
+            m_InstructionGenerator.GenerateInstruction("捏住并移动展品", "拇指与食指捏住展品，可进一步探索", 10);
+        }
     }
 
     public void ResumeExhibitPanel()

@@ -47,6 +47,13 @@ public class GameController_Historical : MonoBehaviour
             SkipPlaneDetectionStep();
 
         HideGroundMask();
+    }
+
+    private async void Start()
+    {
+        // 先识别平面，等待三秒再开始
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
+
         NextScene();
     }
 

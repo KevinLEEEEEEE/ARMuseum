@@ -64,7 +64,7 @@ public class GameController_Tutorial : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(18), ignoreTimeScale: false);
 
-        m_InstructionGenerator.GenerateInstruction("如何激活按钮", "五指张开，指向目标，做「捏住-松开」动作");
+        m_InstructionGenerator.GenerateInstruction("如何激活文字按钮", "1.五指张开，指向目标\n2.拇指食指，捏住松开");
 
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 
@@ -87,7 +87,7 @@ public class GameController_Tutorial : MonoBehaviour
 
         await UniTask.Delay(TimeSpan.FromSeconds(13), ignoreTimeScale: false);
 
-        m_InstructionGenerator.GenerateInstruction("如何激活圆球", "伸出食指触碰圆球，并保持2秒");
+        m_InstructionGenerator.GenerateInstruction("如何激活圆球按钮", "1.伸出食指，靠近变亮\n2.点击圆球，保持2秒");
 
         await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
 

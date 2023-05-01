@@ -187,7 +187,7 @@ Material:
     - _Opacity: 1
     - _Parallax: 0.02
     - _RustContrast: 1
-    - _RustIntensity: 2
+    - _RustIntensity: 0
     - _RustMaskTiling: 5
     - _RustMaskWeight: 0.575
     - _RustSecondPattern: 2

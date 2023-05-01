@@ -25,6 +25,7 @@ public class GameController : MonoBehaviour
     private bool isTouring = false;
     private bool firstFound = true;
     private bool firstTour = true;
+    private bool isRecording = false;
 
     void Awake()
     {
@@ -32,12 +33,12 @@ public class GameController : MonoBehaviour
 
         observer.FoundEvent += Found;
         observer.LostEvent += Lost;
-
-        m_VideoCapture.StartRecord();
     }
 
     private void Found(Vector3 pos, Quaternion qua)
     {
+        if (isRecording) return;
+        
         observerFollower.SetPositionAndRotation(pos, qua);
 
         if (!isTracking)
@@ -51,6 +52,14 @@ public class GameController : MonoBehaviour
 
     private async void FirstFound()
     {
+        await UniTask.Delay(TimeSpan.FromSeconds(3), ignoreTimeScale: false);
+
+        // 等待1秒后开始录制
+        isRecording = true;
+        m_VideoCapture.StartRecord();
+
+        await UniTask.Delay(TimeSpan.FromSeconds(1), ignoreTimeScale: false);
+
         firstFound = false;
         audioSource_CurrentEntry.Play();
 

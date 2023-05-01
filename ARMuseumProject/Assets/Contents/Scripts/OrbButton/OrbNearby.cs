@@ -19,10 +19,10 @@ public class OrbNearby : MonoBehaviour
             return _material;
         }
     }
-    private const float MaxDistance = 0.12f;
-    private const float MinDistance = 0.05f;
-    private const float MaxRimPower = 4f;
-    private const float MinRimPower = 2.5f;
+    private const float MaxDistance = 0.2f;
+    private const float MinDistance = 0.02f;
+    private const float MaxRimPower = 5f;
+    private const float MinRimPower = 1f;
 
     private void OnEnable()
     {

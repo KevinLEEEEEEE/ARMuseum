@@ -10,14 +10,12 @@ public class EventAnchor
     private RaycastHit hitResult;
     private Vector3 hitDirection;
     private readonly float offset;
-    private readonly float heightOffset;
 
-    public EventAnchor(RaycastHit res, Vector3 dir, float distanceFromCenter, float handModelOffset, float yAxisOffset)
+    public EventAnchor(RaycastHit res, Vector3 dir, float distanceFromCenter, float handModelOffset)
     {
         hitResult = res;
         hitDirection = dir;
         offset = distanceFromCenter + handModelOffset;
-        heightOffset = yAxisOffset;
     }
 
     public GameObject GetHitObject()
@@ -32,9 +30,7 @@ public class EventAnchor
         Vector3 planeCenter = hitResult.point;
         Plane plane = new(planeNormal, planeCenter);
 
-        Vector3 centerPoint = plane.ClosestPointOnPlane(point);
-
-        return centerPoint + new Vector3(0, heightOffset, 0);
+        return plane.ClosestPointOnPlane(point);
     }
 
     public Vector3 GetHitPoint()
@@ -61,7 +57,6 @@ public class AnchorController : MonoBehaviour
     public float motionThreshold;
     public float distanceFromCenter;
     public float handModelOffset;
-    public float yAxisOffset;
     public AudioClip audioClip_planeActive;
     [SerializeField] private AudioClip audioClip_HistoricalEntry;
 
@@ -200,6 +195,7 @@ public class AnchorController : MonoBehaviour
         {
             StopActivationTiming();
             EndingScene();
+            //motionCount = -1;
         }
 
         // ≈–∂œ ÷’∆“∆∂Øæ‡¿Î «∑Ò≥¨≥ˆ„–÷µ
@@ -238,8 +234,7 @@ public class AnchorController : MonoBehaviour
 
         if (Physics.Raycast(new Ray(laserPoint, Vector3.down), out var hitResult, activationRange, planeMask))
         {
-            float heightOffset = Application.isEditor ? 0 : yAxisOffset;
-            eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset, heightOffset);
+            eventAnchor = new EventAnchor(hitResult, laserDirection, distanceFromCenter, handModelOffset);
             StartActivationTiming();
         }
         else

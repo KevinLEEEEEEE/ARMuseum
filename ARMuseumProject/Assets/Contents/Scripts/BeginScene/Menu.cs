@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using System;
 using Cysharp.Threading.Tasks;
 using TMPro;
+using NRKernal.NRExamples;
 
 public class Menu : MonoBehaviour
 {
@@ -30,6 +31,7 @@ public class Menu : MonoBehaviour
     {
         m_VideoCapture.StartRecord();
 
+        transform.GetComponent<MoveWithCamera>().ResetTransform();
         animationComp.Play("MenuFadeIn");
         fadeInPlayer.Play();
     }

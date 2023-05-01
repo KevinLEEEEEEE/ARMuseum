@@ -31,7 +31,7 @@ public class ShellMatchManager : MonoBehaviour
             return;
 
         isActive = true;
-        holdingHand = rightHandState.isPinching ? rightHandState : leftHandState;
+        holdingHand = leftHandState.isPinching ? leftHandState : rightHandState;
         animatorComp.Play("MatchFadeIn");
     }
 

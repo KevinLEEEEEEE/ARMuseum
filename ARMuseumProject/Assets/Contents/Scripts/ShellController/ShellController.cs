@@ -33,7 +33,6 @@ public class ShellController : MonoBehaviour
     private AudioGenerator source_AncientAmbient;
     private AudioGenerator source_shellCasting;
     private bool canDetectObject;
-    private bool hasObjectDetectedBefore;
     private bool isObjectFound;
 
     void Awake()
@@ -51,7 +50,6 @@ public class ShellController : MonoBehaviour
     {
         isObjectFound = false;
         canDetectObject = true;
-        hasObjectDetectedBefore = false;
         SetRootsActive(false);
         SetAnimatorEnable(false);
     }
@@ -97,11 +95,11 @@ public class ShellController : MonoBehaviour
         // 等待生成动画结束
         await UniTask.Delay(TimeSpan.FromSeconds(6), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("铸模已形成......");
+        dialogGenerator.GenerateDialog("浇筑外壳已成型...");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration + 1), ignoreTimeScale: false);
 
-        dialogGenerator.GenerateDialog("升高温度直至铜水融化");
+        dialogGenerator.GenerateDialog("升高炉温，融化铜水\n并灌入壳中");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
@@ -116,7 +114,7 @@ public class ShellController : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
         // 给出下一步操作提示
-        instructionGenerator.GenerateInstruction("加速升温", "拾起火柴并划开，\n可以「加速」升温");
+        instructionGenerator.GenerateInstruction("点燃真实火柴", "拾起火柴并点燃，\n可以「加速」升温", 8);
 
         // 启动物体识别服务
         StartObjectDetectionLoop();
@@ -126,7 +124,7 @@ public class ShellController : MonoBehaviour
     {
         while (canDetectObject)
         {
-            if (rightHandState.isPinching || leftHnadState.isPinching)
+            if (rightHandState.isTracked || leftHnadState.isTracked)
             {
                 if(lockToBurningState)
                 {
@@ -167,7 +165,7 @@ public class ShellController : MonoBehaviour
 
     public async void ShellCastingFinish()
     {
-        dialogGenerator.GenerateDialog("青铜器浇筑完成");
+        dialogGenerator.GenerateDialog("青铜灌注完成");
 
         await UniTask.Delay(TimeSpan.FromSeconds(DialogGenerator.dialogDuration), ignoreTimeScale: false);
 
@@ -193,12 +191,12 @@ public class ShellController : MonoBehaviour
             // 如果请求成功，则根据结果决定火柴组件是否启用
             if (res.ContainLabel("burning"))
             {
-                NRDebugger.Info(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
+                //NRDebugger.Info(string.Format("[ShellController] Match detected, Receive result in {0} ms.", res.GetCostTime()));
                 TargetObjectFound();
             }
             else
             {
-                NRDebugger.Info(string.Format("[ShellController] Match undetected, Receive result in {0} ms.", res.GetCostTime()));
+                //NRDebugger.Info(string.Format("[ShellController] Match undetected, Receive result in {0} ms.", res.GetCostTime()));
                 TargetObjectLost();
             }
 
@@ -218,12 +216,6 @@ public class ShellController : MonoBehaviour
     {
         if (isObjectFound)
             return;
-
-        if(!hasObjectDetectedBefore)
-        {
-            instructionGenerator.HideInstruction();
-            hasObjectDetectedBefore = true;
-        }
 
         isObjectFound = true;
         FastSpeedMode();
