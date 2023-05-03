@@ -140,7 +140,7 @@ public class ClockController : MonoBehaviour
                 if(state == ClockState.Playing)
                 {
                     state = ClockState.Fading;
-                    audioSourceComp.DOFade(0, 0.3f).OnComplete(() =>
+                    audioSourceComp.DOFade(0, 0.4f).OnComplete(() =>
                     {
                         state = ClockState.Pause;
                         videoPlayerComp.Pause();

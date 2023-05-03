@@ -20,6 +20,8 @@ public class ShellController : MonoBehaviour
     [SerializeField] private AudioClip clip_shellBurning;
     [SerializeField] private AudioClip clip_shellCasting;
     [SerializeField] private float objectDetectionFrequency;
+    [SerializeField] private float defaultSpeed;
+    [SerializeField] private float burningSpeed;
     [SerializeField] private bool lockToBurningState;
 
     private CameraManager cameraManager;
@@ -259,14 +261,14 @@ public class ShellController : MonoBehaviour
     {
         DOTween.To(() => animatorComp.GetFloat("SpeedMultiplier"), (t) => {
             animatorComp.SetFloat("SpeedMultiplier", t);
-        }, 1, 0.6f);
+        }, burningSpeed, 0.6f);
     }
 
     private void NormalSpeedMode()
     {
         DOTween.To(() => animatorComp.GetFloat("SpeedMultiplier"), (t) => {
             animatorComp.SetFloat("SpeedMultiplier", t);
-        }, 0.1f, 0.6f);
+        }, defaultSpeed, 0.6f);
     }
 
     public delegate void ImageRecogResultListener(ImageRecogResult result);

@@ -94,9 +94,9 @@ public class ExhibitsPanel : MonoBehaviour
         {
             firstSelectExhibit = false;
 
-            await UniTask.Delay(TimeSpan.FromSeconds(2), ignoreTimeScale: false);
+            await UniTask.Delay(TimeSpan.FromSeconds(4), ignoreTimeScale: false);
 
-            m_InstructionGenerator.GenerateInstruction("捏住并移动展品", "拇指与食指捏住展品，可进一步探索", 10);
+            m_InstructionGenerator.GenerateInstruction("捏住并移动展品", "拇指与食指捏住展品，可进一步探索", 12);
         }
     }
 
