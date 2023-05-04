@@ -22617,7 +22617,7 @@ MonoBehaviour:
   Server: https://khbpwmcz.lc-cn-n1-shared.com
   Class: UserModelTest2
   debugMode: 0
-  saveUserVoxelData: 1
+  saveUserVoxelData: 0
 --- !u!1 &699214625
 GameObject:
   m_ObjectHideFlags: 0
