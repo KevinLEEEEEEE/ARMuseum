@@ -2345,7 +2345,7 @@ MonoBehaviour:
   - {fileID: 8036845841294773125}
   - {fileID: 1696016988}
   - {fileID: 1090171499}
-  rootPosition: {x: 0, y: -0.015, z: 0}
+  rootPosition: {x: 0, y: -0.01, z: 0}
 --- !u!1 &615039756
 GameObject:
   m_ObjectHideFlags: 0

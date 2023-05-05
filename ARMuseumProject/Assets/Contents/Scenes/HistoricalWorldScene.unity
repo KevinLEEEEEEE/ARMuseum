@@ -10951,7 +10951,7 @@ MonoBehaviour:
   UseInitPoint: 0
   Initpoint: {x: 0, y: 0, z: 0}
   DebugMode: 0
-  instanceID: 28118
+  instanceID: 32292
   IsExtension: 0
   __export_foldout: 0
   __export_savePath: Assets/
@@ -60936,7 +60936,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DetectedPlanePrefab: {fileID: 8185341669080518061, guid: 730bc9d3402e5b640b02bb200abfd007, type: 3}
-  verticalOffset: -0.023
+  verticalOffset: -0.015
 --- !u!1 &1363530510
 GameObject:
   m_ObjectHideFlags: 0
